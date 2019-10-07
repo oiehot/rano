@@ -1,0 +1,12 @@
+{
+    "releaseVersion": 1,
+    "majorVersion": 0,
+    "minorVersion": 0,
+    "buildVersion": 1,
+    "applicationName": "afo",
+    "applicationIdentifier": "com.oiehot.afo",
+    "buildTarget": "android",
+    "scenes": [
+        "/Scenes/GameScene.unity"
+    ]
+}

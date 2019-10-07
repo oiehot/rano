@@ -1,0 +1,2 @@
+#!/bin/bash
+/Applications/Unity3D/2019.2.1f1/Unity.app/Contents/MacOS/Unity -batchmode -quit -nographics -projectPath /project/flappybird -executeMethod "UBuilder.Client.Main" --output /project/flappybird/Archive --config /project/flappybird/Assets/UBuilder/Editor/fb_android.json

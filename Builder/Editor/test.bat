@@ -1,0 +1,4 @@
+@ECHO OFF
+REM "C:/Program Files/Unity/Hub/Editor/2019.2.0f1/Editor/Unity.exe" -batchmode -quit -nographics -logFile d:/project/flappybird/Assets/Editor/UBuilder/log.log -projectPath d:/project/flappybird -executeMethod "UBuilder.Client.Test"
+REM "C:/Program Files/Unity/Hub/Editor/2019.2.0f1/Editor/Unity.exe" -batchmode -quit -nographics -logFile d:/project/flappybird/Assets/UBuilder/Editor/UBuilder.log -projectPath d:/project/flappybird -executeMethod "UBuilder.Client.Main" --config d:/project/flappybird/Assets/UBuilder/Editor/fb_android.json
+"D:/Program Files/Unity/2019.2.0f1/Editor/Unity.exe" -batchmode -quit -nographics -logFile d:/project/flappybird/Assets/UBuilder/Editor/UBuilder.log -projectPath d:/project/flappybird -executeMethod "UBuilder.Client.Main" --config d:/project/flappybird/Assets/UBuilder/Editor/fb_android.json
