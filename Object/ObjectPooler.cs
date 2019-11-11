@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace Rano.Object
 {
-    // ObjectPoolItem 클래스는 Inspector에서 수정이 가능하다.
     [System.Serializable]
     public class ObjectPoolItem
     {
@@ -15,13 +14,13 @@ namespace Rano.Object
 
     public class ObjectPooler : MonoBehaviour
     {
-        public static ObjectPooler instance;
+        public static ObjectPooler Instance;
         public List<ObjectPoolItem> items;
         public List<GameObject> pool;
 
         private void Awake()
         {
-            instance = this;
+            Instance = this;
         }
 
         private void Start()
