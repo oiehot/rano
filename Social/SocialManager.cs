@@ -1,6 +1,8 @@
 ﻿// https://github.com/playgameservices/play-games-plugin-for-unity
 // oiehot@gmail.com
 
+#if RANO_GPGS
+
 namespace Rano.Social {
 	
 	using System.Collections;
@@ -72,7 +74,7 @@ namespace Rano.Social {
 					PlayGamesPlatform.Instance.ReportProgress(gpgsAchievementID, percent, null); // null callback
 					Debug.Log($"SocialManager: UnlockAchievement [{gpgsAchievementID}, {percent}] Requested");
 				#elif UNITY_IOS
-					Social.ReportProgress(iosAchievementID, percent null); // null callback
+					Social.ReportProgress(iosAchievementID, percent, null); // null callback
 					Debug.Log($"SocialManager: UnlockAchievement [{iosAchievementID}, {percent}] Requested");
 				#endif
 			}
@@ -174,3 +176,5 @@ namespace Rano.Social {
 		#endregion
 	}
 }
+
+#endif

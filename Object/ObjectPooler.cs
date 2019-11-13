@@ -37,7 +37,7 @@ namespace Rano.Object
             }
         }
 
-        public GameObject Get(string tag)
+        public GameObject GetByTag(string tag)
         {
             for (int i = 0; i < pool.Count; i++)
             {
