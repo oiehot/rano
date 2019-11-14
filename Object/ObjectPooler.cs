@@ -18,11 +18,6 @@ namespace Rano.Object
         public List<ObjectPoolItem> items;
         public List<GameObject> pool;
 
-        private void Awake()
-        {
-            Instance = this;
-        }
-
         private void Start()
         {
             pool = new List<GameObject>();
@@ -49,6 +44,31 @@ namespace Rano.Object
             foreach (ObjectPoolItem item in items)
             {
                 if (item.gameObject.tag == tag)
+                {
+                    if (item.expandable)
+                    {
+                        GameObject obj = (GameObject)Instantiate(item.gameObject);
+                        obj.SetActive(false);
+                        pool.Add(obj);
+                        return obj;
+                    }
+                }
+            }
+            return null;
+        }
+
+        public GameObject GetByNamePrefix(string prefix)
+        {
+            for (int i = 0; i < pool.Count; i++)
+            {
+                if (!pool[i].activeInHierarchy && pool[i].name.StartsWith(prefix))
+                {
+                    return pool[i];
+                }
+            }
+            foreach (ObjectPoolItem item in items)
+            {
+                if (item.gameObject.name.StartsWith(prefix))
                 {
                     if (item.expandable)
                     {
