@@ -41,13 +41,13 @@ namespace Rano.OS
 			return Run("python", $"{scriptPath} {arg}", out result);
 		}
 		
-		[MenuItem("Rano/Test/Python Test")]
-		public static void PythonTest()
-		{
-			string result;
-			int exitCode = Python("o:/project/afo2/bin/xls2json.py","--xlsPath o:/project/afo2/unity/Assets/Data/StageData01.xlsx --jsonPath o:/project/afo2/unity/Assets/Data/StageData01.json --sheetName StageData", out result);
-			// UnityEngine.Debug.Log(exitCode);
-			// UnityEngine.Debug.Log(result);
-		}
+		// [MenuItem("Rano/Test/Python Test")]
+		// public static void PythonTest()
+		// {
+		// 	string result;
+		// 	int exitCode = Python("o:/project/afo2/bin/xls2json.py","--xlsPath o:/project/afo2/unity/Assets/Data/StageData01.xlsx --jsonPath o:/project/afo2/unity/Assets/Data/StageData01.json --sheetName StageData", out result);
+		// 	// UnityEngine.Debug.Log(exitCode);
+		// 	// UnityEngine.Debug.Log(result);
+		// }
 	}
 }
