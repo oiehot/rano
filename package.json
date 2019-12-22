@@ -1,8 +1,8 @@
 {
 	"name": "com.oiehot.rano",
 	"displayName": "Rano",
-	"version": "0.1.0",
-	"unity": "2019.1",
+	"version": "0.2.0",
+	"unity": "2019.2",
 	"description": "OIEHOT Unity Library",
 	"keywords": [
 		"unity"

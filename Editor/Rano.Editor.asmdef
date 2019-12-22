@@ -1,0 +1,10 @@
+{
+    "name": "Rano.Editor",
+    "references": [
+        "Rano"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}

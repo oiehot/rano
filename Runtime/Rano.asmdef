@@ -1,0 +1,15 @@
+{
+    "name": "Rano",
+    "references": [
+        "GoogleMobileAds",
+        "GooglePlayGames"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}
