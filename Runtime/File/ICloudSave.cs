@@ -1,3 +1,4 @@
+#if false
 namespace Rano.File
 {
     using System;
@@ -9,7 +10,7 @@ namespace Rano.File
 	using GooglePlayGames.BasicApi;
 	using GooglePlayGames.BasicApi.SavedGame;
         
-    interface ICloudSave
+    public interface ICloudSave
     {
         Action<SavedGameRequestStatus, byte[]> OnLoadComplete { get; set; }
         Action<SavedGameRequestStatus, ISavedGameMetadata> OnSaveComplete { get; set; }
@@ -17,3 +18,4 @@ namespace Rano.File
         void Load(string filePath);
     }
 }
+#endif

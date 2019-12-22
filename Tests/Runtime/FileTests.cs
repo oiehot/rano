@@ -1,4 +1,6 @@
-﻿namespace Rano.RuntimeTests
+﻿// TODO: 풀고 작동되게 작업해야함
+#if false
+namespace Rano.RuntimeTests
 {
     using System;
     using System.Collections;
@@ -48,3 +50,4 @@
         }
     }
 }
+#endif

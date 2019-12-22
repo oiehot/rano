@@ -8,7 +8,6 @@ namespace Rano.File
     using UnityEditor;
     using Newtonsoft.Json; // JsonConvert
     
-    // TODO: Module Test Require
     public static class LocalSave
     {
         public static void Save(string filePath, byte[] bytes)
@@ -18,7 +17,6 @@ namespace Rano.File
             System.IO.File.WriteAllBytes(path, bytes);
         }
         
-        // TODO: Test Require
         public static void SaveToJson(string filePath, object data)
         {
             string json = JsonConvert.SerializeObject(data); // JsonConvert (Newtonsoft JSON)
@@ -29,32 +27,23 @@ namespace Rano.File
         public static byte[] Load(string filePath)
         {
             string path = $"{Application.persistentDataPath}/{filePath}";
+            if (!System.IO.File.Exists(path)) return null;
+            
             Debug.Log($"Load from {path}");
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             return bytes;
 
         }
-        
-        // TODO: Test Require
-        public static T Load<T>(string filePath)
+
+        public static T LoadFromJson<T>(string filePath)
         {
+            string path = $"{Application.persistentDataPath}/{filePath}";
+            if (!System.IO.File.Exists(path)) return default(T);
+            
             byte[] bytes;
             bytes = Load(filePath);
             string json = Encoding.UTF8.GetString(bytes);
             return JsonUtility.FromJson<T>(json);
-        }
-        
-        // [MenuItem("Rano/File/Save Test")]
-        // public static void SaveTest()
-        // {
-        //     Save("text.txt", Encoding.UTF8.GetBytes("Hello World!"));
-        // }
-
-        // [MenuItem("Rano/File/Load Test")]
-        // public static void LoadTest()
-        // {
-        //     byte[] bytes = Load("text.txt");
-        //     Debug.Log( Encoding.UTF8.GetString(bytes) );
-        // }        
+        }     
     }
 }
