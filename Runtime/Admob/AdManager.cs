@@ -1,3 +1,5 @@
+#if ADMOB
+
 namespace Rano.Admob
 {
     using System;
@@ -15,3 +17,5 @@ namespace Rano.Admob
         }
     }
 }
+
+#endif

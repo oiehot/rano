@@ -1,3 +1,5 @@
+#if GooglePlayGames
+
 namespace Rano.File
 {
     using System;
@@ -96,3 +98,5 @@ namespace Rano.File
         }
     }
 }
+
+#endif

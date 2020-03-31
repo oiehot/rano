@@ -1,3 +1,7 @@
+// TODO:  뉴튼소프트 플러그인 연계 방법 정리.
+
+#if Newtonsoft_Json
+
 namespace Rano.File
 {
     using System;
@@ -47,3 +51,5 @@ namespace Rano.File
         }     
     }
 }
+
+#endif
