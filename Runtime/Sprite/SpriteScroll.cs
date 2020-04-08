@@ -1,9 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 namespace Rano.Sprite
 {   
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
+    
     [RequireComponent(typeof(SpriteRenderer))]
     public class SpriteScroll : MonoBehaviour
     {
@@ -21,8 +21,13 @@ namespace Rano.Sprite
         void Awake()
         {  
             spriteRenderer = GetComponent<SpriteRenderer>();
-            spriteWidth = spriteRenderer.size.x;
-            spriteHeight = spriteRenderer.size.y;
+            // TEST: Old
+            // spriteWidth = spriteRenderer.size.x;
+            // spriteHeight = spriteRenderer.size.y;
+            
+            // New
+            spriteWidth = spriteRenderer.bounds.max.x - spriteRenderer.bounds.min.x;
+            spriteHeight = spriteRenderer.bounds.max.y - spriteRenderer.bounds.min.y;
         }
         
         void Start()
