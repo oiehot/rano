@@ -1,10 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 namespace Rano.Sprite
 {
-    [RequireComponent(typeof(SpriteRenderer))]
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
+    
+    [RequireComponent(typeof(MeshRenderer))]
     public class SpriteScrollUV : MonoBehaviour
     {
         Material material;
@@ -15,7 +15,7 @@ namespace Rano.Sprite
         
         void Start()
         {
-            material = GetComponent<SpriteRenderer>().material;
+            material = GetComponent<MeshRenderer>().material;
         }
 
         void Update()
