@@ -70,7 +70,7 @@
             {
                 if (item.gameObject.name.StartsWith(prefix))
                 {
-                    if (item.expandable)
+                    if (item.expandable) // TODO: 이게 앞에 있는게 더 최적화가 좋을듯함.
                     {
                         GameObject obj = (GameObject)Instantiate(item.gameObject);
                         obj.SetActive(false);
