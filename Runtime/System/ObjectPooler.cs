@@ -26,6 +26,7 @@
                 for (int i = 0; i < item.amount; i++)
                 {
                     GameObject obj = (GameObject)Instantiate(item.gameObject);
+                    obj.name = $"{obj.name}_{i}";
                     obj.SetActive(false);
                     pool.Add(obj);
                 }
