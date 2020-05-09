@@ -14,9 +14,12 @@
 
     public class ObjectPooler : MonoBehaviour
     {
+        private int count = 0;
         public static ObjectPooler Instance;
         public List<ObjectPoolItem> items;
         public List<GameObject> pool;
+        
+        public HideFlags defaultHideFlags = HideFlags.HideInHierarchy;
 
         private void Start()
         {
@@ -25,12 +28,20 @@
             {
                 for (int i = 0; i < item.amount; i++)
                 {
-                    GameObject obj = (GameObject)Instantiate(item.gameObject);
-                    obj.name = $"{obj.name}_{i}";
-                    obj.SetActive(false);
-                    pool.Add(obj);
+                    Create(item.gameObject);
                 }
             }
+        }
+
+        private GameObject Create(GameObject src)
+        {
+            GameObject obj = (GameObject)Instantiate(src);
+            obj.name = $"{src.name}_{count}";
+            obj.hideFlags = defaultHideFlags;
+            obj.SetActive(false);
+            pool.Add(obj);
+            count++;
+            return obj;
         }
 
         public GameObject GetByTag(string tag)
@@ -48,10 +59,7 @@
                 {
                     if (item.expandable)
                     {
-                        GameObject obj = (GameObject)Instantiate(item.gameObject);
-                        obj.SetActive(false);
-                        pool.Add(obj);
-                        return obj;
+                        return Create(item.gameObject);
                     }
                 }
             }
@@ -73,10 +81,7 @@
                 {
                     if (item.expandable) // TODO: 이게 앞에 있는게 더 최적화가 좋을듯함.
                     {
-                        GameObject obj = (GameObject)Instantiate(item.gameObject);
-                        obj.SetActive(false);
-                        pool.Add(obj);
-                        return obj;
+                        return Create(item.gameObject);
                     }
                 }
             }
