@@ -7,5 +7,10 @@
 	"keywords": [
 		"unity"
 	],
-	"category": "Unity"
+	"category": "Unity",
+	"author": {
+		"name": "oiehot",
+		"email": "oiehot@gmail.com",
+		"url": "https://www.oiehot.com"
+	  }
 }
