@@ -1,5 +1,3 @@
-#if ADMOB
-
 namespace Rano.Admob
 {
     using System;
@@ -7,7 +5,7 @@ namespace Rano.Admob
     using GoogleMobileAds.Api;
     using Rano.Core; // Singleton
 
-    public class AdManager : Singleton<AdManager>
+    public class AdmobManager : Singleton<AdmobManager>
     {
         public string appId;
         
@@ -17,5 +15,3 @@ namespace Rano.Admob
         }
     }
 }
-
-#endif

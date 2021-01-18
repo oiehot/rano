@@ -1,5 +1,3 @@
-#if GoogleMobileAds
-
 namespace Rano.Admob
 {
     using System;
@@ -117,5 +115,3 @@ namespace Rano.Admob
     #endregion
     }
 }
-
-#endif
