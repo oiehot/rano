@@ -1,9 +1,9 @@
-namespace Rano.Debug
-{
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
+namespace Rano
+{
     public class DebugBeat : MonoBehaviour
     {
         public bool invokeBeat = false;
@@ -14,8 +14,6 @@ namespace Rano.Debug
         private float updateCount = 0.0f;
         public float updateDelay = 1.0f;
         public string updateMessage = "UpdateBeat";
-        
-        // TODO: Coroutine Beat
         
         void Awake()
         {

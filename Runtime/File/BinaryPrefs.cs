@@ -1,10 +1,10 @@
+using System;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
+using UnityEngine;
+
 namespace Rano.File
-{
-    using System;
-    using System.Runtime.Serialization.Formatters.Binary;
-    using System.IO;
-    using UnityEngine;
-    
+{   
     public static class BinaryPrefs<T>
     {
         /// var data = new SerializableObject(params);

@@ -1,10 +1,11 @@
+using System;
+using UnityEngine;
+using GoogleMobileAds.Api;
+using Rano.Core; // Singleton
+using Rano;
+
 namespace Rano.Admob
 {
-    using System;
-    using UnityEngine;
-    using GoogleMobileAds.Api;
-    using Rano.Core; // Singleton
-
     public class InterstitialAdManager : Singleton<InterstitialAdManager>
     {
         InterstitialAd ad;
@@ -25,7 +26,6 @@ namespace Rano.Admob
     #region Setup
         public void Start()
         {
-            Debug.Log("InterstitialAdManager.Start(): Start");
             #if UNITY_ANDROID
                 #if DEVELOPMENT_BUILD
                     adUnitId = androidTestAdUnitId;
@@ -53,7 +53,7 @@ namespace Rano.Admob
     #region Action
         public void LoadAd()
         {
-            Debug.Log("InterstitialAdManager.LoadAd(): Create New InterstitialAd Object");
+            Log.Info("Create New InterstitialAd Object");
             ad = new InterstitialAd(adUnitId);
             ad.OnAdLoaded += OnAdLoaded;
             ad.OnAdFailedToLoad += OnAdFailedToLoad;
@@ -71,16 +71,16 @@ namespace Rano.Admob
                     .AddTestDevice(deviceId)
                     .Build();
             }
-            Debug.Log("InterstitialAdManager.LoadAd(): LoadAd Request");
+            Log.Info("LoadAd Request");
             ad.LoadAd(request);
         }
 
         public void Show()
         {
-            Debug.Log("InterstitialAdManager.Show(): Start");
+            Log.Info("Start");
             if (ad.IsLoaded())
             {
-                Debug.Log("InterstitialAdManager.Show(): Call Show");
+                Log.Info("Call Show");
                 ad.Show();
             }
         }
@@ -89,28 +89,28 @@ namespace Rano.Admob
     #region Event
         void OnAdLoaded(object sender, EventArgs args)
         {
-            Debug.Log("InterstitialAdManager.OnAdLoaded()");
+            Log.Info("Called");
         }
 
         void OnAdFailedToLoad(object sender, AdFailedToLoadEventArgs args)
         {
-            Debug.Log("InterstitialAdManager.OnAdFailedToLoad(): " + args.Message);
+            Log.Info(args.Message);
         }
 
         void OnAdOpening(object sender, EventArgs args)
         {
-            Debug.Log("InterstitialAdManager.OnAdOpening()");
+            Log.Info("Called");
         }
 
         void OnAdClosed(object sender, EventArgs args)
         {
-            Debug.Log("InterstitialAdManager.OnAdClosed()");
+            Log.Info("Called");
             this.LoadAd();  // 닫히면 바로 다음 광고를 로드한다.
         }
 
         void OnAdLeavingApplication(object sender, EventArgs args)
         {
-            Debug.Log("InterstitialAdManager.OnAdLeavingApplication()");
+            Log.Info("Called");
         }
     #endregion
     }
