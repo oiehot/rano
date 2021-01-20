@@ -1,31 +1,26 @@
+using System;
+using UnityEngine;
+using GoogleMobileAds.Api;
+using Rano;
+using UnityEngine.Events; // UnityAction
+
 namespace Rano.Admob
 {
-    using System;
-    using UnityEngine;
-    using GoogleMobileAds.Api;
-    using Rano.Core; // Singleton
-
-    public class RewardAdManager : Singleton<RewardAdManager>
+    public class RewardAdManager: Singleton<RewardAdManager>
     {
-        public RewardedAd ad;
-
+        private RewardedAd ad;
+        
         private string adUnitId;
-
         public string androidAdUnitId;
         public string androidTestAdUnitId;
-
         public string iosAdUnitId;
         public string iosTestAdUnitId;
-
         public string otherAdUnitId;
         public string otherTestAdUnitId;
-
         public string deviceId;
 
-    #region Setup
-        public void Start()
+        public void Awake()
         {
-            Debug.Log("RewardAdManager.Start(): Start");
             #if UNITY_ANDROID
                 #if DEVELOPMENT_BUILD
                     adUnitId = androidTestAdUnitId;
@@ -45,7 +40,17 @@ namespace Rano.Admob
                     adUnitId = otherAdUnitId;
                 #endif
             #endif
+            
+            CreateAndLoadAd();
+        }
 
+        public void CreateAndLoadAd()
+        {
+            Log.Info("Create and LoadAd");
+
+            // RewardedAd는 일회용 객체다.
+            // 보상형 광고가 표시된 후에는 이 객체를 사용해 다른 광고를 로드할 수 없다.
+            // 다른 보상형 광고를 요청하려면 RewardedAd 객체를 만들어야 한다.
             ad = new RewardedAd(adUnitId);
             ad.OnAdLoaded += OnAdLoaded;
             ad.OnAdFailedToLoad += OnAdFailedToLoad;
@@ -54,80 +59,81 @@ namespace Rano.Admob
             ad.OnUserEarnedReward += OnUserEarnedReward;
             ad.OnAdClosed += OnAdClosed;
             // ad.OnAdLeavingApplication += OnAdLeavingApplication;
-            LoadAd();
-        }
-    #endregion
 
-    #region Body
-        public void LoadAd()
-        {
             AdRequest request;
-            request = new AdRequest.Builder().Build();
-
-            // 테스트 기기를 통해 광고 테스트를 하는 경우
-            if (deviceId != null)
+            if (deviceId == null)
             {
+                // 테스트 기기가 아닌 경우
+                request = new AdRequest.Builder().Build();
+            }
+            else
+            {
+                // 테스트 기기를 통해 광고 테스트를 하는 경우
+                Log.Important("Using Test Device");
                 request = new AdRequest.Builder()
                     .AddTestDevice(AdRequest.TestDeviceSimulator)
                     .AddTestDevice(deviceId)
                     .Build();
             }
-
-            Debug.Log("RewardAdManager.LoadAd(): LoadAD Requested");
             ad.LoadAd(request);
         }
 
         public void Show()
         {
-            Debug.Log("RewardAdManager.Show(): Requested");
+            Log.Important("Show Ad");
             if (ad.IsLoaded())
             {
-                Debug.Log("RewardAdManager.Show(): Call Show");
                 ad.Show();
             }
             else
             {
-                Debug.Log("RewardAdManager.Show(): Not Loaded. Call LoadAd");
-                this.LoadAd();
+                Log.Warning("Can't Show Ad. Not loaded");
             }
         }
-    #endregion
 
-    #region Handlers
+        /// <summary>광고 로드가 완료될 때 실행</summary>
         void OnAdLoaded(object sender, EventArgs args)
         {
-            Debug.Log("RewardAdManager.OnAdLoaded()");
+            // Log.Info("Called");
         }
 
+        /// <summary>광고 로드에 실패할 때 실행</summary>
         void OnAdFailedToLoad(object sender, AdErrorEventArgs args)
         {
-            Debug.Log("RewardAdManager.OnAdFailedToLoad(): " + args.Message);
+            Log.Warning(args.Message);
         }
 
+        /// <summary>
+        /// 광고가 표시될 때 기기 화면을 덮는다.
+        /// 이때 필요한 경우 오디오 출력 또는 게임 루프를 일시중지하는 것이 좋다.
+        /// </summary>
         void OnAdOpening(object sender, EventArgs args)
         {
-            Debug.Log("RewardAdManager.OnAdOpening()");
+            // Log.Info("Called");
         }
 
+        /// <summary>광고 표시에 실패할 떄 실행된다.</summary>
         void OnAdFailedToShow(object sender, AdErrorEventArgs args)
         {
-            Debug.Log("RewardAdManager.OnAdFailedToShow(): " + args.Message);
+            Log.Warning(args.Message);
         }
 
+        /// <summary>
+        /// 사용자가 닫기 아이콘을 탭하거나 뒤로 버튼을 사용하여 광고를 닫을 때 실행된다.
+        /// 앱에서 오디오 출력 또는 게임 루프를 일시중지했을 때 이 메소드로 재개하면 편리하다.
+        /// </summary>
         void OnAdClosed(object sender, EventArgs args)
         {
-            Debug.Log("RewardAdManager.OnAdClosed()");
-            this.LoadAd(); // 닫히면 바로 다음 광고를 로드한다.
+            // Log.Info("Called");
+            this.CreateAndLoadAd(); // 닫히면 바로 다음 광고를 로드한다.
         }
 
+        /// <summary>사용자가 동영상 시청에 대한 보상을 받아야 할 때 실행된다.</summary>
         void OnUserEarnedReward(object sender, Reward reward)
         {
-            #if DEVELOPMENT_BUILD
-                string type = reward.Type;
-                double amount = reward.Amount;
-                Debug.Log("RewardAdManager.OnUserEarnedReward(): " + reward.ToString() + " " + type); // 1 Bomb
-            #endif
+            string type = reward.Type;
+            double amount = reward.Amount;
+            Log.Important($"Type:{type}, Amount:{amount}"); // ex) Reward, 10
         }
-    #endregion
     }
 }

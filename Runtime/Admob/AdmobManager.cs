@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using GoogleMobileAds.Api;
 using Rano; // Logger
-using Rano.Core; // Singleton
 
 namespace Rano.Admob
 {

@@ -1,37 +1,6 @@
-namespace Rano.Core
+namespace Rano
 {
     using UnityEngine;
-
-    // public class SingletonA<T> : MonoBehaviour where T : MonoBehaviour
-    // {
-    //     private static bool m_Closed = false;
-    //     private static T m_Instance;
-    //     public static T Instance
-    //     {
-    //         get
-    //         {
-    //             return m_Instance;
-    //         }
-    //     }
-
-    //     private void Awake()
-    //     {
-    //         // var gameObject = new GameObject();
-    //         // m_Instance = gameObject.AddComponent<T>();
-    //         // gameObject.name = typeof(T).ToString() + " (Singleton)";
-    //         // DontDestroyOnLoad(gameObject);
-    //     }
-
-    //     private void OnApplicationQuit()
-    //     {
-    //         m_Closed = true;
-    //     }
-
-    //     private void OnDestroy()
-    //     {
-    //         m_Closed = true;
-    //     }
-    // }
 
     public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     {

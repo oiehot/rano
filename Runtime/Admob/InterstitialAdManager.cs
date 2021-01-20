@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 using GoogleMobileAds.Api;
-using Rano.Core; // Singleton
 using Rano;
 
 namespace Rano.Admob
@@ -11,20 +10,15 @@ namespace Rano.Admob
         InterstitialAd ad;
 
         private string adUnitId;
-
         public string androidAdUnitId;
         public string androidTestAdUnitId;
-
         public string iosAdUnitId;
         public string iosTestAdUnitId;
-
         public string otherAdUnitId;
         public string otherTestAdUnitId;
-
         public string deviceId;
 
-    #region Setup
-        public void Start()
+        public void Awake()
         {
             #if UNITY_ANDROID
                 #if DEVELOPMENT_BUILD
@@ -48,9 +42,7 @@ namespace Rano.Admob
             
             this.LoadAd();
         }
-    #endregion
 
-    #region Action
         public void LoadAd()
         {
             Log.Info("Create New InterstitialAd Object");
@@ -61,35 +53,40 @@ namespace Rano.Admob
             ad.OnAdClosed += OnAdClosed;
             ad.OnAdLeavingApplication += OnAdLeavingApplication;
                     
-            AdRequest request = new AdRequest.Builder().Build();
-
-            // 테스트 기기를 통해 광고 테스트를 하는 경우
-            if (deviceId != null)
+            AdRequest request;
+            if (deviceId == null)
             {
+                // 테스트 기기를 통해 광고 테스트를 하는 경우
+                request = new AdRequest.Builder().Build();
+            }
+            else
+            {
+                // 테스트 기기 사용시
+                Log.Important("Using Test Device");
                 request = new AdRequest.Builder()
                     .AddTestDevice(AdRequest.TestDeviceSimulator)
                     .AddTestDevice(deviceId)
                     .Build();
             }
-            Log.Info("LoadAd Request");
             ad.LoadAd(request);
         }
 
         public void Show()
         {
-            Log.Info("Start");
             if (ad.IsLoaded())
             {
-                Log.Info("Call Show");
+                Log.Important("Show InterstitialAd");
                 ad.Show();
             }
+            else
+            {
+                Log.Warning("Can't Show InterstitialAd. Not Loaded");
+            }
         }
-    #endregion
 
-    #region Event
         void OnAdLoaded(object sender, EventArgs args)
         {
-            Log.Info("Called");
+            // Log.Info("Called");
         }
 
         void OnAdFailedToLoad(object sender, AdFailedToLoadEventArgs args)
@@ -99,19 +96,18 @@ namespace Rano.Admob
 
         void OnAdOpening(object sender, EventArgs args)
         {
-            Log.Info("Called");
+            // Log.Info("Called");
         }
 
         void OnAdClosed(object sender, EventArgs args)
         {
-            Log.Info("Called");
+            // Log.Info("Called");
             this.LoadAd();  // 닫히면 바로 다음 광고를 로드한다.
         }
 
         void OnAdLeavingApplication(object sender, EventArgs args)
         {
-            Log.Info("Called");
+            // Log.Info("Called");
         }
-    #endregion
     }
 }
