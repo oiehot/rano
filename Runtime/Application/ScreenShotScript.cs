@@ -1,23 +1,24 @@
-namespace Rano.Application
+using System;
+using UnityEngine;
+
+namespace Rano
 {
-    using System;
-    using UnityEngine;
-    
-    public class ScreenShotScript : MonoBehaviour
+    // TODO: Screenshot 디렉토리가 없으면 캡쳐가 안됨
+    public class ScreenshotScript : MonoBehaviour
     {
-        string dir;
+        private string directory;
         
         private void Awake()
         {
-            dir = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/') ) + "/Screenshot" ;
+            directory = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/') ) + "/Screenshot" ;
         }
         
         private void Capture()
         {
             string date = DateTime.Now.ToString("yyyymmdd_HHmmss");
-            string path = dir + '/' + date + ".png";
+            string path = directory + '/' + date + ".png";
             ScreenCapture.CaptureScreenshot(path);
-            Debug.Log("Capture Screenshot to " + path);
+            Rano.Log.Important("Capture Screenshot to " + path);
         }
         
         #if UNITY_EDITOR
