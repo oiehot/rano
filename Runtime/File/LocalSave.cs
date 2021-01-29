@@ -1,14 +1,13 @@
-// TODO:  뉴튼소프트 플러그인 연계 방법 정리.
+using System;
+using System.Text; // Encoding
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEditor;
+using Newtonsoft.Json; // JsonConvert
+
 namespace Rano.File
 {
-    using System;
-    using System.Text; // Encoding
-	using System.Collections;
-	using System.Collections.Generic;
-	using UnityEngine;
-    using UnityEditor;
-    using Newtonsoft.Json; // JsonConvert
-    
     public static class LocalSave
     {
         public static void Save(string filePath, byte[] bytes)
@@ -21,7 +20,7 @@ namespace Rano.File
         public static void SaveToJson(string filePath, object data)
         {
             string json = JsonConvert.SerializeObject(data); // JsonConvert (Newtonsoft JSON)
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(json);
             Save(filePath, bytes);
         }
         
@@ -43,7 +42,7 @@ namespace Rano.File
             
             byte[] bytes;
             bytes = Load(filePath);
-            string json = Encoding.UTF8.GetString(bytes);
+            string json = System.Text.Encoding.UTF8.GetString(bytes);
             return JsonUtility.FromJson<T>(json);
         }     
     }

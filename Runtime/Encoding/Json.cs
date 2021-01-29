@@ -1,7 +1,7 @@
-﻿namespace Rano.Encoding
+﻿using UnityEngine;
+
+namespace Rano.Encoding
 {
-    using UnityEngine;
-    
     [System.Serializable]
     public class ArrayWrapper<T>
     {
