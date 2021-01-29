@@ -10,7 +10,7 @@ namespace Rano.Admob
         public string appId;
         public void Awake()
         {
-            Log.Info("Initialize");
+            SysLog.Info("Initialize");
             MobileAds.Initialize(appId);
         }
     }

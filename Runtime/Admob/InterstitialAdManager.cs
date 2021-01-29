@@ -45,7 +45,7 @@ namespace Rano.Admob
 
         public void LoadAd()
         {
-            Log.Info("Create New InterstitialAd Object");
+            SysLog.Info("Create New InterstitialAd Object");
             ad = new InterstitialAd(adUnitId);
             ad.OnAdLoaded += OnAdLoaded;
             ad.OnAdFailedToLoad += OnAdFailedToLoad;
@@ -62,7 +62,7 @@ namespace Rano.Admob
             else
             {
                 // 테스트 기기 사용시
-                Log.Important("Using Test Device");
+                SysLog.Important("Using Test Device");
                 request = new AdRequest.Builder()
                     .AddTestDevice(AdRequest.TestDeviceSimulator)
                     .AddTestDevice(deviceId)
@@ -75,39 +75,39 @@ namespace Rano.Admob
         {
             if (ad.IsLoaded())
             {
-                Log.Important("Show InterstitialAd");
+                SysLog.Important("Show InterstitialAd");
                 ad.Show();
             }
             else
             {
-                Log.Warning("Can't Show InterstitialAd. Not Loaded");
+                SysLog.Warning("Can't Show InterstitialAd. Not Loaded");
             }
         }
 
         void OnAdLoaded(object sender, EventArgs args)
         {
-            // Log.Info("Called");
+            // SysLog.Info("Called");
         }
 
         void OnAdFailedToLoad(object sender, AdFailedToLoadEventArgs args)
         {
-            Log.Info(args.Message);
+            SysLog.Info(args.Message);
         }
 
         void OnAdOpening(object sender, EventArgs args)
         {
-            // Log.Info("Called");
+            // SysLog.Info("Called");
         }
 
         void OnAdClosed(object sender, EventArgs args)
         {
-            // Log.Info("Called");
+            // SysLog.Info("Called");
             this.LoadAd();  // 닫히면 바로 다음 광고를 로드한다.
         }
 
         void OnAdLeavingApplication(object sender, EventArgs args)
         {
-            // Log.Info("Called");
+            // SysLog.Info("Called");
         }
     }
 }

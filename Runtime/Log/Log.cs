@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Rano
 {   
-    public static class Log
+    public static class SysLog
     {
         public static string Caller
         {
@@ -23,22 +23,22 @@ namespace Rano
 
         public static void Important(string txt)
         {
-            UnityEngine.Debug.Log($"<color=#55ff55ff><b>{Log.Caller}: {txt}</b></color>");
+            UnityEngine.Debug.Log($"<color=#55ff55ff><b>{SysLog.Caller}: {txt}</b></color>");
         }
 
         public static void Info(string txt)
         {
-            UnityEngine.Debug.Log($"<color=#ffffffff>{Log.Caller}: {txt}</color>");
+            UnityEngine.Debug.Log($"<color=#ffffffff>{SysLog.Caller}: {txt}</color>");
         }
 
         public static void Warning(string txt)
         {
-            UnityEngine.Debug.Log($"<color=#ffff55ff>{Log.Caller}: {txt}</color>");
+            UnityEngine.Debug.Log($"<color=#ffff55ff>{SysLog.Caller}: {txt}</color>");
         }
 
         public static void Error(string txt)
         {
-            UnityEngine.Debug.Log($"<color=#ff5555ff>{Log.Caller}: {txt}</color>");
+            UnityEngine.Debug.Log($"<color=#ff5555ff>{SysLog.Caller}: {txt}</color>");
         }
     }
 }

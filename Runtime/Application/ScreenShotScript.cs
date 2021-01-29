@@ -18,7 +18,7 @@ namespace Rano
             string date = DateTime.Now.ToString("yyyymmdd_HHmmss");
             string path = directory + '/' + date + ".png";
             ScreenCapture.CaptureScreenshot(path);
-            Rano.Log.Important("Capture Screenshot to " + path);
+            Rano.SysLog.Important("Capture Screenshot to " + path);
         }
         
         #if UNITY_EDITOR

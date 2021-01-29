@@ -46,7 +46,7 @@ namespace Rano.Admob
 
         public void CreateAndLoadAd()
         {
-            Log.Info("Create and LoadAd");
+            SysLog.Info("Create and LoadAd");
 
             // RewardedAd는 일회용 객체다.
             // 보상형 광고가 표시된 후에는 이 객체를 사용해 다른 광고를 로드할 수 없다.
@@ -69,7 +69,7 @@ namespace Rano.Admob
             else
             {
                 // 테스트 기기를 통해 광고 테스트를 하는 경우
-                Log.Important("Using Test Device");
+                SysLog.Important("Using Test Device");
                 request = new AdRequest.Builder()
                     .AddTestDevice(AdRequest.TestDeviceSimulator)
                     .AddTestDevice(deviceId)
@@ -80,27 +80,27 @@ namespace Rano.Admob
 
         public void Show()
         {
-            Log.Important("Show Ad");
+            SysLog.Important("Show Ad");
             if (ad.IsLoaded())
             {
                 ad.Show();
             }
             else
             {
-                Log.Warning("Can't Show Ad. Not loaded");
+                SysLog.Warning("Can't Show Ad. Not loaded");
             }
         }
 
         /// <summary>광고 로드가 완료될 때 실행</summary>
         void OnAdLoaded(object sender, EventArgs args)
         {
-            // Log.Info("Called");
+            // SysLog.Info("Called");
         }
 
         /// <summary>광고 로드에 실패할 때 실행</summary>
         void OnAdFailedToLoad(object sender, AdErrorEventArgs args)
         {
-            Log.Warning(args.Message);
+            SysLog.Warning(args.Message);
         }
 
         /// <summary>
@@ -109,13 +109,13 @@ namespace Rano.Admob
         /// </summary>
         void OnAdOpening(object sender, EventArgs args)
         {
-            // Log.Info("Called");
+            // SysLog.Info("Called");
         }
 
         /// <summary>광고 표시에 실패할 떄 실행된다.</summary>
         void OnAdFailedToShow(object sender, AdErrorEventArgs args)
         {
-            Log.Warning(args.Message);
+            SysLog.Warning(args.Message);
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace Rano.Admob
         {
             string type = reward.Type;
             double amount = reward.Amount;
-            Log.Important($"Type:{type}, Amount:{amount}"); // ex) Reward, 10
+            SysLog.Important($"Type:{type}, Amount:{amount}"); // ex) Reward, 10
         }
     }
 }
