@@ -15,15 +15,18 @@
     public class ObjectPooler : MonoBehaviour
     {
         private int count = 0;
-        public static ObjectPooler Instance;
         public List<ObjectPoolItem> items;
         public List<GameObject> pool;
         
         public HideFlags defaultHideFlags = HideFlags.HideInHierarchy;
 
-        private void Start()
+        void Awake()
         {
-            pool = new List<GameObject>();
+            this.pool = new List<GameObject>();
+        }
+
+        public void Init()
+        {
             foreach (ObjectPoolItem item in items)
             {
                 for (int i = 0; i < item.amount; i++)

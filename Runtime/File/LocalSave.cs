@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using Newtonsoft.Json; // JsonConvert
+// using Newtonsoft.Json;
 
 namespace Rano.File
 {
@@ -19,8 +19,10 @@ namespace Rano.File
         
         public static void SaveToJson(string filePath, object data)
         {
-            string json = JsonConvert.SerializeObject(data); // JsonConvert (Newtonsoft JSON)
-            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(json);
+            // Newtonsoft.Json 을 사용하는 경우:
+                // string json = JsonConvert.SerializeObject(data);
+            string txt = JsonUtility.ToJson(data);
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(txt);
             Save(filePath, bytes);
         }
         
@@ -43,6 +45,7 @@ namespace Rano.File
             byte[] bytes;
             bytes = Load(filePath);
             string json = System.Text.Encoding.UTF8.GetString(bytes);
+
             return JsonUtility.FromJson<T>(json);
         }     
     }
