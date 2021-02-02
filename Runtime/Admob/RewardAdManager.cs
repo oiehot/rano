@@ -112,7 +112,7 @@ namespace Rano.Admob
             // SysLog.Info("Called");
         }
 
-        /// <summary>광고 표시에 실패할 떄 실행된다.</summary>
+        /// <summary>광고 표시에 실패할 때 실행된다.</summary>
         void OnAdFailedToShow(object sender, AdErrorEventArgs args)
         {
             SysLog.Warning(args.Message);
