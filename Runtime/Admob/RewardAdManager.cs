@@ -1,3 +1,5 @@
+// TODO: AFO2가 완성된 이후 AFO2의 에드몹 스크립트를 정리하여 이곳에 놓을것
+/*
 using System;
 using UnityEngine;
 using GoogleMobileAds.Api;
@@ -137,3 +139,4 @@ namespace Rano.Admob
         }
     }
 }
+*/

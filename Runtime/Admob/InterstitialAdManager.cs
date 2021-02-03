@@ -1,3 +1,5 @@
+// TODO: AFO2가 완성된 이후 AFO2의 에드몹 스크립트를 정리하여 이곳에 놓을것
+/*
 using System;
 using UnityEngine;
 using GoogleMobileAds.Api;
@@ -18,8 +20,9 @@ namespace Rano.Admob
         public string otherTestAdUnitId;
         public string deviceId;
 
-        public void Awake()
+        void Awake()
         {
+            SysLog.Info("Begin");
             #if UNITY_ANDROID
                 #if DEVELOPMENT_BUILD
                     adUnitId = androidTestAdUnitId;
@@ -39,14 +42,21 @@ namespace Rano.Admob
                     adUnitId = otherAdUnitId;
                 #endif
             #endif
-            
-            this.LoadAd();
         }
 
-        public void LoadAd()
+        void Start()
         {
-            SysLog.Info("Create New InterstitialAd Object");
+            SysLog.Info("Begin");
+            CreateAndLoadAd();
+        }
+
+        public void CreateAndLoadAd()
+        {
+            SysLog.Info("Begin");
+            SysLog.Info("Create InterstitialAd Object");
+            SysLog.Info($"Using AdUnitId: {adUnitId}");
             ad = new InterstitialAd(adUnitId);
+            SysLog.Info("Connect Event Handlers");
             ad.OnAdLoaded += OnAdLoaded;
             ad.OnAdFailedToLoad += OnAdFailedToLoad;
             ad.OnAdOpening += OnAdOpening;
@@ -57,6 +67,7 @@ namespace Rano.Admob
             if (deviceId == null)
             {
                 // 테스트 기기를 통해 광고 테스트를 하는 경우
+                SysLog.Info("Run Build()");
                 request = new AdRequest.Builder().Build();
             }
             else
@@ -68,7 +79,9 @@ namespace Rano.Admob
                     .AddTestDevice(deviceId)
                     .Build();
             }
+            SysLog.Info("LoadAd(request) Before");
             ad.LoadAd(request);
+            SysLog.Info("LoadAd(request) After");
         }
 
         public void Show()
@@ -86,28 +99,24 @@ namespace Rano.Admob
 
         void OnAdLoaded(object sender, EventArgs args)
         {
-            // SysLog.Info("Called");
         }
 
         void OnAdFailedToLoad(object sender, AdFailedToLoadEventArgs args)
         {
-            SysLog.Info(args.Message);
         }
 
         void OnAdOpening(object sender, EventArgs args)
         {
-            // SysLog.Info("Called");
         }
 
         void OnAdClosed(object sender, EventArgs args)
         {
-            // SysLog.Info("Called");
-            this.LoadAd();  // 닫히면 바로 다음 광고를 로드한다.
+            this.CreateAndLoadAd();  // 닫히면 바로 다음 광고를 로드한다.
         }
 
         void OnAdLeavingApplication(object sender, EventArgs args)
         {
-            // SysLog.Info("Called");
         }
     }
 }
+*/

@@ -21,24 +21,24 @@ namespace Rano
             }
         }
 
-        public static void Important(string txt)
+        public static void Important(string text)
         {
-            UnityEngine.Debug.Log($"<color=#55ff55ff><b>{SysLog.Caller}: {txt}</b></color>");
+            UnityEngine.Debug.Log($"<color=#55ff55ff><b>{SysLog.Caller}: {text}</b></color>");
         }
 
-        public static void Info(string txt)
+        public static void Info(string text)
         {
-            UnityEngine.Debug.Log($"<color=#ffffffff>{SysLog.Caller}: {txt}</color>");
+            UnityEngine.Debug.Log($"<color=#ffffffff>{SysLog.Caller}: {text}</color>");
         }
 
-        public static void Warning(string txt)
+        public static void Warning(string text)
         {
-            UnityEngine.Debug.Log($"<color=#ffff55ff>{SysLog.Caller}: {txt}</color>");
+            UnityEngine.Debug.Log($"<color=#ffff55ff>{SysLog.Caller}: {text}</color>");
         }
 
-        public static void Error(string txt)
+        public static void Error(string text)
         {
-            UnityEngine.Debug.Log($"<color=#ff5555ff>{SysLog.Caller}: {txt}</color>");
+            UnityEngine.Debug.Log($"<color=#ff5555ff>{SysLog.Caller}: {text}</color>");
         }
     }
 }
