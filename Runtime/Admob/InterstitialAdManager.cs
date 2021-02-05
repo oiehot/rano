@@ -22,7 +22,7 @@ namespace Rano.Admob
 
         void Awake()
         {
-            SysLog.Info("Begin");
+            Log.Info("Begin");
             #if UNITY_ANDROID
                 #if DEVELOPMENT_BUILD
                     adUnitId = androidTestAdUnitId;
@@ -46,17 +46,17 @@ namespace Rano.Admob
 
         void Start()
         {
-            SysLog.Info("Begin");
+            Log.Info("Begin");
             CreateAndLoadAd();
         }
 
         public void CreateAndLoadAd()
         {
-            SysLog.Info("Begin");
-            SysLog.Info("Create InterstitialAd Object");
-            SysLog.Info($"Using AdUnitId: {adUnitId}");
+            Log.Info("Begin");
+            Log.Info("Create InterstitialAd Object");
+            Log.Info($"Using AdUnitId: {adUnitId}");
             ad = new InterstitialAd(adUnitId);
-            SysLog.Info("Connect Event Handlers");
+            Log.Info("Connect Event Handlers");
             ad.OnAdLoaded += OnAdLoaded;
             ad.OnAdFailedToLoad += OnAdFailedToLoad;
             ad.OnAdOpening += OnAdOpening;
@@ -67,33 +67,33 @@ namespace Rano.Admob
             if (deviceId == null)
             {
                 // 테스트 기기를 통해 광고 테스트를 하는 경우
-                SysLog.Info("Run Build()");
+                Log.Info("Run Build()");
                 request = new AdRequest.Builder().Build();
             }
             else
             {
                 // 테스트 기기 사용시
-                SysLog.Important("Using Test Device");
+                Log.Important("Using Test Device");
                 request = new AdRequest.Builder()
                     .AddTestDevice(AdRequest.TestDeviceSimulator)
                     .AddTestDevice(deviceId)
                     .Build();
             }
-            SysLog.Info("LoadAd(request) Before");
+            Log.Info("LoadAd(request) Before");
             ad.LoadAd(request);
-            SysLog.Info("LoadAd(request) After");
+            Log.Info("LoadAd(request) After");
         }
 
         public void Show()
         {
             if (ad.IsLoaded())
             {
-                SysLog.Important("Show InterstitialAd");
+                Log.Important("Show InterstitialAd");
                 ad.Show();
             }
             else
             {
-                SysLog.Warning("Can't Show InterstitialAd. Not Loaded");
+                Log.Warning("Can't Show InterstitialAd. Not Loaded");
             }
         }
 

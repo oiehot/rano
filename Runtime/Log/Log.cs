@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 
 // <b>Bold</b>
@@ -6,15 +7,24 @@ using System.Diagnostics;
 // <color=#000000ff>Black</color>
 
 namespace Rano
-{   
-    public static class SysLog
+{
+    public static class Log
     {
         public static string Caller
         {
             get
             {
                 StackTrace stackTrace = new StackTrace();
-                var method = stackTrace.GetFrame(2).GetMethod();
+                System.Reflection.MethodBase method;
+
+                try
+                {
+                    method = stackTrace.GetFrame(2).GetMethod();
+                }
+                catch
+                {
+                    return $"UnknownClass.UnknownMethod()";
+                }
                 string methodName = method.Name;
                 string className = method.DeclaringType.Name;
                 return $"{className}.{methodName}()";
@@ -23,22 +33,38 @@ namespace Rano
 
         public static void Important(string text)
         {
-            UnityEngine.Debug.Log($"<color=#55ff55ff><b>{SysLog.Caller}: {text}</b></color>");
-        }
-
-        public static void Info(string text)
-        {
-            UnityEngine.Debug.Log($"<color=#ffffffff>{SysLog.Caller}: {text}</color>");
+            #if UNITY_EDITOR
+            UnityEngine.Debug.Log($"<color=#55ff55ff><b>{Log.Caller}: {text}</b></color>");
+            #else
+            UnityEngine.Debug.Log($"[IMPORTANT] {Log.Caller}: {text}");
+            #endif
         }
 
         public static void Warning(string text)
         {
-            UnityEngine.Debug.Log($"<color=#ffff55ff>{SysLog.Caller}: {text}</color>");
+            #if UNITY_EDITOR
+            UnityEngine.Debug.LogWarning($"<color=#ffff55ff>{Log.Caller}: {text}</color>");
+            #else
+            UnityEngine.Debug.LogWarning($"[WARN] {Log.Caller}: {text}");
+            #endif
+        }
+
+        public static void Info(string text)
+        {
+            #if UNITY_EDITOR            
+            UnityEngine.Debug.Log($"<color=#ffffffff>{Log.Caller}: {text}</color>");
+            #else
+            UnityEngine.Debug.Log($"[INFO] {Log.Caller}: {text}");
+            #endif
         }
 
         public static void Error(string text)
         {
-            UnityEngine.Debug.Log($"<color=#ff5555ff>{SysLog.Caller}: {text}</color>");
+            #if UNITY_EDITOR
+            UnityEngine.Debug.LogError($"<color=#ff5555ff>{Log.Caller}: {text}</color>");
+            #else
+            UnityEngine.Debug.LogError($"[ERR] {Log.Caller}: {text}");
+            #endif
         }
     }
 }

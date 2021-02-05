@@ -13,15 +13,14 @@ namespace Rano.File
         public static void Save(string filePath, byte[] bytes)
         {
             string path = $"{Application.persistentDataPath}/{filePath}";
-            Debug.Log($"Save to {path}");
+            Log.Info($"Save to {path}");
             System.IO.File.WriteAllBytes(path, bytes);
         }
         
-        public static void SaveToJson(string filePath, object data)
+        public static void SaveToJson<T>(string filePath, T data)
         {
-            // Newtonsoft.Json 을 사용하는 경우:
-                // string json = JsonConvert.SerializeObject(data);
-            string txt = JsonUtility.ToJson(data);
+            // Newtonsoft.Json 을 사용하는 경우: string json = JsonConvert.SerializeObject(data);
+            string txt = JsonUtility.ToJson(data, false); // prettyPrint: True
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes(txt);
             Save(filePath, bytes);
         }
@@ -29,18 +28,23 @@ namespace Rano.File
         public static byte[] Load(string filePath)
         {
             string path = $"{Application.persistentDataPath}/{filePath}";
-            if (!System.IO.File.Exists(path)) return null;
+            if (!System.IO.File.Exists(path))
+            {
+                throw new Exception("File is not exists");
+            }
             
-            Debug.Log($"Load from {path}");
+            Log.Info($"Load from {path}");
             byte[] bytes = System.IO.File.ReadAllBytes(path);
             return bytes;
-
         }
 
         public static T LoadFromJson<T>(string filePath)
         {
             string path = $"{Application.persistentDataPath}/{filePath}";
-            if (!System.IO.File.Exists(path)) return default(T);
+            if (!System.IO.File.Exists(path))
+            {
+                throw new Exception("File is not exists");
+            }
             
             byte[] bytes;
             bytes = Load(filePath);
