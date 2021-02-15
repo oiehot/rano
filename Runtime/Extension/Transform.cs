@@ -1,8 +1,8 @@
-namespace Rano.Extension
-{
-    using UnityEngine;
-    
-    public static class TransformExtensionMethods
+using UnityEngine;
+
+namespace Rano
+{    
+    public static class TransformExtensions
     {
         public static void ResetTransformation(this Transform trans)
         {

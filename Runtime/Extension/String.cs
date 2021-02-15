@@ -1,8 +1,8 @@
-namespace Rano.Extension
-{
-    using System.Text; // StringBuilder
+using System.Text; // StringBuilder
 
-    public static class StringExtensionMethods
+namespace Rano
+{
+    public static class StringExtensions
     {
         public static string Repeat(this string source, int multiplier)
         {
