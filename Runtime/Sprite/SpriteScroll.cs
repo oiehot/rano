@@ -1,4 +1,4 @@
-namespace Rano.Sprite
+namespace Rano
 {   
     using System.Collections;
     using System.Collections.Generic;

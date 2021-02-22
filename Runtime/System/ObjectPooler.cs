@@ -1,91 +1,64 @@
-﻿namespace Rano.Core
-{
-    using UnityEngine;
-    using System.Collections;
-    using System.Collections.Generic;
-    
+﻿using System;
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+namespace Rano
+{   
     [System.Serializable]
     public class ObjectPoolItem
     {
+        public string name;
         public GameObject gameObject;
         public int amount;
-        public bool expandable;
     }
 
     public class ObjectPooler : MonoBehaviour
     {
         private int count = 0;
+        private Dictionary<string, List<GameObject>> pools;
         public List<ObjectPoolItem> items;
-        public List<GameObject> pool;
-        
         public HideFlags defaultHideFlags = HideFlags.HideInHierarchy;
 
         void Awake()
         {
-            this.pool = new List<GameObject>();
+            this.pools = new Dictionary<string, List<GameObject>>();
         }
 
         public void Init()
         {
             foreach (ObjectPoolItem item in items)
             {
-                for (int i = 0; i < item.amount; i++)
+                GameObject srcGameObject = item.gameObject;
+                string srcName = item.name;
+                if (srcName == null)
                 {
-                    Create(item.gameObject);
+                    throw new Exception("Item must have a name");
+                }
+                var pool = new List<GameObject>();
+                this.pools[srcName] = pool;
+
+                for (int i=0; i<item.amount; i++)
+                {
+                    GameObject obj = (GameObject)Instantiate(srcGameObject);
+                    obj.name = $"{srcName}_{i}";
+                    obj.hideFlags = defaultHideFlags;
+                    obj.SetActive(false);
+                    pool.Add(obj);
                 }
             }
         }
 
-        private GameObject Create(GameObject src)
+        public GameObject Get(string name)
         {
-            GameObject obj = (GameObject)Instantiate(src);
-            obj.name = $"{src.name}_{count}";
-            obj.hideFlags = defaultHideFlags;
-            obj.SetActive(false);
-            pool.Add(obj);
-            count++;
-            return obj;
-        }
+            if (!this.pools.ContainsKey(name)) return null;
+            List<GameObject> pool = this.pools[name];
 
-        public GameObject GetByTag(string tag)
-        {
-            for (int i = 0; i < pool.Count; i++)
+            for (int i=0; i<pool.Count; i++)
             {
-                if (!pool[i].activeInHierarchy && pool[i].tag == tag)
+                if (!pool[i].activeInHierarchy)
                 {
                     return pool[i];
-                }
-            }
-            foreach (ObjectPoolItem item in items)
-            {
-                if (item.gameObject.tag == tag)
-                {
-                    if (item.expandable)
-                    {
-                        return Create(item.gameObject);
-                    }
-                }
-            }
-            return null;
-        }
-
-        public GameObject GetByNamePrefix(string prefix)
-        {
-            for (int i = 0; i < pool.Count; i++)
-            {
-                if (!pool[i].activeInHierarchy && pool[i].name.StartsWith(prefix))
-                {
-                    return pool[i];
-                }
-            }
-            foreach (ObjectPoolItem item in items)
-            {
-                if (item.gameObject.name.StartsWith(prefix))
-                {
-                    if (item.expandable) // TODO: 이게 앞에 있는게 더 최적화가 좋을듯함.
-                    {
-                        return Create(item.gameObject);
-                    }
                 }
             }
             return null;

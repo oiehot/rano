@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Rano.Social
+namespace Rano
 {
     public interface ISocialManager
     {
