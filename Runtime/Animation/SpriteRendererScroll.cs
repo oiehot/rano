@@ -1,11 +1,11 @@
-namespace Rano
-{   
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
     
+namespace Rano
+{      
     [RequireComponent(typeof(SpriteRenderer))]
-    public class SpriteScroll : MonoBehaviour
+    public class SpriteRendererScroll : MonoBehaviour
     {
         // TODO: Must required
         public float speed;

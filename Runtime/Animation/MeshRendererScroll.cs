@@ -1,11 +1,11 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace Rano
-{
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEngine;
-    
+{   
     [RequireComponent(typeof(MeshRenderer))]
-    public class SpriteScrollUV : MonoBehaviour
+    public class MeshRendererScroll : MonoBehaviour
     {
         Material material;
         public float speed_x = 0.1f;
