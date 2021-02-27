@@ -11,7 +11,7 @@ namespace Rano
 
     public interface IService
     {
-        EServiceState state { get; set; }
+        EServiceState state { get; }
         void Init();
         void Run();
         void Pause();
