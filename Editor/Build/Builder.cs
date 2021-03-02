@@ -68,11 +68,11 @@ namespace Rano.Editor.Build
             switch (report.summary.result)
             {
                 case BuildResult.Unknown:
-                    Log.Important("Build Completed (with some warnings)");
+                    Log.Important($"Build Completed {PlayerSettings.bundleVersion} (with some warnings)");
                     break;
 
                 case BuildResult.Succeeded:
-                    Log.Important("Build Completed");
+                    Log.Important($"Build Completed {PlayerSettings.bundleVersion}");
                     // Debug.Log($"{report.summary.totalSize} 바이트");
                     break;
 
