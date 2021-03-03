@@ -1,5 +1,11 @@
+// Copyright (C) OIEHOT - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+// Written by Taewoo Lee <oiehot@gmail.com>
+
 #if false
-namespace Rano.Core
+
+namespace Rano
 {
     using UnityEngine;
     using System.Collections;
@@ -93,4 +99,5 @@ namespace Rano.Core
         }
     }
 }
+
 #endif

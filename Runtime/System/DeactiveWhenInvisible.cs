@@ -1,9 +1,14 @@
-namespace Rano.Core
-{
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEngine;
+// Copyright (C) OIEHOT - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+// Written by Taewoo Lee <oiehot@gmail.com>
 
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Rano
+{
     public class DeactiveWhenInvisible : MonoBehaviour
     {
         // 화면 밖으로 나가 보이지 않게 되면 호출이 된다.

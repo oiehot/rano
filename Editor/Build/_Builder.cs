@@ -1,11 +1,18 @@
+// Copyright (C) OIEHOT - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+// Written by Taewoo Lee <oiehot@gmail.com>
+
 #if false
+
 using UnityEngine;
 using UnityEditor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Rano;
 
-namespace Rano.Builder
+namespace RanoEditor.Build
 {
     [Serializable]
     class BuildConfig
@@ -121,4 +128,5 @@ namespace Rano.Builder
         }
     }
 }
+
 #endif

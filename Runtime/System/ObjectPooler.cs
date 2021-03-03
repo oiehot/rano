@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Copyright (C) OIEHOT - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+// Written by Taewoo Lee <oiehot@gmail.com>
+
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,7 +20,6 @@ namespace Rano
 
     public class ObjectPooler : MonoBehaviour
     {
-        private int count = 0;
         private Dictionary<string, List<GameObject>> pools;
         public List<ObjectPoolItem> items;
         public HideFlags defaultHideFlags = HideFlags.HideInHierarchy;

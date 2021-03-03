@@ -1,10 +1,14 @@
+// Copyright (C) OIEHOT - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+// Written by Taewoo Lee <oiehot@gmail.com>
+
 #if UNITY_IOS
 
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
-using Rano;
 
-namespace Rano.Social
+namespace Rano
 {
     public class SocialManager : Singleton<SocialManager>, ISocialManager
     {

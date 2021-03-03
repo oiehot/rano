@@ -1,16 +1,19 @@
 {
-	"name": "com.oiehot.rano",
-	"displayName": "Rano",
-	"version": "1.0.0",
-	"unity": "2019.2",
-	"description": "OIEHOT Unity Library",
-	"keywords": [
-		"unity"
-	],
-	"category": "Unity",
-	"author": {
-		"name": "OIEHOT",
-		"email": "oiehot@gmail.com",
-		"url": "https://www.oiehot.com"
-	  }
+  "name": "com.oiehot.rano",
+  "displayName": "Rano",
+  "version": "1.0.1",
+  "unity": "2020.2",
+  "description": "OIEHOT Unity Library",
+  "keywords": [
+    "unity"
+  ],
+  "category": "Unity",
+  "author": {
+    "name": "OIEHOT",
+    "email": "oiehot@gmail.com",
+    "url": "https://www.oiehot.com"
+  },
+  "dependencies": {
+    "com.unity.purchasing": "2.1.1"
+  }
 }

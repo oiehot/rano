@@ -1,3 +1,8 @@
+// Copyright (C) OIEHOT - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+// Written by Taewoo Lee <oiehot@gmail.com>
+
 #if UNITY_EDITOR
     #define ENABLE_LOG
 #elif DEVELOPMENT_BUILD

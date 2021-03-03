@@ -1,6 +1,12 @@
-using UnityEngine;
+// Copyright (C) OIEHOT - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+// Written by Taewoo Lee <oiehot@gmail.com>
 
-namespace Rano
+using UnityEngine;
+using Rano;
+
+namespace RanoEditor.Build
 {
     /// <summary>
     /// 버젼 데이터를 다루는 데이터 타입

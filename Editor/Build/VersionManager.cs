@@ -1,9 +1,15 @@
+// Copyright (C) OIEHOT - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+// Written by Taewoo Lee <oiehot@gmail.com>
+
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
+using Rano;
 
-namespace Rano.Editor.Build
+namespace RanoEditor.Build
 {
     /// <summary>
     /// 빌드 버젼을 통합적으로 관리해줌

@@ -1,11 +1,18 @@
-namespace Rano.Appstore
+// Copyright (C) OIEHOT - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+// Written by Taewoo Lee <oiehot@gmail.com>
+
+#if false
+
+using UnityEngine;
+using System.Net.Http;
+using System.Threading; // for Thread.Sleep
+using System.Threading.Tasks; // for Task.Run
+using LitJson;
+
+namespace Rano
 {
-    using UnityEngine;
-    using System.Net.Http;
-    using System.Threading; // for Thread.Sleep
-    using System.Threading.Tasks; // for Task.Run
-    using LitJson;
-    
     public static class AppleAppstore
     {
         // !
@@ -48,3 +55,5 @@ namespace Rano.Appstore
         }
     }
 }
+
+#endif

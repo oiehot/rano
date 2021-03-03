@@ -1,8 +1,10 @@
 {
     "name": "Rano",
+    "rootNamespace": "",
     "references": [
         "GoogleMobileAds",
-        "GooglePlayGames"
+        "GooglePlayGames",
+        "UnityEngine.Purchasing"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -11,5 +13,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

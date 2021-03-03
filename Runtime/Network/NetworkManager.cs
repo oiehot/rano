@@ -1,3 +1,8 @@
+// Copyright (C) OIEHOT - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+// Written by Taewoo Lee <oiehot@gmail.com>
+
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
@@ -5,7 +10,7 @@ using Rano;
 
 namespace Rano
 {
-    public class NetworkManager : MonoBehaviour, IService
+    public class NetworkManager : Singleton<NetworkManager>, IService
     {
         public EServiceState state { get; private set; }
         public bool connected { get; private set; }
