@@ -18,11 +18,29 @@ namespace Rano
     {
         public Dictionary<string, AudioClip> clips;        
         public Dictionary<string, SoundLayer> layers;
+        public AudioListener audioListener;
+        public float masterVolume {
+            get
+            {
+                return AudioListener.volume;
+            }
+            set
+            {
+                AudioListener.volume = value;
+            }
+        }
 
         void Awake()
         {
             this.clips = new Dictionary<string, AudioClip>();
             this.layers = new Dictionary<string, SoundLayer>();
+
+            // 현재 씬에 AudioListener가 없다면(보통 카메라에 있음) 이 사운드 매니져에 장착한다.
+            this.audioListener = UnityEngine.Object.FindObjectOfType<AudioListener>();
+            if (this.audioListener == null)
+            {
+                this.audioListener = this.gameObject.AddComponent<AudioListener>();
+            }
         }
 
         void OnEnable()

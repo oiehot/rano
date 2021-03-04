@@ -103,7 +103,7 @@ namespace YOUR_PROJECT
 
         void OnEnable()
         {
-            Log.Info("OnEnable");
+            Log.Info("GameManager OnEnable");
             this.Network.OnNetworkConnected += this.OnNetworkConnected;
             this.Network.OnNetworkDisconnected += this.OnNetworkDisconnected;
             this.Network.Resume();
@@ -113,7 +113,7 @@ namespace YOUR_PROJECT
 
         void OnDisable()
         {
-            Log.Info("OnDisable");
+            Log.Info("GameManager OnDisable");
             this.Social.OnSignInFailed -= this.OnSignInFailed;
             this.Social.OnSignInSuccess -= this.OnSignInSuccess;
             this.Network.Pause();
@@ -187,8 +187,8 @@ namespace YOUR_PROJECT
 
         void Start()
         {
-            this.networkManager.Init();
-            this.networkManager.Run();
+            this.Network.Init();
+            this.Network.Run();
 
             // 일단 로컬 데이터를 로드한다.
             // 이후 소셜에 로그인 되면 OnSignInSuccess가 호출되며 클라우드 데이터를 로드한다.
