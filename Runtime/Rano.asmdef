@@ -4,7 +4,9 @@
     "references": [
         "GoogleMobileAds",
         "GooglePlayGames",
-        "UnityEngine.Purchasing"
+        "UnityEngine.Purchasing",
+        "Unity.Addressables",
+        "Unity.ResourceManager"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
