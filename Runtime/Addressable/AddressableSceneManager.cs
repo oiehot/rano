@@ -18,11 +18,11 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 
 namespace Rano.Addressable
 {
-    public struct AddressableAddress
+    public struct Address
     {
         public string value;
         
-        public AddressableAddress(string address)
+        public Address(string address)
         {
             value = address;
         }
@@ -38,7 +38,7 @@ namespace Rano.Addressable
         }
     }
     
-    public enum AddressableSceneStatus
+    public enum SceneStatus
     {
         Loading,
         Loaded,
@@ -46,11 +46,11 @@ namespace Rano.Addressable
         Unloaded,
     }
     
-    public class AddressableSceneInfo
+    public class SceneInfo
     {
-        public AddressableAddress address;
-        public AddressableSceneStatus status;
-        public SceneInstance sceneInstance;
+        public Address address;
+        public SceneStatus status;
+        public SceneInstance? sceneInstance;
         public float percent;
         
         public override string ToString()
@@ -61,102 +61,138 @@ namespace Rano.Addressable
     
     public class AddressableSceneManager : MonoBehaviour
     {
-        private Dictionary<AddressableAddress, AddressableSceneInfo> scenes;
+        private Dictionary<Address, SceneInfo> scenes;
 
         void Awake()
         {
-            this.scenes = new Dictionary<AddressableAddress, AddressableSceneInfo>();
+            this.scenes = new Dictionary<Address, SceneInfo>();
         }
-        
-        public AddressableSceneInfo GetInfo(string address)
-        {
-            AddressableAddress addressableAddress;
-            addressableAddress = new AddressableAddress(address);
-            
-            if (this.scenes.ContainsKey(addressableAddress))
-            {
-                return this.scenes[addressableAddress];
-            }
-            return null;
-        }
-        
+                
         /// <summary>어드레서블 씬을 로딩함</summary>
-        public AsyncOperationHandle<SceneInstance> LoadSceneAsync(AddressableAddress address, LoadSceneMode loadSceneMode)
+        public AsyncOperationHandle<SceneInstance> LoadSceneAsync(Address address, LoadSceneMode loadSceneMode)
         {
+            SceneInfo sceneInfo;
+            AsyncOperationHandle<SceneInstance> handle;
+
             if (this.scenes.ContainsKey(address))
             {
-                throw new Exception($"Load Scene Failed: {address} already loaded");
+                sceneInfo = this.scenes[address];
+                if (sceneInfo.status != SceneStatus.Unloaded)
+                {
+                    throw new Exception($"Load Scene Failed: {address} already loaded");
+                }
             }
-            
-            AddressableSceneInfo info = new AddressableSceneInfo();
-            info.address = address;
-            info.status = AddressableSceneStatus.Loading;
-            info.percent = 0;
-            this.scenes.Add(address, info);
-            
-            AsyncOperationHandle<SceneInstance> handle;
+            else
+            {
+                sceneInfo = new SceneInfo();
+                this.scenes.Add(address, sceneInfo);
+            }
+            sceneInfo.address = address;
+            sceneInfo.status = SceneStatus.Loading;
+            sceneInfo.sceneInstance = null;
+            sceneInfo.percent = 0;
+
+            // 로딩 시작
             handle = Addressables.LoadSceneAsync(address.value, loadSceneMode);
-            
             handle.Completed += (handle) => {
+                // 로딩 성공
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
-                    info.sceneInstance = handle.Result; // handle.Result: SceneInstance
-                    info.status = AddressableSceneStatus.Loaded;
-                    info.percent = 100;
                     Debug.Log($"Scene Loaded: {address.value}");
+                    sceneInfo.status = SceneStatus.Loaded;
+                    sceneInfo.sceneInstance = handle.Result; // handle.Result: SceneInstance
+                    sceneInfo.percent = 100.0f;
                 }
+                // 로딩 실패
                 else
                 {
                     Debug.LogError($"Load Scene Failed: {address}");
                 }
             };
             
-            StartCoroutine(this.UpdateProgress(handle, info));
+            // 로딩 상태 업데이트
+            StartCoroutine(this.UpdateProgress(handle, sceneInfo));
             
             return handle;
         }
 
         /// <summary>어드레서블 씬을 언로드함</summary>
-        public AsyncOperationHandle<SceneInstance> UnloadSceneAsync(AddressableAddress address)
+        public AsyncOperationHandle<SceneInstance> UnloadSceneAsync(Address address)
         {
+            SceneInfo sceneInfo;
+            AsyncOperationHandle<SceneInstance> handle;
+
             if (!this.scenes.ContainsKey(address)) 
             {
                 throw new Exception($"Unload Scene Failed: {address} was not loaded");
             }
             
-            AddressableSceneInfo info;
-            AsyncOperationHandle<SceneInstance> handle;
-            
-            info = this.scenes[address];
-            info.status = AddressableSceneStatus.Unloading;
-            handle = Addressables.UnloadSceneAsync(info.sceneInstance);
-            
+            sceneInfo = this.scenes[address];
+
+            if (sceneInfo.status != SceneStatus.Loaded)
+            {
+                throw new Exception($"Unload Scene Failed: {address} was not loaded");
+            }
+
+            if (!sceneInfo.sceneInstance.HasValue)
+            {
+                throw new Exception($"Unload Scene Failed: {address} sceneInstance not found");
+            }
+
+            // 언로딩 시작
+            sceneInfo.status = SceneStatus.Unloading;
+            handle = Addressables.UnloadSceneAsync(sceneInfo.sceneInstance.Value);
             handle.Completed += (handle) => {
+                // 언로딩 완료
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
                     Debug.Log($"Scene Unloaded: {address}");
-                    info.status = AddressableSceneStatus.Unloaded;
-                    this.scenes.Remove(address);
+                    sceneInfo.status = SceneStatus.Unloaded;
+                    sceneInfo.sceneInstance = null;
+                    sceneInfo.percent = 0.0f;
                 }
+                // 언로딩 실패
                 else
                 {
                     Debug.LogError($"Unload Scene Failed: {address}");
                 }
             };
-            
-            StartCoroutine(this.UpdateProgress(handle, info));
+
+            // 언로딩 상태 업데이트
+            StartCoroutine(this.UpdateProgress(handle, sceneInfo));
             
             return handle;
         }
         
-        private IEnumerator UpdateProgress(AsyncOperationHandle<SceneInstance> handle, AddressableSceneInfo info)
+        private IEnumerator UpdateProgress(AsyncOperationHandle<SceneInstance> handle, SceneInfo sceneInfo)
         {
             while (!handle.IsDone)
             {
-                Debug.Log($"Load Scene {handle.PercentComplete}%");
-                info.percent = handle.PercentComplete;
+                sceneInfo.percent = handle.PercentComplete;
                 yield return null;
             }
+        }
+
+        /// <summary>씬 상태 정보를 얻는다</summary>
+        public SceneInfo GetSceneInfo(Address address)
+        {   
+            if (this.scenes.ContainsKey(address))
+            {
+                return this.scenes[address];
+            }
+            return null;
+        }
+
+        public void DebugLogScenes()
+        {
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log("----");
+            foreach (KeyValuePair<Address,SceneInfo> item in this.scenes)
+            {
+                SceneInfo sceneInfo = item.Value;
+                Debug.Log($"{item.Value}");
+            }
+            #endif
         }
     }
 }
