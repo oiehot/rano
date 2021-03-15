@@ -3,8 +3,6 @@
 // Proprietary and confidential
 // Written by Taewoo Lee <oiehot@gmail.com>
 
-// Reference: https://github.com/Unity-Technologies/Addressables-Sample/tree/master/Basic/Scene%20Loading
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,26 +16,6 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 
 namespace Rano.Addressable
 {
-    public struct Address
-    {
-        public string value;
-        
-        public Address(string address)
-        {
-            value = address;
-        }
-
-        public override string ToString()
-        {
-            return $"{value.ToString()}";
-        }        
-        
-        public override int GetHashCode()
-        {
-            return value.GetHashCode();
-        }
-    }
-    
     public enum SceneStatus
     {
         Loading,
@@ -111,7 +89,7 @@ namespace Rano.Addressable
             };
             
             // 로딩 상태 업데이트
-            StartCoroutine(this.UpdateProgress(handle, sceneInfo));
+            StartCoroutine(this.UpdateProgressCoroutine(handle, sceneInfo));
             
             return handle;
         }
@@ -159,12 +137,12 @@ namespace Rano.Addressable
             };
 
             // 언로딩 상태 업데이트
-            StartCoroutine(this.UpdateProgress(handle, sceneInfo));
+            StartCoroutine(this.UpdateProgressCoroutine(handle, sceneInfo));
             
             return handle;
         }
         
-        private IEnumerator UpdateProgress(AsyncOperationHandle<SceneInstance> handle, SceneInfo sceneInfo)
+        private IEnumerator UpdateProgressCoroutine(AsyncOperationHandle<SceneInstance> handle, SceneInfo sceneInfo)
         {
             while (!handle.IsDone)
             {
