@@ -37,21 +37,21 @@ namespace Rano.Addressable
         }
     }
 
-    public class ResourceLoadTask : ResourceTask
+    public class LoadTask : ResourceTask
     {
         public Path path;
 
-        public ResourceLoadTask(Path path)
+        public LoadTask(Path path)
         {
             this.path = path;
         }
     }
 
-    public class ResourceUnloadTask : ResourceTask
+    public class UnloadTask : ResourceTask
     {
         public Path path;
 
-        public ResourceUnloadTask(Path path)
+        public UnloadTask(Path path)
         {
             this.path = path;
         }        

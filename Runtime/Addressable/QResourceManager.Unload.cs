@@ -20,11 +20,11 @@ namespace Rano.Addressable
     {
         public void Unload(Path path)
         {
-            ResourceUnloadTask task = new ResourceUnloadTask(path);
-            this.taskQueue.Enqueue(task);
+            UnloadTask task = new UnloadTask(path);
+            this.queue.Enqueue(task);
         }
         
-        private void ProcessUnloadTask(ResourceUnloadTask task)
+        private void ProcessUnloadTask(UnloadTask task)
         {
             throw new NotImplementedException();
         }

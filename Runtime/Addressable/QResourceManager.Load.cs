@@ -20,7 +20,7 @@ namespace Rano.Addressable
     {
         public void Load(Path path)
         {
-            ResourceLoadTask task = new ResourceLoadTask(path);
+            LoadTask task = new LoadTask(path);
             this.queue.Enqueue(task);
         }
 
@@ -39,14 +39,13 @@ namespace Rano.Addressable
             }
         }
         
-        private void ProcessLoadTask(ResourceLoadTask task)
+        private void ProcessLoadTask(LoadTask task)
         {
             Path path;
             Resource resource;
             AsyncOperationHandle handle;
 
             path = task.path;
-
             if (this.resources.ContainsKey(path) == true)
             {
                 resource = this.resources[path];
@@ -60,14 +59,17 @@ namespace Rano.Addressable
                 resource = new Resource();
                 resource.path = path;
                 resource.id = this.pathToId[path]; // Label, Address, AssetReference(GUID)
+                resource.asset = null;
                 this.resources.Add(path, resource);
             }
+
             task.status = ResourceTaskStatus.Working;
+            
             handle = Addressables.LoadAssetAsync<object>(resource.id);
             handle.Completed += (AsyncOperationHandle handle) => {
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
-                    Log.Info($"리소스 로드 성공: {path}");
+                    Log.Info($"리소스 로드 성공: {resource.path}");
                     resource.asset = handle.Result;
                     task.percent = 1.0f;
                     task.status = ResourceTaskStatus.Done;
@@ -75,10 +77,10 @@ namespace Rano.Addressable
                 else
                 {
                     task.status = ResourceTaskStatus.Failed;
-                    Log.Warning($"리소스 로드 실패: {path}");
+                    Log.Warning($"리소스 로드 실패: {resource.path}");
                 }
             };
-            StartCoroutine(UpdatePercentCoroutine(resource, handle));
+            StartCoroutine(UpdatePercentCoroutine(task, handle));
         }
     }
 }

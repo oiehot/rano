@@ -24,8 +24,8 @@ namespace Rano.Addressable
 
     public struct Resource
     {
-        string id;
-        Path path;
-        object asset;
+        public string id;
+        public Path path;
+        public object asset;
     }
 }

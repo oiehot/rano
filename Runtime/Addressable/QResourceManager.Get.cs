@@ -1,0 +1,47 @@
+// Copyright (C) OIEHOT - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+// Written by Taewoo Lee <oiehot@gmail.com>
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.SceneManagement;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceProviders;
+
+namespace Rano.Addressable
+{
+    public partial class QResourceManager : MonoBehaviour
+    {
+        private T Get<T>(Path path)
+        {
+            if (this.resources.ContainsKey(path))
+            {
+                return (T)this.resources[path].asset;
+            }
+            else
+            {
+                throw new Exception($"리소스가 캐싱되어 있지 않음: {path}");
+            }
+        }
+
+        /// <summary>Address를 통해 캐싱된 에셋을 얻는다</summary>
+        public T Get<T>(Address address)
+        {
+            Path path = address.GetPath();
+            return this.Get<T>(path);
+        }
+
+        /// <summary>AssetReference를 통해 캐싱된 에셋을 얻는다</summary>
+        public T Get<T>(AssetReference assetReference)
+        {
+            Path path = ResourceManagerUtils.GetPath(assetReference);
+            return this.Get<T>(path);
+        }
+    }
+}
