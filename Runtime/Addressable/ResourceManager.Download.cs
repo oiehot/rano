@@ -16,7 +16,7 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 
 namespace Rano.Addressable
 {
-    public partial class AssetManager : MonoBehaviour, IAssetManager
+    public partial class ResourceManager : MonoBehaviour
     {
         /// <summary>
         /// 다운로드 사이즈 얻기. 0이면 이미 캐싱된 것이다.
@@ -27,13 +27,14 @@ namespace Rano.Addressable
                 .Completed += (AsyncOperationHandle<long> handle) => {
                     if (handle.Status == AsyncOperationStatus.Succeeded)
                     {
-                        Log.Info($"Download Size: {label.value}: {handle.Result}");
+                        Log.Info($"Download Size: {label.value}(Label): {handle.Result}");
                     }
                     else
                     {
-                        Log.Warning($"Get Download Size Failed: {label.value}");
+                        Log.Warning($"Get Download Size Failed: {label.value}(Label)");
                     }
-                    Addressables.Release(handle);
+                    // TODO: Release?
+                    // Addressables.Release(handle);
             };
         }
 
@@ -45,7 +46,7 @@ namespace Rano.Addressable
                 {
                     if (handle.Status == AsyncOperationStatus.Succeeded)
                     {
-                        Log.Info($"Get ResourceLocations Complete from Label: {label.value}");
+                        Log.Info($"Get ResourceLocations Complete: {label.value}(Label)");
                         foreach (var item in handle.Result)
                         {
                             Log.Info($"* {item}");
@@ -58,7 +59,8 @@ namespace Rano.Addressable
                     {
                         Log.Info($"Get ResourceLocations Failed from Label: {label.value}");
                     }
-                    Addressables.Release(handle);
+                    // TODO: Release?
+                    // Addressables.Release(handle);
                 };
         }
 
@@ -69,14 +71,14 @@ namespace Rano.Addressable
                 .Completed += (AsyncOperationHandle handle) => {
                     if (handle.Status == AsyncOperationStatus.Succeeded)
                     {
-                        Log.Info($"DownloadDependencies Completed: {label.value} (using Label)");
+                        Log.Info($"DownloadDependencies Completed: {label.value}(Label)");
                     }
                     else
                     {
-                        Log.Warning($"DownloadDependencies Failed: {label.value} (using Label)");
+                        Log.Warning($"DownloadDependencies Failed: {label.value}(Label)");
                     }
-                    // handle.PercentComplete;
-                    Addressables.Release(handle);
+                    // TODO: Release?
+                    // Addressables.Release(handle);
                 };
         }
 
@@ -87,27 +89,34 @@ namespace Rano.Addressable
                 .Completed += (AsyncOperationHandle handle) => {
                     if (handle.Status == AsyncOperationStatus.Succeeded)
                     {
-                        Log.Info($"DownloadDependencies Completed: {address.value} (using Address)");
+                        Log.Info($"DownloadDependencies Completed: {address.value}(Address)");
                     }
                     else
                     {
-                        Log.Warning($"DownloadDependencies Failed: {address.value} (using Address)");
+                        Log.Warning($"DownloadDependencies Failed: {address.value}(Address)");
                     }
-                    // handle.PercentComplete;
-                    Addressables.Release(handle);
+                    // TODO: Release?
+                    // Addressables.Release(handle);
                 };
         }
         
-        /// <summary>주어진 레이블이 의존하는 에셋번들 캐시들을 삭제함</summart>
+        /// <summary>레이블로 에셋번들 캐시들을 삭제함</summart>
         public void ClearCacheAsync(Label label)
         {
             Addressables.ClearDependencyCacheAsync(label.value);
         }
 
-        /// <summary>주어진 어드레스가 의존하는 에셋번들 캐시들을 삭제함</summart>
+        /// <summary>어드레스로 에셋번들 캐시들을 삭제함</summart>
         public void ClearCacheAsync(Address address)
         {
             Addressables.ClearDependencyCacheAsync(address.value);
+        }
+
+        /// <summary>에셋레퍼런스로 에셋번들 캐시들을 삭제함</summart>
+        public void ClearCacheAsync(AssetReference assetReference)
+        {
+            // Addressables.ClearDependencyCacheAsync(address.value);
+            throw new NotImplementedException();
         }
     }
 }

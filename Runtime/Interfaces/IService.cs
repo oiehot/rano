@@ -8,7 +8,7 @@ namespace Rano
     public enum EServiceState
     {
         None,
-        Initalized,
+        Initialized,
         Running,
         Paused,
         Stopped

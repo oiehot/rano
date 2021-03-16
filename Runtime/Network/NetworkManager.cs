@@ -38,12 +38,12 @@ namespace Rano
         public void Init()
         {
             Log.Info("NetworkManager Init");
-            this.state = EServiceState.Initalized;
+            this.state = EServiceState.Initialized;
         }
 
         public void Run()
         {
-            if (this.state == EServiceState.Initalized ||
+            if (this.state == EServiceState.Initialized ||
                 this.state == EServiceState.Stopped)
             {
                 Log.Info("NetworkManager Run");
