@@ -164,15 +164,6 @@ namespace Rano.Addressable
             this.UnloadAsset(path);
         }
 
-        /// <summary>
-        /// Ref-Count가 0지만 언로드되지 않은 에셋은 강제로 언로드한다.
-        /// Ref-Count가 0더라도, 에셋번들이 완전히 Unload 되지 않은 경우 Asset은 Unload되지 않는다.
-        /// 주의: 잠깐 멈출 수 있음.
-        /// </summary>
-        public void FreeUnusedAssets()
-        {
-            Resources.UnloadUnusedAssets();
-        }
     }
 }
 

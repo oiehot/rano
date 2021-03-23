@@ -20,32 +20,6 @@ namespace Rano.Addressable
 {
     public partial class AssetManager : MonoBehaviour
     {
-        /// <summary>에셋을 언로드한다</summary>
-        public void UnloadAsset(Path path)
-        {
-            AssetInfo assetInfo;
-            if (this.assets.ContainsKey(path) == true)
-            {
-                assetInfo = this.assets[path];
-                if (assetInfo.status != AssetStatus.Loaded)
-                {
-                    // Log.Info($"에셋 언로드: {path} (이미 언로드되어 있어 생략함)");
-                    return;
-                }
-            }
-            else
-            {
-                // Log.Info($"에셋 언로드: {path} (이미 언로드되어 있어 생략함)");
-                return;
-            }
-
-            Log.Info($"에셋 언로드: {path}");
-            Addressables.Release(assetInfo.asset);
-            assetInfo.asset = null;
-            assetInfo.percent = 0.0f;
-            assetInfo.status = AssetStatus.None;
-        }
-
         public void UnloadAsset(Address address)
         {
             Path path = address.GetPath();
@@ -66,6 +40,39 @@ namespace Rano.Addressable
         {
             Path path = AssetManagerUtils.GetPath(assetReference);
             this.UnloadAsset(path);
+        }
+        
+        /// <summary>에셋을 언로드한다</summary>
+        public void UnloadAsset(Path path)
+        {
+            AssetInfo assetInfo;
+
+            if (!path.IsAssetPath())
+            {
+                // throw new Exception($"에셋 언로드 실패: {path} 는 에셋이 아님");
+                return;
+            }      
+
+            if (this.assets.ContainsKey(path) == true)
+            {
+                assetInfo = this.assets[path];
+                if (assetInfo.status != AssetStatus.Loaded)
+                {
+                    // Log.Info($"에셋 언로드: {path} (이미 언로드되어 있어 생략함)");
+                    return;
+                }
+            }
+            else
+            {
+                // Log.Info($"에셋 언로드: {path} (이미 언로드되어 있어 생략함)");
+                return;
+            }
+
+            Log.Info($"에셋 언로드: {path}");
+            Addressables.Release(assetInfo.asset);
+            assetInfo.asset = null;
+            assetInfo.percent = 0.0f;
+            assetInfo.status = AssetStatus.None;
         }
 
         /// <summary>

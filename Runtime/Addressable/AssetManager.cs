@@ -28,11 +28,13 @@ namespace Rano.Addressable
     {
         public AssetManagerStatus status {get; private set;}
         private Dictionary<Path, AssetInfo> assets;
+        private Dictionary<Path, SceneInfo> scenes;
         private Dictionary<Path, string> pathToId;
 
         void Awake()
         {
             this.assets = new Dictionary<Path, AssetInfo>();
+            this.scenes = new Dictionary<Path, SceneInfo>();
             this.pathToId = new Dictionary<Path, string>();
         }
 
@@ -87,8 +89,8 @@ namespace Rano.Addressable
             }
         }
 
-        /// <summary>비동기 로드/언로드 작업의 진행과정% 값을 resource 개체에 업데이트 함</summary>
-        IEnumerator UpdatePercentCoroutine(AssetInfo assetInfo, AsyncOperationHandle handle)
+        /// <summary>비동기 에셋 로드/언로드 작업의 진행과정% 값을 Info 개체에 업데이트 함</summary>
+        private IEnumerator UpdateAssetProgressCoroutine(AssetInfo assetInfo, AsyncOperationHandle handle)
         {
             while (!handle.IsDone)
             {
@@ -96,7 +98,20 @@ namespace Rano.Addressable
                 yield return new WaitForEndOfFrame();
             }
             // TODO: Release?
-            // Addressable.Release(handle);
+                // Addressable.Release(handle);
         }
+
+        /// <summary>비동기 씬 로드/언로드 작업의 진행과정% 값을 Info 개체에 업데이트 함</summary>
+        private IEnumerator UpdateSceneProgressCoroutine(SceneInfo sceneInfo, AsyncOperationHandle<SceneInstance> handle)
+        {
+            while (!handle.IsDone)
+            {
+                sceneInfo.percent = handle.PercentComplete;
+                yield return new WaitForEndOfFrame(); 
+                // yield return null;
+            }
+            // TODO: Release?
+                // Addressable.Release(handle);            
+        }        
     }
 }

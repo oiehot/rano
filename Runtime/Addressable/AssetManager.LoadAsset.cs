@@ -44,6 +44,12 @@ namespace Rano.Addressable
             AssetInfo assetInfo;
             AsyncOperationHandle handle;
 
+            if (!path.IsAssetPath())
+            {
+                // throw new Exception($"에셋 로드 실패: {path} 는 에셋이 아님");
+                return;
+            }            
+
             if (this.assets.ContainsKey(path) == true)
             {
                 assetInfo = this.assets[path];
@@ -52,11 +58,11 @@ namespace Rano.Addressable
             {
                 if (this.pathToId.ContainsKey(path) == false)
                 {
-                    throw new Exception($"{path}에 해당하는 어드레서블을 찾을 수 없음");
+                    throw new Exception($"에셋 로드 실패: {path}에 해당하는 어드레서블을 찾을 수 없음");
                 }
                 assetInfo = new AssetInfo();
+                assetInfo.id = this.pathToId[path]; // TODO: Label면 절대로 안된다.
                 assetInfo.path = path;
-                assetInfo.id = this.pathToId[path]; // Label, Address, AssetReference(GUID)
                 assetInfo.asset = null;
                 assetInfo.status = AssetStatus.None;
                 this.assets.Add(path, assetInfo);
@@ -85,7 +91,7 @@ namespace Rano.Addressable
                 }
             };
 
-            StartCoroutine(UpdatePercentCoroutine(assetInfo, handle));
+            StartCoroutine(UpdateAssetProgressCoroutine(assetInfo, handle));
         }
     }
 }

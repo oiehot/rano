@@ -14,6 +14,18 @@ namespace Rano.Addressable
             value = path;
         }
 
+        public bool IsAssetPath()
+        {
+            if (IsScenePath()) return false;
+            else return true;
+        }
+
+        public bool IsScenePath()
+        {
+            if (value.EndsWith(".unity")) return true;
+            else return false;
+        }
+
         public override string ToString()
         {
             return $"{value.ToString()}(Path)";

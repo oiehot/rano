@@ -1,3 +1,5 @@
+#if false
+
 // Copyright (C) OIEHOT - All Rights Reserved
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
@@ -18,7 +20,7 @@ namespace Rano.Addressable
 {
     public partial class AssetManager : MonoBehaviour
     {
-        public bool IsLoaded(Path path)
+        public bool IsAssetLoaded(Path path)
         {
             AssetInfo assetInfo;
             assetInfo = this.GetAssetInfo(path);
@@ -30,15 +32,17 @@ namespace Rano.Addressable
             else return false;
         }
 
-        public bool IsLoaded(Address address)
+        public bool IsAssetLoaded(Address address)
         {
-            return this.IsLoaded(address.GetPath());
+            return this.IsAssetLoaded(address.GetPath());
         }
 
-        public bool IsLoaded(AssetReference assetReference)
+        public bool IsAssetLoaded(AssetReference assetReference)
         {
             Path path = AssetManagerUtils.GetPath(assetReference);
-            return this.IsLoaded(path);
+            return this.IsAssetLoaded(path);
         }
     }
 }
+
+#endif

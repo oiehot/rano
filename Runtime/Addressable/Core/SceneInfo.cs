@@ -10,37 +10,39 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.AddressableAssets;
+using UnityEngine.AddressableAssets.ResourceLocators;
 using UnityEngine.ResourceManagement;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
+using UnityEngine.ResourceManagement.ResourceLocations;
 
 namespace Rano.Addressable
 {
-    public enum AssetStatus
+    public enum SceneStatus
     {
-        None,
         Loading,
         Loaded,
-        Failed
+        Unloading,
+        Unloaded,
     }
-
-    public class AssetInfo
+    
+    public class SceneInfo
     {
         public string id; // Address or AssetReference(GUID)
         public Path path;
-        public object asset;
-        public AssetStatus status;        
+        public SceneInstance? sceneInstance;
+        public SceneStatus status;
         public float percent;
 
         public bool IsLoaded()
         {
-            if (status == AssetStatus.Loaded) return true;
+            if (status == SceneStatus.Loaded) return true;
             else return false;
         }
-
+        
         public override string ToString()
         {
-            return $"Asset: path:{path}, status:{status}, percent:{percent}";
+            return $"Scene: path:{path}, status:{status}, percent:{percent}";
         }
     }
 }
