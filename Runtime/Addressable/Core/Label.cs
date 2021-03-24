@@ -32,7 +32,7 @@ namespace Rano.Addressable
             ResourceLocationMap map = AssetManagerUtils.GetResourceLocationMap();
             if (map != null)
             {
-                string key = value;            
+                string key = value;
                 if (map.Locations.ContainsKey(key))
                 {
                     IList<IResourceLocation> locations;

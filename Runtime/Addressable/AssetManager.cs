@@ -112,6 +112,6 @@ namespace Rano.Addressable
             }
             // TODO: Release?
                 // Addressable.Release(handle);            
-        }        
+        }
     }
 }

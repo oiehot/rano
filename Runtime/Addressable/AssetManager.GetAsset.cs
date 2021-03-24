@@ -34,7 +34,7 @@ namespace Rano.Addressable
             }
             else
             {
-                throw new Exception($"리소스가 로드되어 있찌 않음: {path}");
+                throw new Exception($"리소스가 로드되어 있지 않음: {path}");
             }
         }
 

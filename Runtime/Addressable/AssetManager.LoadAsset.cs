@@ -91,7 +91,7 @@ namespace Rano.Addressable
                 }
             };
 
-            StartCoroutine(UpdateAssetProgressCoroutine(assetInfo, handle));
+            StartCoroutine(this.UpdateAssetProgressCoroutine(assetInfo, handle));
         }
     }
 }
