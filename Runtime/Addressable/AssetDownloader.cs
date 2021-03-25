@@ -100,15 +100,27 @@ namespace Rano.Addressable
 
         public void Clear()
         {
-            // TODO: 코루틴이 실행중이면 중지한다.
-
-            // 현재 작업 리스트를 비운다. (히스토리 리스트는 비우지 않는다)
-            this.currentTasks.Clear();
+            switch (this.status)
+            {
+                case AssetDownloaderStatus.Initalizing:
+                case AssetDownloaderStatus.Downloading:
+                    throw new Exception("에셋다운로더: 초기화나 다운로드가 완료된 상태에서만 작업리스트를 비울 수 있습니다");
+                    break;
+                case AssetDownloaderStatus.None:                    
+                case AssetDownloaderStatus.Initialized:
+                case AssetDownloaderStatus.Downloaded:
+                case AssetDownloaderStatus.InitializeFailed:                
+                case AssetDownloaderStatus.DownloadFailed:
+                    Log.Info("에셋다운로더: 작업 리스트 리셋");
+                    this.status = AssetDownloaderStatus.None;
+                    this.currentTasks.Clear();
+                    break;
+            }
         }
 
         public void Run()
         {
-            StartCoroutine(this.DownloaderCoroutine());
+            StartCoroutine(this.RunCoroutine());
         }
 
         public bool IsDownloaded()
@@ -117,12 +129,19 @@ namespace Rano.Addressable
             else return false;
         }
 
-        private IEnumerator DownloaderCoroutine()
+        private IEnumerator RunCoroutine()
         {
-            int totalCount = this.currentTasks.Count;
+            yield return this.Initialize();
+            yield return this.WaitInitialize();
+            yield return this.Download();
+            yield return this.WaitDownload();
+        }
 
-            // 초기화: 용량 체크
+        private IEnumerator Initialize()
+        {
             Log.Info("에셋다운로더: 초기화중...");
+            this.status = AssetDownloaderStatus.Initalizing;
+            int totalCount = this.currentTasks.Count;
             for (int i=0; i<totalCount; i++)
             {
                 DownloadTask task = this.currentTasks[i];
@@ -141,10 +160,14 @@ namespace Rano.Addressable
                         }
                         // TODO: Addressables.Release(handle);
                     };
+                yield return null;
             }
+        }
 
-            // 초기화가 완료될 때까지 대기
+        private IEnumerator WaitInitialize()
+        {
             Log.Info("에셋다운로더: 초기화 완료 대기중...");
+            int totalCount = this.currentTasks.Count;            
             while (true)
             {
                 int initializedCount = 0;
@@ -166,15 +189,23 @@ namespace Rano.Addressable
                 if (initializedCount >= totalCount) break; // 초기화 종료
                 else yield return null;
             }
-            
-            // 초기화 완료
+
             Log.Info("에셋다운로더: 초기화 완료");
-            this.status = AssetDownloaderStatus.Initialized;
+            this.status = AssetDownloaderStatus.Initialized;            
+        }
+        
+        private IEnumerator Download()
+        {
+            if (this.status != AssetDownloaderStatus.Initialized)
+            {
+                Log.Warning("에셋다운로더: 초기화되어 있지않아 다운로드를 시작하지 않습니다");
+                yield break;
+            }
 
-            // 다운로드 시작
             Log.Info("에셋다운로더: 다운로드중...");
-            this.status = AssetDownloaderStatus.Downloading;
+            this.status = AssetDownloaderStatus.Downloading;            
 
+            int totalCount = this.currentTasks.Count;
             for (int i=0; i<totalCount; i++)
             {
                 AsyncOperationHandle handle;
@@ -206,10 +237,16 @@ namespace Rano.Addressable
                     // TODO: Addressables.Release(handle);
                 };
                 StartCoroutine(this.UpdateDownloadTaskProgress(task, handle));
+                yield return null;
             }
+        }
 
-            // 다운로드 완료 대기
+        private IEnumerator WaitDownload()
+        {
             Log.Info("에셋다운로더: 다운로드 완료 대기중...");
+
+            int totalCount = this.currentTasks.Count;
+            
             while (true)
             {
                 int downloadedCount = 0;
@@ -234,7 +271,7 @@ namespace Rano.Addressable
 
             // 다운로드 완료
             Log.Info("에셋다운로더: 다운로드 완료");
-            this.status = AssetDownloaderStatus.Downloaded;
+            this.status = AssetDownloaderStatus.Downloaded;            
         }
 
         private IEnumerator UpdateDownloadTaskProgress(DownloadTask info, AsyncOperationHandle handle)
@@ -246,13 +283,16 @@ namespace Rano.Addressable
             }
         }        
 
-        public DownloadTask QueueDownload(string key)
+        private DownloadTask QueueDownload(string key)
         {
             DownloadTask task;
             if (this.tasks.ContainsKey(key) == true)
             {
                 task = this.tasks[key];
-                if (task.status == DownloadStatus.Downloaded) return null;
+                if (task.status == DownloadStatus.Downloaded)
+                {
+                    return null;
+                }
             }
             else
             {
@@ -277,13 +317,5 @@ namespace Rano.Addressable
         {
             this.ClearCacheAsync(label.value);
         }
-
-        // public void ClearCache()
-        // {
-        //     Log.Info($"캐시 카운트: {Caching.cacheCount}");
-        //     bool result;
-        //     result = Caching.ClearCache();
-        //     Log.Info($"캐시 클리어 결과: {result}");
-        // }
     }
 }
