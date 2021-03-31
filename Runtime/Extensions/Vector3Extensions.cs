@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Rano
 {
-    public static class BoundsExtensions
+    public static class Vector3Extensions
     {
         public static Vector3 GetRandomPoint(this Bounds bounds)
         {

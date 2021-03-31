@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Rano
 {
-    public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
+    public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
         private static bool m_ShuttingDown = false;
         private static object m_Lock = new object();

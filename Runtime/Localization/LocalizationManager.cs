@@ -11,7 +11,7 @@ using Rano;
 
 namespace Rano
 {
-    public class LocalizationManager : Singleton<LocalizationManager>
+    public class LocalizationManager : MonoSingleton<LocalizationManager>
     {
         private LocalizationLanguage language;
         private Dictionary<string, string> dict;

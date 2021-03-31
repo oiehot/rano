@@ -29,7 +29,7 @@ namespace Rano.Addressable
         DownloadFailed
     }
 
-    public partial class AssetDownloader : MonoBehaviour
+    public partial class AssetDownloader : MonoSingleton<AssetDownloader>
     {
         private Dictionary<string, DownloadTask> tasks;
         private List<DownloadTask> currentTasks;
@@ -105,11 +105,10 @@ namespace Rano.Addressable
                 case AssetDownloaderStatus.Initalizing:
                 case AssetDownloaderStatus.Downloading:
                     throw new Exception("에셋다운로더: 초기화나 다운로드가 완료된 상태에서만 작업리스트를 비울 수 있습니다");
-                    break;
-                case AssetDownloaderStatus.None:                    
+                case AssetDownloaderStatus.None:
                 case AssetDownloaderStatus.Initialized:
                 case AssetDownloaderStatus.Downloaded:
-                case AssetDownloaderStatus.InitializeFailed:                
+                case AssetDownloaderStatus.InitializeFailed:
                 case AssetDownloaderStatus.DownloadFailed:
                     Log.Info("에셋다운로더: 작업 리스트 리셋");
                     this.status = AssetDownloaderStatus.None;
@@ -271,7 +270,7 @@ namespace Rano.Addressable
 
             // 다운로드 완료
             Log.Info("에셋다운로더: 다운로드 완료");
-            this.status = AssetDownloaderStatus.Downloaded;            
+            this.status = AssetDownloaderStatus.Downloaded;  
         }
 
         private IEnumerator UpdateDownloadTaskProgress(DownloadTask info, AsyncOperationHandle handle)

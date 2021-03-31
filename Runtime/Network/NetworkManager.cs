@@ -10,7 +10,7 @@ using Rano;
 
 namespace Rano
 {
-    public class NetworkManager : Singleton<NetworkManager>, IService
+    public class NetworkManager : MonoSingleton<NetworkManager>, IService
     {
         public EServiceState state { get; private set; }
         public bool connected { get; private set; }

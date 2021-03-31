@@ -33,19 +33,19 @@ namespace Rano.Addressable
                     locations = map.Locations[key];
                     if (locations.Count >= 2)
                     {
-                        throw new Exception($"GetPath Failed: 이 {key}(AssetReference) 는 여러개의 리소스 로케이션 데이터가 있음.");
+                        throw new Exception($"GetPath 실패: 이 {key}(AssetReference) 는 여러개의 리소스 로케이션 데이터가 있음.");
                     }
                     
                     return new Path(locations[0].InternalId);
                 }
                 else
                 {
-                    throw new Exception($"GetPath Failed: Invalid Key: {key}(AssetReference)");
+                    throw new Exception($"GetPath 실패: 잘못된 키: {key}(AssetReference)");
                 }
             }
             else
             {
-                throw new Exception($"GetPath Failed: Not found ResourceLocationMap");
+                throw new Exception($"GetPath 실패: ResourceLocationMap을 찾을수 없음");
             }
         }
 

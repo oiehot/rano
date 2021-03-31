@@ -16,7 +16,7 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 
 namespace Rano.Addressable
 {
-    public partial class AssetManager : MonoBehaviour
+    public partial class AssetManager : MonoSingleton<AssetManager>
     {
         #region Async
 

@@ -24,21 +24,21 @@ namespace Rano.Addressable
         Initialized,
     }
 
-    public partial class AssetManager : MonoBehaviour
+    public partial class AssetManager : MonoSingleton<AssetManager>
     {
         public AssetManagerStatus status {get; private set;}
         private Dictionary<Path, AssetInfo> assets;
-        private Dictionary<Path, SceneInfo> scenes;
+        private Dictionary<Address, SceneInstance> scenes;
         private Dictionary<Path, string> pathToId;
 
         void Awake()
         {
             this.assets = new Dictionary<Path, AssetInfo>();
-            this.scenes = new Dictionary<Path, SceneInfo>();
+            this.scenes = new Dictionary<Address, SceneInstance>();
             this.pathToId = new Dictionary<Path, string>();
         }
 
-        public void InitializeAsync()
+        public AsyncOperationHandle<IResourceLocator> InitializeAsync()
         {
             AsyncOperationHandle<IResourceLocator> handle;
             handle = Addressables.InitializeAsync();
@@ -54,7 +54,8 @@ namespace Rano.Addressable
                     throw new Exception("AssetManager: 초기화 실패");
                 }
             };
-        }        
+            return handle;
+        }
 
         private void CacheCatalog()
         {
@@ -95,23 +96,15 @@ namespace Rano.Addressable
             while (!handle.IsDone)
             {
                 assetInfo.percent = handle.PercentComplete;
-                yield return new WaitForEndOfFrame();
+                yield return null;
             }
             // TODO: Release?
                 // Addressable.Release(handle);
         }
 
-        /// <summary>비동기 씬 로드/언로드 작업의 진행과정% 값을 Info 개체에 업데이트 함</summary>
-        private IEnumerator UpdateSceneProgressCoroutine(SceneInfo sceneInfo, AsyncOperationHandle<SceneInstance> handle)
+        public void ReleaseHandle(AsyncOperationHandle handle)
         {
-            while (!handle.IsDone)
-            {
-                sceneInfo.percent = handle.PercentComplete;
-                yield return new WaitForEndOfFrame(); 
-                // yield return null;
-            }
-            // TODO: Release?
-                // Addressable.Release(handle);            
+            Addressables.Release(handle);
         }
     }
 }

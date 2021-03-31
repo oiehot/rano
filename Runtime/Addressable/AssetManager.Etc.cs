@@ -18,31 +18,20 @@ using UnityEngine.ResourceManagement.ResourceLocations;
 
 namespace Rano.Addressable
 {
-    public enum SceneStatus
+    public partial class AssetManager : MonoSingleton<AssetManager>
     {
-        Loading,
-        Loaded,
-        Unloading,
-        Unloaded,
-    }
-    
-    public class SceneInfo
-    {
-        public string id; // Address or AssetReference(GUID)
-        public Path path;
-        public SceneInstance? sceneInstance;
-        public SceneStatus status;
-        public float percent;
+        #region Etc
 
-        public bool IsLoaded()
+        /// <summary>
+        /// Ref-Count가 0지만 언로드되지 않은 에셋은 강제로 언로드한다.
+        /// Ref-Count가 0더라도, 에셋번들이 완전히 Unload 되지 않은 경우 Asset은 Unload되지 않는다.
+        /// 주의: 잠깐 멈출 수 있음.
+        /// </summary>
+        public void FreeUnusedAssets()
         {
-            if (status == SceneStatus.Loaded) return true;
-            else return false;
+            Resources.UnloadUnusedAssets();
         }
-        
-        public override string ToString()
-        {
-            return $"Scene: path:{path}, status:{status}, percent:{percent}";
-        }
+
+        #endregion
     }
 }

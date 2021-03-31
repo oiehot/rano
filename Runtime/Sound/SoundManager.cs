@@ -14,7 +14,7 @@ namespace Rano
     /// <todo>
     /// TODO: PlayOneShot 의 사용
     /// </todo>
-    public partial class SoundManager : Singleton<SoundManager>
+    public partial class SoundManager : MonoSingleton<SoundManager>
     {
         public Dictionary<string, AudioClip> clips;        
         public Dictionary<string, SoundLayer> layers;
