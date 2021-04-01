@@ -22,7 +22,7 @@ namespace Rano.Addressable
         /// <summary>
         /// 씬을 교체함. 로드된 모든 씬들은 언로드된다.
         /// </summary>        
-        public AsyncOperationHandle<SceneInstance> ChangeSceneAsync(Address address, bool activateOnLoad=true)
+        public AsyncOperationHandle<SceneInstance> ChangeSceneAsync(Address address)
         {
             if (this.scenes.ContainsKey(address))
             {
@@ -30,7 +30,7 @@ namespace Rano.Addressable
             }
 
             AsyncOperationHandle<SceneInstance> handle;
-            handle = Addressables.LoadSceneAsync(address.value, LoadSceneMode.Single, activateOnLoad);
+            handle = Addressables.LoadSceneAsync(address.value, LoadSceneMode.Single, true); // activateOnLoad:true
             handle.Completed += (handle) => {
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
@@ -40,7 +40,7 @@ namespace Rano.Addressable
                 }
                 else
                 {
-                    throw new Exception($"씬 추가 실패: {address}");
+                    throw new Exception($"씬 교체 실패: {address}");
                 }
             };
             return handle;
@@ -49,7 +49,7 @@ namespace Rano.Addressable
         /// <summary>
         /// 씬을 추가함. 기존에 열린 씬들은 닫히지 않는다.
         /// </summary>
-        public AsyncOperationHandle<SceneInstance> AddSceneAsync(Address address, bool activateOnLoad=true)
+        public AsyncOperationHandle<SceneInstance> AddSceneAsync(Address address)
         {
             if (this.scenes.ContainsKey(address))
             {
@@ -57,7 +57,7 @@ namespace Rano.Addressable
             }
 
             AsyncOperationHandle<SceneInstance> handle;
-            handle = Addressables.LoadSceneAsync(address.value, LoadSceneMode.Additive, activateOnLoad);
+            handle = Addressables.LoadSceneAsync(address.value, LoadSceneMode.Additive, true); // activateOnLoad:true
             handle.Completed += (handle) => {
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
@@ -100,29 +100,16 @@ namespace Rano.Addressable
             return handle;
         }
 
-        // public IEnumerator RemoveAllScenes(Address excludeAddress)
-        // {
-        //     List<Address> sceneAddresses = this.scenes.Keys.ToList();
-        //     foreach (Address sceneAddress in sceneAddresses)
-        //     {
-        //         if (sceneAddress.value != excludeAddress.value)
-        //             yield return this.RemoveSceneAsync(sceneAddress);
-        //     }
-        // }
-
-        // public IEnumerator ChangeSceneAsync(Address address)
-        // {
-        //     yield return StartCoroutine(this.RemoveAllScenes());
-        //     yield return this.AddSceneAsync(address, activateOnLoad:true);
-        // }
-
         public AsyncOperation ActivateSceneAsync(Address address)
         {
             if (this.scenes.ContainsKey(address) == false)
             {            
-                throw new Exception($"씬 활성화 실패: {address}가 로드되어있지 않음");
+                throw new Exception($"씬 활성화 실패: {address}가 로드 되어있지 않음");
             }
-            return this.scenes[address].ActivateAsync();
+            else
+            {
+                return this.scenes[address].ActivateAsync();
+            }
         }
     }
 }
