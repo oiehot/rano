@@ -10,23 +10,38 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.AddressableAssets;
+using UnityEngine.AddressableAssets.ResourceLocators;
 using UnityEngine.ResourceManagement;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
-using System.Linq;
+using UnityEngine.ResourceManagement.ResourceLocations;
 
 namespace Rano.Addressable
 {
-    public partial class AssetManager : MonoSingleton<AssetManager>
+    public partial class SceneManager : MonoSingleton<SceneManager>
     {
+        public enum Status
+        {
+            None,
+            Initialized,
+        }
+        public Status status {get; private set;}
+        private Dictionary<Address, SceneInstance> _scenes;
+
+        void Awake()
+        {
+            status = Status.None;
+            _scenes = new Dictionary<Address, SceneInstance>();
+        }
+
         /// <summary>
         /// 씬을 교체함. 로드된 모든 씬들은 언로드된다.
-        /// </summary>        
+        /// </summary>
         public AsyncOperationHandle<SceneInstance> ChangeSceneAsync(Address address)
         {
-            if (this.scenes.ContainsKey(address))
+            if (_scenes.ContainsKey(address))
             {
-                throw new Exception($"씬 교체 실패: {address}는 이미 로드되어 있음");
+                throw new SceneOperationException($"씬 교체 실패: {address}는 이미 로드되어 있음");
             }
 
             AsyncOperationHandle<SceneInstance> handle;
@@ -35,12 +50,12 @@ namespace Rano.Addressable
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
                     Log.Info($"씬 교체됨: {address}");
-                    this.scenes.Clear(); // 등재 씬 전부 삭제.
-                    this.scenes.Add(address, handle.Result); // 새 씬 등재
+                    _scenes.Clear(); // 등재 씬 전부 삭제.
+                    _scenes.Add(address, handle.Result); // 새 씬 등재
                 }
                 else
                 {
-                    throw new Exception($"씬 교체 실패: {address}");
+                    throw new SceneOperationException($"씬 교체 실패: {address}");
                 }
             };
             return handle;
@@ -51,9 +66,9 @@ namespace Rano.Addressable
         /// </summary>
         public AsyncOperationHandle<SceneInstance> AddSceneAsync(Address address)
         {
-            if (this.scenes.ContainsKey(address))
+            if (_scenes.ContainsKey(address))
             {
-                throw new Exception($"씬 추가 실패: {address}는 이미 로드되어 있음");
+                throw new SceneOperationException($"씬 추가 실패: {address}는 이미 로드되어 있음");
             }
 
             AsyncOperationHandle<SceneInstance> handle;
@@ -62,15 +77,15 @@ namespace Rano.Addressable
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
                     Log.Info($"씬 추가됨: {address}");
-                    this.scenes.Add(address, handle.Result); // SceneInstance 등재
+                    _scenes.Add(address, handle.Result); // SceneInstance 등재
                 }
                 else
                 {
-                    throw new Exception($"씬 추가 실패: {address}");
+                    throw new SceneOperationException($"씬 추가 실패: {address}");
                 }
             };
             return handle;
-        }        
+        }
 
         /// <summary>
         /// 씬을 제거한다. 기존에 열린 씬들은 건들지 않는다.
@@ -78,23 +93,23 @@ namespace Rano.Addressable
         /// </summary>
         public AsyncOperationHandle<SceneInstance> RemoveSceneAsync(Address address, bool autoReleaseHandle=true)
         {
-            if (this.scenes.ContainsKey(address) == false)
-            {            
-                throw new Exception($"씬 제거 실패: {address}가 로드되어있지 않음");
+            if (_scenes.ContainsKey(address) == false)
+            {
+                throw new SceneOperationException($"씬 제거 실패: {address}가 로드되어있지 않음");
             }
 
             AsyncOperationHandle<SceneInstance> handle;
-            SceneInstance sceneInstance = this.scenes[address];
+            SceneInstance sceneInstance = _scenes[address];
             handle = Addressables.UnloadSceneAsync(sceneInstance, autoReleaseHandle);
             handle.Completed += (handle) => {
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
                     Log.Info($"씬 제거: {address}");
-                    this.scenes.Remove(address);
+                    _scenes.Remove(address);
                 }
                 else
                 {
-                    throw new Exception($"씬 제거 실패: {address}");
+                    throw new SceneOperationException($"씬 제거 실패: {address}");
                 }
             };
             return handle;
@@ -102,14 +117,34 @@ namespace Rano.Addressable
 
         public AsyncOperation ActivateSceneAsync(Address address)
         {
-            if (this.scenes.ContainsKey(address) == false)
-            {            
-                throw new Exception($"씬 활성화 실패: {address}가 로드 되어있지 않음");
+            if (_scenes.ContainsKey(address) == false)
+            {
+                throw new SceneOperationException($"씬 활성화 실패: {address}가 로드 되어있지 않음");
             }
             else
             {
-                return this.scenes[address].ActivateAsync();
+                return _scenes[address].ActivateAsync();
             }
+        }
+
+        // public void ReleaseHandle(AsyncOperationHandle handle)
+        // {
+        //     Addressables.Release(handle);
+        // }
+    }
+
+    public class SceneOperationException : Exception
+    {
+        public SceneOperationException()
+        {
+        }
+
+        public SceneOperationException(string message) : base(message)
+        {
+        }
+
+        public SceneOperationException(string message, Exception inner) : base(message, inner)
+        {
         }
     }
 }

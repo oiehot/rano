@@ -17,7 +17,7 @@ namespace Rano
 
         public bool isRunning {get; private set;}
         public T current {get; private set;}
-        public T next {get; set;}
+        public T next {get; set;} // 이 값을 설정하면 곧 상태가 바뀐다.
 
         public bool shouldChange => !EqualityComparer<T>.Default.Equals(current, next);
 
