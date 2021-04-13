@@ -26,7 +26,8 @@ namespace Rano
             Rano.Log.Important("Capture Screenshot to " + path);
         }
         
-        #if UNITY_EDITOR
+        // TODO: ENABLE_INPUT_SYSTEM
+        #if UNITY_EDITOR && ENABLE_LEGACY_INPUT_MANAGER
         public void Update()
         {   
             if (
