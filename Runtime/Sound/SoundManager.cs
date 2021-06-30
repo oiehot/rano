@@ -11,15 +11,14 @@ using Rano;
 
 namespace Rano
 {
-    /// <todo>
-    /// TODO: PlayOneShot 의 사용
-    /// </todo>
-    public partial class SoundManager : MonoSingleton<SoundManager>
+    public class SoundManager : MonoSingleton<SoundManager>
     {
-        public Dictionary<string, AudioClip> clips;        
-        public Dictionary<string, SoundLayer> layers;
-        public AudioListener audioListener;
-        public float masterVolume {
+        Dictionary<string, AudioClip> clips;
+        Dictionary<string, SoundLayer> layers;
+        AudioListener audioListener;
+
+        public float masterVolume
+        {
             get
             {
                 return AudioListener.volume;
@@ -32,30 +31,33 @@ namespace Rano
 
         void Awake()
         {
-            this.clips = new Dictionary<string, AudioClip>();
-            this.layers = new Dictionary<string, SoundLayer>();
+            clips = new Dictionary<string, AudioClip>();
+            layers = new Dictionary<string, SoundLayer>();
 
             // 현재 씬에 AudioListener가 없다면(보통 카메라에 있음) 이 사운드 매니져에 장착한다.
-            this.audioListener = UnityEngine.Object.FindObjectOfType<AudioListener>();
-            if (this.audioListener == null)
+            audioListener = UnityEngine.Object.FindObjectOfType<AudioListener>();
+            if (audioListener == null)
             {
-                this.audioListener = this.gameObject.AddComponent<AudioListener>();
+                audioListener = gameObject.AddComponent<AudioListener>();
             }
         }
 
         void OnEnable()
         {
-            Log.Info("SoundManager Enabled");
+            Log.Important("SoundManager Enabled");
         }
 
         void OnDisable()
         {
-            Log.Info("SoundManager Disabled");
+            Log.Important("SoundManager Disabled");
         }
-        
-        /// <example>
+
+        /// <summary>
+        /// 사운드 레이어를 추가한다.
+        /// </summary>
+        /// <example><code>
         /// SoundManager.Instance.AddLayer("Music");
-        /// <example>
+        /// </code></example>
         public SoundLayer AddLayer(string name, float volume=1.0f)
         {
             Log.Info($"Add SoundLayer: {name}");
@@ -64,17 +66,19 @@ namespace Rano
             SoundLayer soundLayer = soundLayerGameObject.AddComponent<SoundLayer>();
             soundLayer.layerName = name;
             soundLayer.volume = volume;
-            soundLayerGameObject.transform.parent = this.gameObject.transform;
-            this.layers.Add(name, soundLayer);
+            soundLayerGameObject.transform.parent = gameObject.transform;
+            layers.Add(name, soundLayer);
             return soundLayer;
         }
 
-        /// <summary>로드된 오디오 클립을 찾는다</summary>
+        /// <summary>
+        /// 로드된 오디오 클립을 찾는다.
+        /// </summary>
         public AudioClip FindClip(string clipName)
         {
-            if (this.clips.ContainsKey(clipName))
+            if (clips.ContainsKey(clipName))
             {
-                return this.clips[clipName];
+                return clips[clipName];
             }
             else
             {
@@ -82,10 +86,17 @@ namespace Rano
             }
         }
 
-        /// <summary>리소스 폴더로 부터 사운드를 로드한다.</summary>
+        /// <summary>
+        /// 리소스 폴더로 부터 사운드를 로드한다.
+        /// </summary>
+        /// <example><code>
+        /// SoundManager.Instance.LoadInResources("BGM_GameMenu", "Sounds/BGM/BGM_GameMenu");
+        /// SoundManager.Instance.LoadInResources("SFX_Bounce_01", "Sounds/SFX/SFX_Bounce_01");
+        /// </code></example>
         public void LoadInResources(string clipName, string path)
         {
             AudioClip audioClip;
+
             try
             {
                 audioClip = Resources.Load<AudioClip>(path);
@@ -96,9 +107,9 @@ namespace Rano
                 return;
             }
 
-            if (audioClip)
+            if (audioClip != null)
             {
-                this.clips.Add(clipName, audioClip);
+                clips.Add(clipName, audioClip);
                 Log.Info($"AudioClip Loaded: {clipName} <= {path}");
             }
             else
@@ -107,22 +118,25 @@ namespace Rano
             }
         }
 
-        /// <example>
+        /// <summary>
+        /// 원하는 레이어에서 특정 클립을 플레이한다.
+        /// </summary>
+        /// <example><code>
         /// SoundManager.Instance.Play("Music", "BGM_GamePlay1", true);
-        /// </example>
-        public AudioSource Play(string soundLayerName, string clipName, bool loop=false)
+        /// </code></example>
+        public AudioSource Play(string soundLayerName, string clipName, bool loop)
         {
             AudioClip clip;
-            clip = this.FindClip(clipName);
+            clip = FindClip(clipName);
             if (!clip)
             {
                 Log.Warning($"Not found AudioClip: {clipName}");
                 return null;
             }
 
-            if (this.layers.ContainsKey(soundLayerName))
+            if (layers.ContainsKey(soundLayerName))
             {
-                return this.layers[soundLayerName].Play(clip, loop);
+                return layers[soundLayerName].Play(clip, loop);
             }
             else
             {
@@ -131,78 +145,94 @@ namespace Rano
             }
         }
 
-        /// <example>
+        /// <summary>
+        /// 특정 레이어에서 플레이중인 클립을 중지한다.
+        /// </summary>
+        /// <example><code>
         /// SoundManager.Instance.Stop("Music", "BGM_GamePlay1");
-        /// </example>
+        /// </code></example>
         public void Stop(string soundLayerName, string clipName)
         {
             AudioClip clip;
-            clip = this.FindClip(clipName);
+            clip = FindClip(clipName);
             if (!clip) return;
 
-            if (this.layers.ContainsKey(soundLayerName))
+            if (layers.ContainsKey(soundLayerName))
             {
-                this.layers[soundLayerName].Stop(clip);
+                layers[soundLayerName].Stop(clip);
             }
             else
             {
                 Log.Warning($"Not found SoundLayer: {soundLayerName}");
-            }            
+            }
         }
 
-        /// <summary>모든 레이어에서 출력중인 사운드를 중지한다</summary>
+        /// <summary>
+        /// 모든 레이어에서 출력중인 사운드를 중지한다.
+        /// </summary>
         public void StopAll()
         {
-            foreach(SoundLayer soundLayer in this.layers.Values)
+            foreach(SoundLayer soundLayer in layers.Values)
             {
                 soundLayer.StopAll();
-            }            
+            }
         }
 
-        /// <summary>모든 레이어의 출력을 멈춘다</summary>
+        /// <summary>
+        /// 모든 레이어의 출력을 멈춘다.
+        /// </summary>
         public void Pause()
         {
-            foreach(SoundLayer soundLayer in this.layers.Values)
+            foreach(SoundLayer soundLayer in layers.Values)
             {
                 soundLayer.Pause();
             }
         }
 
-        /// <summary>모든 레이어의 출력을 재개한다</summary>
+        /// <summary>
+        /// 모든 레이어의 출력을 재개한다.
+        /// </summary>
         public void Resume()
         {
-            foreach(SoundLayer soundLayer in this.layers.Values)
+            foreach(SoundLayer soundLayer in layers.Values)
             {
                 soundLayer.Resume();
             }
         }
 
-        /// <summary>특정 레이어를 Mute한다</summary>
-        /// <example>
+        /// <summary>
+        /// 특정 레이어를 Mute 여부를 설정한다.
+        /// </summary>
+        /// <example><code>
         /// SoundManager.Instance.SetMute("Music", true);
-        /// </example>
+        /// </code></example>
         public void SetMute(string soundLayerName, bool mute)
         {
-            if (this.layers.ContainsKey(soundLayerName))
+            if (layers.ContainsKey(soundLayerName))
             {
-                this.layers[soundLayerName].SetMute(mute);
+                layers[soundLayerName].SetMute(mute);
             }
             else
             {
                 Log.Warning($"Not found SoundLayer: {soundLayerName}");
-            }            
+            }
         }
 
+        /// <summary>
+        /// 특정 레이어의 뮤트값을 없는다.
+        /// </summary>
+        /// <returns>
+        /// 뮤트 여부 bool 값.
+        /// </returns>
         public bool GetMute(string soundLayerName)
         {
-            if (this.layers.ContainsKey(soundLayerName))
+            if (layers.ContainsKey(soundLayerName))
             {
-                return this.layers[soundLayerName].GetMute();
+                return layers[soundLayerName].GetMute();
             }
             else
             {
-                Log.Warning($"Not found SoundLayer: {soundLayerName}");
-                return false; // TODO: Check                
+                throw new NotFoundSoundLayerException($"Not found SoundLayer: {soundLayerName}");
             }
         }
     }
