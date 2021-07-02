@@ -72,7 +72,7 @@ namespace Rano.Addressable
             }
 
             AsyncOperationHandle<SceneInstance> handle;
-            handle = Addressables.LoadSceneAsync(address.value, LoadSceneMode.Additive, true); // activateOnLoad:true
+            handle = Addressables.LoadSceneAsync(address.value, LoadSceneMode.Additive, activateOnLoad:true);
             handle.Completed += (handle) => {
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
@@ -115,7 +115,26 @@ namespace Rano.Addressable
             return handle;
         }
 
-        public AsyncOperation ActivateSceneAsync(Address address)
+        // TODO: Instantiate가 지정되는 활성화가 아니라 로드 후 씬이 켜지는 활성화를 말하는것 같다.
+        // public AsyncOperation ActivateSceneAsync(Address address)
+        // {
+        //     if (_scenes.ContainsKey(address) == false)
+        //     {
+        //         throw new SceneOperationException($"씬 활성화 실패: {address}가 로드 되어있지 않음");
+        //     }
+        //     else
+        //     {
+        //         return _scenes[address].ActivateAsync();
+        //     }
+        // }
+
+        /// <summary>
+        /// 씬을 활성화한다.
+        /// </summary>
+        /// <remarks>
+        /// Instantiate된 개체가 지정되는 씬 활성화를 말한다.
+        /// </remarks>
+        public void ActivateScene(Address address)
         {
             if (_scenes.ContainsKey(address) == false)
             {
@@ -123,7 +142,8 @@ namespace Rano.Addressable
             }
             else
             {
-                return _scenes[address].ActivateAsync();
+                Log.Info($"현재 활성화 씬으로 지정: {address}");
+                UnityEngine.SceneManagement.SceneManager.SetActiveScene(_scenes[address].Scene);
             }
         }
 
@@ -131,20 +151,5 @@ namespace Rano.Addressable
         // {
         //     Addressables.Release(handle);
         // }
-    }
-
-    public class SceneOperationException : Exception
-    {
-        public SceneOperationException()
-        {
-        }
-
-        public SceneOperationException(string message) : base(message)
-        {
-        }
-
-        public SceneOperationException(string message, Exception inner) : base(message, inner)
-        {
-        }
     }
 }

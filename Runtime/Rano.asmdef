@@ -6,7 +6,8 @@
         "GooglePlayGames",
         "UnityEngine.Purchasing",
         "Unity.Addressables",
-        "Unity.ResourceManager"
+        "Unity.ResourceManager",
+        "DOTween.Modules"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
