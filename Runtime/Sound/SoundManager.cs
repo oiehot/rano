@@ -44,12 +44,12 @@ namespace Rano
 
         void OnEnable()
         {
-            Log.Important("SoundManager Enabled");
+            Log.Info("SoundManager Enabled");
         }
 
         void OnDisable()
         {
-            Log.Important("SoundManager Disabled");
+            Log.Info("SoundManager Disabled");
         }
 
         /// <summary>
