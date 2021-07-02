@@ -10,133 +10,82 @@ using Rano;
 
 namespace Rano
 {
-    public class NetworkManager : MonoSingleton<NetworkManager>, IService
+    public class NetworkManager : MonoSingleton<NetworkManager>
     {
-        public EServiceState state { get; private set; }
-        public bool connected { get; private set; }
+        public bool isConnected { get; private set; }
 
-        public UnityAction OnNetworkConnected;
-        public UnityAction OnNetworkDisconnected;
-        private Coroutine checkNetworkCoroutine;
+        [Header("Ping")]
+        public string pingAddress = "8.8.8.8";
+        public float pingWaitTime = 0.5f;
+        public float pingNextTime = 5.0f;
+
+        [Header("Events")]
+        public UnityEvent onConnected;
+        public UnityEvent onDisconnected;
 
         void Awake()
         {
-            this.state = EServiceState.None;
-            this.connected = false;
+            isConnected = false;
         }
 
         void OnEnable()
         {
-            this.Resume();
+            Log.Info("NetworkManager Enabled");
+            StartCoroutine(nameof(CoUpdate));
         }
 
         void OnDisable()
         {
-            this.Pause();
+            Log.Info("NetworkManager Disabled");
+            StopCoroutine(nameof(CoUpdate));
         }
 
-        public void Init()
+        IEnumerator CoUpdate()
         {
-            Log.Info("NetworkManager Init");
-            this.state = EServiceState.Initialized;
-        }
-
-        public void Run()
-        {
-            if (this.state == EServiceState.Initialized ||
-                this.state == EServiceState.Stopped)
-            {
-                Log.Info("NetworkManager Run");
-                this.state = EServiceState.Running;
-                this.checkNetworkCoroutine = StartCoroutine(this.CheckNetworkCoroutine());
-            }
-        }
-
-        public void Pause()
-        {
-            if (this.state == EServiceState.Running)
-            {
-                Log.Info("NetworkManager Pause");
-                StopCoroutine(this.checkNetworkCoroutine);
-                this.state = EServiceState.Paused;
-            }
-        }
-
-        public void Resume()
-        {
-            if (this.state == EServiceState.Paused)
-            {
-                Log.Info("NetworkManager Resume");
-                this.checkNetworkCoroutine = StartCoroutine(this.CheckNetworkCoroutine());
-                this.state = EServiceState.Running;
-            }
-        }
-
-        public void Stop()
-        {
-            if (this.state == EServiceState.Running)
-            {
-                Log.Info("NetworkManager Running > Stop");
-                StopCoroutine(this.checkNetworkCoroutine);
-                this.state = EServiceState.Stopped;
-            }
-            else if(this.state == EServiceState.Paused)
-            {
-                Log.Info("NetworkManager Pause > Stop");
-                this.state = EServiceState.Stopped;
-            }
-        }
-
-        IEnumerator CheckNetworkCoroutine()
-        {
-            const string pingAddress = "8.8.8.8";
-            const float pingWaitTime = 0.5f;
-            const float nextDelayTime = 5.0f;
             Ping ping;
-            // float pingStartTime;
 
-            while (this.state == EServiceState.Running)
+            while (true)
             {
+                // 핑 발사
                 ping = new Ping(pingAddress);
-                // pingStartTime = Time.time;
 
+                // 핑 대기
                 yield return new WaitForSeconds(pingWaitTime);
 
                 if (ping.isDone)
                 {
-                    // Ping 성공
                     if (ping.time >=0)
                     {
-                        // OFF > ON 인 경우
-                        if (!this.connected)
+                        // OFF > ON
+                        if (isConnected == false)
                         {
-                            this.OnNetworkConnected();
-                            this.connected = true;
+                            onConnected.Invoke();
+                            isConnected = true;
                         }
                     }
                     else
                     {
                         // Ping 실패 (-1 리턴)
-                        // ON >> OFF 인 경우
-                        if (this.connected)
+                        // ON >> OFF
+                        if (isConnected)
                         {
-                            this.OnNetworkDisconnected();
-                            this.connected = false;
+                            onDisconnected.Invoke();
+                            isConnected = false;
                         }
                     }
                 }
                 else
                 {
-                    // Ping 실패 (Timeout)
-                    if (this.connected)
+                    // Timeout 으로 인한 Ping 실패
+                    if (isConnected)
                     {
-                        this.OnNetworkDisconnected();
-                        this.connected = false;
+                        onDisconnected.Invoke();
+                        isConnected = false;
                     }
                 }
 
-                // 첫번째 Ping인 경우 업데이트 시간 수정.
-                yield return new WaitForSeconds(nextDelayTime);
+                // 다음 시도 기다림
+                yield return new WaitForSeconds(pingNextTime);
             }
         }
     }
