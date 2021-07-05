@@ -26,7 +26,7 @@ namespace Rano.Addressable
             Initialized,
         }
         public Status status {get; private set;}
-        private Dictionary<Address, SceneInstance> _scenes;
+        Dictionary<Address, SceneInstance> _scenes;
 
         void Awake()
         {
@@ -41,7 +41,7 @@ namespace Rano.Addressable
         {
             if (_scenes.ContainsKey(address))
             {
-                throw new SceneOperationException($"씬 교체 실패: {address}는 이미 로드되어 있음");
+                throw new SceneManagerException($"씬 교체 실패: {address}는 이미 로드되어 있음");
             }
 
             AsyncOperationHandle<SceneInstance> handle;
@@ -55,7 +55,7 @@ namespace Rano.Addressable
                 }
                 else
                 {
-                    throw new SceneOperationException($"씬 교체 실패: {address}");
+                    throw new SceneManagerException($"씬 교체 실패: {address}");
                 }
             };
             return handle;
@@ -68,7 +68,7 @@ namespace Rano.Addressable
         {
             if (_scenes.ContainsKey(address))
             {
-                throw new SceneOperationException($"씬 추가 실패: {address}는 이미 로드되어 있음");
+                throw new SceneManagerException($"씬 추가 실패: {address}는 이미 로드되어 있음");
             }
 
             AsyncOperationHandle<SceneInstance> handle;
@@ -81,7 +81,7 @@ namespace Rano.Addressable
                 }
                 else
                 {
-                    throw new SceneOperationException($"씬 추가 실패: {address}");
+                    throw new SceneManagerException($"씬 추가 실패: {address}");
                 }
             };
             return handle;
@@ -95,7 +95,7 @@ namespace Rano.Addressable
         {
             if (_scenes.ContainsKey(address) == false)
             {
-                throw new SceneOperationException($"씬 제거 실패: {address}가 로드되어있지 않음");
+                throw new SceneManagerException($"씬 제거 실패: {address}가 로드되어있지 않음");
             }
 
             AsyncOperationHandle<SceneInstance> handle;
@@ -109,24 +109,11 @@ namespace Rano.Addressable
                 }
                 else
                 {
-                    throw new SceneOperationException($"씬 제거 실패: {address}");
+                    throw new SceneManagerException($"씬 제거 실패: {address}");
                 }
             };
             return handle;
         }
-
-        // TODO: Instantiate가 지정되는 활성화가 아니라 로드 후 씬이 켜지는 활성화를 말하는것 같다.
-        // public AsyncOperation ActivateSceneAsync(Address address)
-        // {
-        //     if (_scenes.ContainsKey(address) == false)
-        //     {
-        //         throw new SceneOperationException($"씬 활성화 실패: {address}가 로드 되어있지 않음");
-        //     }
-        //     else
-        //     {
-        //         return _scenes[address].ActivateAsync();
-        //     }
-        // }
 
         /// <summary>
         /// 씬을 활성화한다.
@@ -138,12 +125,13 @@ namespace Rano.Addressable
         {
             if (_scenes.ContainsKey(address) == false)
             {
-                throw new SceneOperationException($"씬 활성화 실패: {address}가 로드 되어있지 않음");
+                throw new SceneManagerException($"씬 활성화 실패: {address}가 로드 되어있지 않음");
             }
             else
             {
                 Log.Info($"현재 활성화 씬으로 지정: {address}");
                 UnityEngine.SceneManagement.SceneManager.SetActiveScene(_scenes[address].Scene);
+                // _scenes[address].ActivateAsync(); // 로드 후 활성화
             }
         }
 

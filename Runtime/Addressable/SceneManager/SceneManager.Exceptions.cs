@@ -10,17 +10,17 @@ namespace Rano.Addressable
 {
     public partial class SceneManager : MonoSingleton<SceneManager>
     {
-        public class SceneOperationException : Exception
+        public class SceneManagerException : Exception
         {
-            public SceneOperationException()
+            public SceneManagerException()
             {
             }
 
-            public SceneOperationException(string message) : base(message)
+            public SceneManagerException(string message) : base(message)
             {
             }
 
-            public SceneOperationException(string message, Exception inner) : base(message, inner)
+            public SceneManagerException(string message, Exception inner) : base(message, inner)
             {
             }
         }

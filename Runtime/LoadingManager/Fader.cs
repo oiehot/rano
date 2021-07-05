@@ -26,11 +26,9 @@ namespace Rano
         [Header("Fade In/Out")]
         public Image fadeImage;
         public Ease fadeEase = Ease.OutQuad;
-        public float fadeSpeed = 0.5f;
 
         [Header("Progress")]
         public Text text;
-        public float fadeTextSpeed = 0.1f;
 
         // Cache
         GameObject fadeGameObject;
@@ -38,18 +36,19 @@ namespace Rano
 
         void Awake()
         {
-            fadeImage.color = new Color(0.0f, 0.0f, 0.0f, 1.0f); // Black
+            // fadeImage.color = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+            fadeImage.color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
             fadeGameObject = fadeImage.gameObject;
-            fadeGameObject.SetActive(false);
-            // status = Status.FadeOut;
-            status = Status.None;
+            fadeGameObject.SetActive(true);
+            status = Status.FadeOut;
+            // status = Status.None;
 
             textGameObject = text.gameObject;
             textGameObject.SetActive(false);
             text.color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
         }
 
-        public IEnumerator FadeOut()
+        public IEnumerator FadeOut(float speed)
         {
             // 이미 페이드아웃 되어 있다면 실행하지 않는다.
             if (status == Status.FadeOut)
@@ -59,13 +58,13 @@ namespace Rano
             }
 
             fadeGameObject.SetActive(true);
-            yield return fadeImage.DOColor(new Color(0.0f, 0.0f, 0.0f, 1.0f), fadeSpeed)
+            yield return fadeImage.DOColor(new Color(0.0f, 0.0f, 0.0f, 1.0f), speed)
                 .SetEase(fadeEase)
-                .WaitForCompletion();
+                .WaitForCompletion();               
             status = Status.FadeOut;
         }
 
-        public IEnumerator FadeIn()
+        public IEnumerator FadeIn(float speed)
         {
             // 이미 페이드인 되어 있다면 실행하지 않는다.
             if (status == Status.FadeIn)
@@ -75,23 +74,23 @@ namespace Rano
             }
 
             fadeGameObject.SetActive(true);
-            yield return fadeImage.DOColor(new Color(0.0f, 0.0f, 0.0f, 0.0f), fadeSpeed)
+            yield return fadeImage.DOColor(new Color(0.0f, 0.0f, 0.0f, 0.0f), speed)
                 .SetEase(fadeEase)
                 .WaitForCompletion();
             fadeGameObject.SetActive(false);
             status = Status.FadeIn;
         }
 
-        public IEnumerator ShowText()
+        public IEnumerator ShowText(float speed)
         {
             textGameObject.SetActive(true);
-            text.DOColor(new Color(1.0f, 1.0f, 1.0f, 1.0f), fadeTextSpeed);
+            text.DOColor(new Color(1.0f, 1.0f, 1.0f, 1.0f), speed);
             yield break;
         }
 
-        public IEnumerator HideText()
+        public IEnumerator HideText(float speed)
         {
-            yield return text.DOColor(new Color(1.0f, 1.0f, 1.0f, 1.0f), fadeTextSpeed)
+            yield return text.DOColor(new Color(1.0f, 1.0f, 1.0f, 0.0f), speed)
                 .WaitForCompletion();
             textGameObject.SetActive(false);
         }

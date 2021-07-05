@@ -9,48 +9,60 @@ namespace Rano
 {
     public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
-        private static bool m_ShuttingDown = false;
-        private static object m_Lock = new object();
-        private static T m_Instance;
-
-        public static T Instance
-        {
-            get
+        static bool _shuttingDown = false;
+        static object _lock = new object();
+    
+        #if UNITY_EDITOR
+            static T _instance;
+            public static T Instance
             {
-                if (m_ShuttingDown)
+                get
                 {
-                    Debug.LogWarning("[Singleton] Instance '" + typeof(T) +
-                        "' already destroyed. Returning null.");
-                    return null;
-                }
-
-                lock (m_Lock)
-                {
-                    if (m_Instance == null)
+                    if (_shuttingDown)
                     {
-                        m_Instance = (T)FindObjectOfType(typeof(T));
-                        if (m_Instance == null)
-                        {
-                            var singletonObject = new GameObject();
-                            m_Instance = singletonObject.AddComponent<T>();
-                            singletonObject.name = typeof(T).ToString() + " (Singleton)";
-                            DontDestroyOnLoad(singletonObject);
-                        }
+                        Debug.LogWarning($"[Singleton] Instance '{typeof(T)}' already destroyed. Returning null.");
+                        return null;
                     }
 
-                    return m_Instance;
+                    lock (_lock)
+                    {
+                        if (_instance == null)
+                        {
+                            _instance = (T)FindObjectOfType(typeof(T));
+                            if (_instance == null)
+                            {
+                                GameObject gameObject = new GameObject();
+                                _instance = gameObject.AddComponent<T>();
+                                gameObject.name = typeof(T).ToString();
+                                Debug.LogWarning($"싱글톤 클래스가 없는 상태에서 액세스되어 새로 생성했습니다.");
+                                Debug.LogWarning($"이 경고가 보이면 발생하지 않도록 수정해주십시요. 퍼포먼스가 저하됩니다.");
+                                // DontDestroyOnLoad(gameObject);
+                            }
+                        }
+                        return _instance;
+                    }
                 }
             }
+        #else
+            public static T Instance {get; private set;}
+        #endif
+        
+        void Awake()
+        {
+            #if (UNITY_EDITOR == false)
+            Instance = this;
+            #endif
+            DontDestroyOnLoad(gameObject);
         }
 
-        private void OnApplicationQuit()
+        void OnApplicationQuit()
         {
-            m_ShuttingDown = true;
+            _shuttingDown = true;
         }
 
-        private void OnDestroy()
+        void OnDestroy()
         {
-            m_ShuttingDown = true;
+            _shuttingDown = true;
         }
     }
 }
