@@ -135,9 +135,25 @@ namespace Rano.Addressable
             }
         }
 
-        // public void ReleaseHandle(AsyncOperationHandle handle)
-        // {
-        //     Addressables.Release(handle);
-        // }
+        #if false
+        // WARNING: Add/Remove로 씬을 추가하지 않은 경우 등재되지 않아서 찾지를 못함.
+        /// <summary>
+        /// 현재 활성화되어 있는 씬의 어드레스를 얻는다.
+        /// </summary>
+        public Address GetActiveScene()
+        {
+            Scene activeScene;
+            activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            foreach (KeyValuePair<Address,SceneInstance> item in _scenes)
+            {
+                // Log.Info($"{item.Value.Scene.path} == {activeScene.path} ?");
+                if (item.Value.Scene == activeScene)
+                {
+                    return item.Key;
+                }
+            }
+            throw new SceneManagerException("현재 활성화된 씬이 캐싱되어있지 않아 리턴할 수 없음. SceneManager에서 Add, Remove되지 않은 Scene은 저장되지 않아 못찾을 수 있습니다.");
+        }
+        #endif
     }
 }

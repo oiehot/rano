@@ -7,52 +7,47 @@ using UnityEngine;
 
 namespace Rano
 {
+    /// <summary>
+    /// 안전한 MonoBehaviour 싱글톤
+    /// </summary>
+    /// <remarks>
+    /// 준비된 게임오브젝트와 컴포넌트가 없으면 새로 만든다.
+    /// 한번 Unload 후 다시 Load 되면 셧다운 플래그로 인해서 에러가 발생한다.
+    /// </remarks>    
     public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
         static bool _shuttingDown = false;
         static object _lock = new object();
-    
-        #if UNITY_EDITOR
-            static T _instance;
-            public static T Instance
-            {
-                get
-                {
-                    if (_shuttingDown)
-                    {
-                        Debug.LogWarning($"[Singleton] Instance '{typeof(T)}' already destroyed. Returning null.");
-                        return null;
-                    }
 
-                    lock (_lock)
+        static T _instance;
+        public static T Instance
+        {
+            get
+            {
+                if (_shuttingDown)
+                {
+                    Debug.LogWarning($"싱글톤 인스턴스 '{typeof(T)}'가 제거되어 사용할 수 없습니다.");
+                    return null;
+                }
+
+                lock (_lock)
+                {
+                    if (_instance == null)
                     {
+                        _instance = (T)FindObjectOfType(typeof(T));
                         if (_instance == null)
                         {
-                            _instance = (T)FindObjectOfType(typeof(T));
-                            if (_instance == null)
-                            {
-                                GameObject gameObject = new GameObject();
-                                _instance = gameObject.AddComponent<T>();
-                                gameObject.name = typeof(T).ToString();
-                                Debug.LogWarning($"싱글톤 클래스가 없는 상태에서 액세스되어 새로 생성했습니다.");
-                                Debug.LogWarning($"이 경고가 보이면 발생하지 않도록 수정해주십시요. 퍼포먼스가 저하됩니다.");
-                                // DontDestroyOnLoad(gameObject);
-                            }
+                            GameObject gameObject = new GameObject();
+                            _instance = gameObject.AddComponent<T>();
+                            gameObject.name = typeof(T).ToString();
+                            Debug.LogWarning($"싱글톤 클래스가 없는 상태에서 액세스되어 새로 생성했습니다.");
+                            Debug.LogWarning($"이 경고가 보이면 발생하지 않도록 수정해주십시요. 퍼포먼스가 저하됩니다.");
+                            DontDestroyOnLoad(gameObject);
                         }
-                        return _instance;
                     }
+                    return _instance;
                 }
             }
-        #else
-            public static T Instance {get; private set;}
-        #endif
-        
-        void Awake()
-        {
-            #if (UNITY_EDITOR == false)
-            Instance = this;
-            #endif
-            DontDestroyOnLoad(gameObject);
         }
 
         void OnApplicationQuit()
