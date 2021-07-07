@@ -56,7 +56,7 @@ namespace Rano
 
         public static void Info(string text)
         {
-            #if UNITY_EDITOR            
+            #if UNITY_EDITOR
             UnityEngine.Debug.Log($"<color=#ffffffff>{Log.Caller}: {text}</color>");
             #else
             UnityEngine.Debug.Log($"[INFO] {Log.Caller}: {text}");
@@ -70,6 +70,11 @@ namespace Rano
             #else
             UnityEngine.Debug.LogError($"[ERR] {Log.Caller}: {text}");
             #endif
+        }
+
+        public static void Exception(Exception e)
+        {
+            UnityEngine.Debug.LogException(e);
         }
     }
 }
