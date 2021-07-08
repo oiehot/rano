@@ -10,11 +10,39 @@ using UnityEngine;
 
 namespace Rano.File
 {   
-    public static class BinaryPrefs<T>
+    public static class Prefs
     {
-        /// var data = new SerializableObject(params);
-        /// Rano.Data.BinaryPrefs<T>.Set("core", data);
-        public static void Set(string key, T value)
+        public static void SetInt(string key, int value)
+        {
+            PlayerPrefs.SetInt(key, value);
+        }
+
+        public static int GetInt(string key, int defaultValue = 0)
+        {
+            return PlayerPrefs.GetInt(key);
+        }
+
+        public static void SetFloat(string key, float value)
+        {
+            PlayerPrefs.SetFloat(key, value);
+        }
+
+        public static float GetFloat(string key, float defaultValue = 0.0f)
+        {
+            return PlayerPrefs.GetFloat(key);
+        }
+
+        public static void SetString(string key, string value)
+        {
+            PlayerPrefs.SetString(key, value);
+        }
+
+        public static string GetString(string key, string defaultValue = "")
+        {
+            return PlayerPrefs.GetString(key);
+        }
+
+        public static void SetToBinary<T>(string key, T value)
         {
             var binaryFormatter = new BinaryFormatter(); // System.Runtime.Serialization.Formatters.Binary
             var memoryStream = new MemoryStream(); // System.IO
@@ -24,13 +52,12 @@ namespace Rano.File
             
             // System.Convert
             // UnityEngine.PlayerPrefs
-            PlayerPrefs.SetString( key, Convert.ToBase64String(memoryStream.GetBuffer()) );
+            PlayerPrefs.SetString(key, Convert.ToBase64String(memoryStream.GetBuffer()) );
             
             // TODO: PlayerPrefs.세이브()
         }
         
-        /// var data = Rano.Data.BinaryPrefs<T>.Get("core");
-        public static T Get(string key)
+        public static T GetFromBinary<T>(string key)
         {
             var data = PlayerPrefs.GetString(key);
             if (!string.IsNullOrEmpty(data))
