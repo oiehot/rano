@@ -3,9 +3,6 @@
 // Proprietary and confidential
 // Written by Taewoo Lee <oiehot@gmail.com>
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Rano

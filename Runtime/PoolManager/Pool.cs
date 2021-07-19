@@ -8,23 +8,21 @@ using UnityEngine;
 
 namespace Rano
 {
-    public class Pool
+    internal class Pool
     {
-        // 원본 프리팹
-        public GameObject original {get; private set;}
-        public Transform root {get; set;}
+        public GameObject prefab {get; private set;}
+        public Transform transform {get; private set;}
         Stack<Poolable> _stack = new Stack<Poolable>();
 
         /// <summary>
         /// 재사용 풀을 초기화한다.
         /// </summary>
-        public void Initialize(GameObject original, int count=5)
+        public void Initialize(GameObject prefab, int capacity)
         {
-            this.original = original;
-            root = new GameObject().transform;
-            root.name = $"{original.name}_Pool";
-
-            for (int i=0; i<count; i++)
+            this.prefab = prefab;
+            transform = new GameObject().transform;
+            transform.name = $"{prefab.name}_Pool";
+            for (int i=0; i<capacity; i++)
             {
                 Push(Create());
             }
@@ -35,8 +33,8 @@ namespace Rano
         /// </summary>
         Poolable Create()
         {
-            GameObject go = UnityEngine.Object.Instantiate<GameObject>(original);
-            // g.name = original.name;
+            GameObject go = UnityEngine.Object.Instantiate<GameObject>(prefab);
+            go.name = prefab.name;
             return go.GetOrAddComponent<Poolable>();
         }
 
@@ -49,11 +47,9 @@ namespace Rano
         public void Push(Poolable poolable)
         {
             if (poolable == null) return;
-
-            poolable.transform.parent = root;
+            poolable.transform.parent = transform;
             poolable.gameObject.SetActive(false);
             poolable.isUsing = false;
-
             _stack.Push(poolable);
         }
 
@@ -81,9 +77,9 @@ namespace Rano
             // 현재 활성화 씬 루트 Transform 에 넣는다.
             // DontDestroyOnLoad 해제 용도: 
             //   한번 DontDestroyOnLoad가 되면 transform.parent = null 이 되어도
-            //   DontDestroyOnLoad 안에서만 빠져나가는 문제가 있음.
-            //   꼼수로, @Scene 오브젝트의 자식으로 설정해서 DontDestroyOnLoad를 빠져나가게 만들고
-            //   다시한번 parent를 설정하는 것.
+            //   DontDestroyOnLoad 안의 루트로만 빠져 나가는 문제가 있음.
+            //   꼼수 해결방법으로, @Scene의 tranform을 부모로 설정해서 DontDestroyOnLoad를 빠져나가게 만들고
+            //   다시 한번 parent를 설정하는 것.
             if (parent == null)
             {
                 poolable.transform.parent = SceneManager.CurrentScene.transform;
@@ -92,6 +88,7 @@ namespace Rano
             
             // 마무리
             poolable.isUsing = true;
+
             return poolable;
         }
     }

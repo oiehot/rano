@@ -19,7 +19,8 @@ namespace Rano
         /// <remarks>
         /// 오브젝트 Pool에서 Instantiate 를 줄이려 하는 것처럼
         /// </remarks>
-        public T Load<T>(string path) where T : UnityEngine.Object
+        // TODO: Addressable로 로드해야 한다.
+        public T Load<T>(Address address) where T : UnityEngine.Object
         {
             if (typeof(T) == typeof(GameObject))
             {
@@ -43,21 +44,27 @@ namespace Rano
         /// 이 경우에는 Instantiate 하지 않고 풀에서 생성된 게임오브젝트를 재사용한다.
         /// 해당 프리팹에 Poolable이 없다면, Object.Instantiate 한다.
         /// </remarks>
-        public GameObject Instantiate(string path, Transform parent=null)
+        // TODO: Addressable로 로드해야 한다.
+        public GameObject Instantiate(Address address, Transform parent=null)
         {
-            GameObject original = Load<GameObject>($"Prefabs/{path}");
-            if (original == null)
+            // TODO: Addressable 프리팹이 로드되어있지 않으면 예외처리.
+            GameObject prefab = Load<GameObject>($"Prefabs/{path}");
+            if (prefab == null)
             {
                 Log.Info($"Failed to load prefab: {path}");
                 return null;
             }
-            if (original.GetComponent<Poolable>() != null)
+            
+            if (prefab.GetComponent<Poolable>() != null)
             {
-                return GameManager.Pool.Pop(original, parent).gameObject;
+                return PoolManager.Pop(prefab, parent).gameObject;
             }
-            GameObject go = Object.Instantiate(original, parent);
-            go.name = original.name;
-            return go;
+            else
+            {
+                GameObject go = Object.Instantiate(prefab, parent);
+                go.name = prefab.name;
+                return go;
+            }
         }
 
         /// <summary>
@@ -79,7 +86,7 @@ namespace Rano
             
             if (go.TryGetComponent<Poolable>(var poolable))
             {
-                GameManager.Pool.Push(poolable);
+                PoolManager.Push(poolable);
                 return;
             }
             else
