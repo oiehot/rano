@@ -8,11 +8,11 @@ using UnityEngine;
 
 namespace Rano
 {
-    internal class Pool
+    public class Pool
     {
         public GameObject prefab {get; private set;}
         public Transform transform {get; private set;}
-        Stack<Poolable> _stack = new Stack<Poolable>();
+        Stack<GameObject> _stack = new Stack<GameObject>();
 
         /// <summary>
         /// 풀을 초기화한다.
@@ -31,11 +31,13 @@ namespace Rano
         /// <summary>
         /// 프리팹으로 부터 게임오브젝트를 생성한다.
         /// </summary>
-        Poolable Create()
+        GameObject Create()
         {
-            GameObject go = UnityEngine.Object.Instantiate<GameObject>(prefab);
-            go.name = prefab.name;
-            return go.GetOrAddComponent<Poolable>();
+            GameObject gameObject;
+            // TODO: 어드레서블인 경우 문제됨.
+            gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab);
+            gameObject.name = prefab.name;
+            return gameObject;
         }
 
         /// <summary>
@@ -44,56 +46,57 @@ namespace Rano
         /// <remarks>
         /// 재사용 풀 스택에 넣으면 게임 오브젝트는 Deactive된다.
         /// </remarks>
-        public void Push(Poolable poolable)
+        public void Push(GameObject gameObject)
         {
-            if (poolable == null) return;
-            poolable.transform.parent = transform;
-            poolable.gameObject.SetActive(false);
-            poolable.isUsing = false;
-            _stack.Push(poolable);
+            if (gameObject == null) return;
+            gameObject.transform.parent = transform;
+            gameObject.SetActive(false);
+            _stack.Push(gameObject);
         }
 
         /// <summary>
-        /// 재사용 풀로부터 게임오브젝트 꺼내오기
+        /// 재사용 풀로부터 게임오브젝트 꺼내오기.
         /// </summary>
-        public Poolable Pop(Transform parent, bool createIfNotExists=true)
+        public GameObject Pop(Transform parent, bool createIfNotExists=true)
         {
-            Poolable poolable;
+            GameObject gameObject;
 
             // 재사용 가능한 게임오브젝트가 있다면 꺼내고
             // 없으면 새로 생성한다.
             if (_stack.Count > 0)
-                poolable = _stack.Pop();
+                gameObject = _stack.Pop();
             else
                 if (createIfNotExists)
-                    poolable = Create();
+                    gameObject = Create();
                 else
                     return null;
             
             // 게임오브젝트를 활성화 한다.
-            poolable.gameObject.SetActive(true);
+            gameObject.SetActive(true);
 
             // 꺼낼 게임오브젝트가 들어갈 Parent Transform이 지정되어있지 않다면,
             // 현재 활성화 씬 루트 Transform 에 넣는다.
-            // DontDestroyOnLoad 해제 용도역할도 한다.
-            // 한번 DontDestroyOnLoad가 되면 transform.parent = null 이 되어도
-            // DontDestroyOnLoad 안의 루트로만 빠져 나가는 문제가 있음.
-            // 꼼수 해결방법으로, 현재 Scene의 tranform을 부모로 설정해서
-            // DontDestroyOnLoad를 빠져나가게 만들고
-            // 다시 한번 parent를 설정하는 것.
+            // DontDestroyOnLoad가 아닌 현재 활성화 씬으로 옮긴다.
             if (parent == null)
             {
-                poolable.transform.parent = SceneManager.CurrentScene.transform;
+                // DontDestroyOnLoad의 루트로 옮긴다.
+                //
+                // 루트로 옮기지 않으면 DontDestroyOnLoad > Pools > Prefab_Pool 이 Parent로 있는 것인데,
+                // 다른 활성화 씬에는 동일한 Parent가 없으므로 문제가 된다. 따라서 루트로 일단 옮겨놓고
+                // 다른 씬으로 이동해야 한다.
+                gameObject.transform.parent = null;
+                
+                // 현재 활성화 씬의 루트로 옮긴다.
+                UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(
+                    gameObject,
+                    UnityEngine.SceneManagement.SceneManager.GetActiveScene()
+                );
             }
-            else
-            {
-                poolable.transform.parent = parent;
-            }
-            
-            // 마무리
-            poolable.isUsing = true;
 
-            return poolable;
+            // 지정한 Transform 아래로 옮긴다. Transform은 활성화 씬에 있어야만 한다.
+            gameObject.transform.parent = parent;
+            
+            return gameObject;
         }
     }
 }
