@@ -24,8 +24,7 @@ namespace Rano
     /// <ref>
     /// * https://ansohxxn.github.io/unity%20lesson%202/ch10/
     /// </refs>
-    [AddComponentMenu("Rano/Pool/PoolManager")]
-    public class PoolManager : MonoBehaviour
+    public class PoolManager
     {
         Dictionary<string, Pool> _pools = new Dictionary<string, Pool>();
         Transform _rootTransform;
@@ -50,7 +49,7 @@ namespace Rano
             string name = prefab.name;
             if (_pools.ContainsKey(name))
             {
-                throw new Exception("이미 같은 프리팹 오브젝트 풀이 존재함.");
+                throw new Exception("프리팹 오브젝트 풀이 이미 존재함.");
             }
             Pool pool = new Pool();
             pool.Initialize(prefab, capacity);
@@ -64,6 +63,14 @@ namespace Rano
         /// <remark>
         /// 풀이 없는 게임오브젝트로 시도하면 예외가 발생한다.
         /// </remark>
+        /// <example>
+        /// <code>
+        /// var poolable = ammoGameObject.GetComponent<Poolable>();
+        /// GameManager.Instance.Push(poolable);
+        /// PoolManager.Instance.Push(poolable);
+        /// Managers.Pool.Push(poolable);
+        /// </code>
+        /// </example>        
         public void Push(Poolable poolable)
         {
             string name = poolable.gameObject.name;
@@ -73,8 +80,7 @@ namespace Rano
             }
             else
             {
-                throw new Exception();
-                // GameObject.Destroy(poolable.gameObject);
+                throw new Exception("풀이 없어서 Push할 수 없음.");
             }
         }
 
@@ -96,6 +102,14 @@ namespace Rano
         }
 
         /// <summary>
+        /// 프리팹으로 오브젝트 풀을 얻는다.
+        /// </summary>
+        public Pool GetPool(GameObject prefab)
+        {
+            return GetPool(prefab.name);
+        }
+
+        /// <summary>
         /// 프리팹 이름으로 오브젝트 풀을 얻는다.
         /// </summary>
         public Pool GetPool(string name)
@@ -109,14 +123,6 @@ namespace Rano
                 return null;
             }
         }        
-
-        /// <summary>
-        /// 프리팹으로 오브젝트 풀을 얻는다.
-        /// </summary>
-        public Pool GetPool(GameObject prefab)
-        {
-            return GetPool(prefab.name);
-        }
 
         /// <summary>
         /// 오브젝트풀 이름으로 프리팹을 얻는다.

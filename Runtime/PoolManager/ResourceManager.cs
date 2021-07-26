@@ -9,8 +9,7 @@ using UnityEngine;
 
 namespace Rano
 {
-    [AddComponentMenu("Rano/Pool/ResourceManager")]
-    public class ResourceManager : MonoBehaviour
+    public class ResourceManager
     {
         /// <summary>
         /// 프리팹 로드 또한 풀에 있으면 풀에서 가져온다.

@@ -15,7 +15,7 @@ namespace Rano
         Stack<Poolable> _stack = new Stack<Poolable>();
 
         /// <summary>
-        /// 재사용 풀을 초기화한다.
+        /// 풀을 초기화한다.
         /// </summary>
         public void Initialize(GameObject prefab, int capacity)
         {
@@ -75,16 +75,20 @@ namespace Rano
 
             // 꺼낼 게임오브젝트가 들어갈 Parent Transform이 지정되어있지 않다면,
             // 현재 활성화 씬 루트 Transform 에 넣는다.
-            // DontDestroyOnLoad 해제 용도: 
-            //   한번 DontDestroyOnLoad가 되면 transform.parent = null 이 되어도
-            //   DontDestroyOnLoad 안의 루트로만 빠져 나가는 문제가 있음.
-            //   꼼수 해결방법으로, @Scene의 tranform을 부모로 설정해서 DontDestroyOnLoad를 빠져나가게 만들고
-            //   다시 한번 parent를 설정하는 것.
+            // DontDestroyOnLoad 해제 용도역할도 한다.
+            // 한번 DontDestroyOnLoad가 되면 transform.parent = null 이 되어도
+            // DontDestroyOnLoad 안의 루트로만 빠져 나가는 문제가 있음.
+            // 꼼수 해결방법으로, 현재 Scene의 tranform을 부모로 설정해서
+            // DontDestroyOnLoad를 빠져나가게 만들고
+            // 다시 한번 parent를 설정하는 것.
             if (parent == null)
             {
                 poolable.transform.parent = SceneManager.CurrentScene.transform;
             }
-            poolable.transform.parent = parent;
+            else
+            {
+                poolable.transform.parent = parent;
+            }
             
             // 마무리
             poolable.isUsing = true;
