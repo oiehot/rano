@@ -26,7 +26,8 @@ namespace Rano
     /// <ref>
     /// https://ansohxxn.github.io/unity%20lesson%202/ch10/
     /// </refs>
-    public class Pools
+    [AddComponentMenu("Rano/Pool/PoolManager")]
+    public class PoolManager : MonoSingleton<PoolManager>
     {
         Dictionary<string, Pool> _pools = new Dictionary<string, Pool>();
         Transform _rootTransform;
@@ -34,7 +35,7 @@ namespace Rano
         /// <summary>
         /// 초기화
         /// </summary>
-        public void Initialize()
+        void Awake()
         {
             if (_rootTransform == null)
             {
@@ -43,10 +44,20 @@ namespace Rano
             }
         }
 
+        void OnEnable()
+        {
+            Log.Info("PoolManager Enabled");
+        }
+
+        void OnDisable()
+        {
+            Log.Info("PoolManager Disabled");
+        }
+
         /// <summary>
         /// 주어진 프리팹의 오브젝트 풀을 생성한다.
         /// </summary>
-        public void CreatePool(GameObject prefab, int capacity=5)
+        public void CreatePool(GameObject prefab, int capacity=10)
         {
             string name = prefab.name;
             if (_pools.ContainsKey(name))

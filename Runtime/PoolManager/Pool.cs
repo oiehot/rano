@@ -67,6 +67,8 @@ namespace Rano
                 gameObject = _stack.Pop();
             else
                 if (createIfNotExists)
+                    // TODO: 하나씩 생성하는게 아니라 초기 capacity의 단위의 곱으로
+                    // TODO: 스택 사이즈를 증가시킬것.
                     gameObject = Create();
                 else
                     return null;
