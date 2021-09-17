@@ -1,9 +1,9 @@
 {
   "name": "com.oiehot.rano",
   "displayName": "Rano",
-  "version": "1.0.1",
-  "unity": "2020.2",
-  "description": "OIEHOT Unity Library",
+  "version": "1.1.0",
+  "unity": "2021.1",
+  "description": "Unity Development Framework",
   "keywords": [
     "unity"
   ],
