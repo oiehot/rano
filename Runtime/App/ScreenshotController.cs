@@ -6,9 +6,9 @@
 using System;
 using UnityEngine;
 
-namespace Rano
+namespace Rano.App
 {
-    // TODO: Screenshot 디렉토리가 없으면 캡쳐가 안됨
+    // TODO: Screenshot 디렉토리가 없으면 캡쳐가 안됨.
     public class ScreenshotController : MonoBehaviour
     {
         private string directory;

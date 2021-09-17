@@ -6,16 +6,19 @@
 using UnityEngine;
 using Rano;
 
-namespace RanoEditor.Build
+namespace Rano.App
 {
     /// <summary>
     /// 버젼 데이터를 다루는 데이터 타입
     /// </summary>
+    [System.Serializable]
     public struct Version
     {
         public int major;
         public int minor;
         public int build;
+
+        /// <summary>빌드 버젼 코드</summary>
         public int buildVersionCode
         {
             get
@@ -27,6 +30,8 @@ namespace RanoEditor.Build
                 return major * 10000 + minor * 1000 + build;
             }
         }
+
+        /// <summary>풀 버젼 스트링</summary>
         public string fullVersion
         {
             get
@@ -105,5 +110,47 @@ namespace RanoEditor.Build
         {
             return $"{major}.{minor}.{build}";
         }
-    }    
+
+        public override bool Equals(object o)
+        {
+            Version v = (Version)o;
+            if (buildVersionCode == v.buildVersionCode) return true;
+            else return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return buildVersionCode;
+        }
+
+        public static bool operator == (Version a, Version b) {
+            if (a.buildVersionCode == b.buildVersionCode) return true;
+            else return false;
+        }
+
+        public static bool operator != (Version a, Version b) {
+            if (a.buildVersionCode != b.buildVersionCode) return true;
+            else return false;
+        }
+
+        public static bool operator >= (Version a, Version b) {
+            if (a.buildVersionCode >= b.buildVersionCode) return true;
+            else return false;
+        }
+
+        public static bool operator <= (Version a, Version b) {
+            if (a.buildVersionCode <= b.buildVersionCode) return true;
+            else return false;
+        }
+
+        public static bool operator > (Version a, Version b) {
+            if (a.buildVersionCode > b.buildVersionCode) return true;
+            else return false;
+        }
+
+        public static bool operator < (Version a, Version b) {
+            if (a.buildVersionCode < b.buildVersionCode) return true;
+            else return false;
+        }
+    }
 }

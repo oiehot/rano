@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using Rano;
+using Rano.App;
 
 namespace RanoEditor.Build
 {

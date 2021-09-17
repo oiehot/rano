@@ -3,11 +3,12 @@
 // Proprietary and confidential
 // Written by Taewoo Lee <oiehot@gmail.com>
 
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.Build.Reporting;
-using System.IO;
 using Rano;
+using Rano.App;
 
 namespace RanoEditor.Build
 {

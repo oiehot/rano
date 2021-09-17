@@ -8,6 +8,7 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 using Rano;
+using Rano.App;
 
 namespace RanoEditor.Build
 {
