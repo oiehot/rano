@@ -16,11 +16,10 @@ namespace Rano.App
     [AddComponentMenu("Rano/App/Update Checker")]
     public class UpdateChecker : MonoBehaviour
     {
-        Appstore appstore;
-        string appID;
+        Appstore appStore;
+        [SerializeField] string bundleId;
 
-        public string appleStoreAppID;
-        [ReadOnly] public RuntimePlatform currentPlatform; // TODO: [ShowOnly] or [ReadOnly]
+        [ReadOnly] public RuntimePlatform currentPlatform;
         [ReadOnly] public Version currentVersion;
         [ReadOnly] public Version? lastestVersion;
         public UnityEvent onUpdateRequired;
@@ -28,61 +27,43 @@ namespace Rano.App
 
         void OnValidate()
         {
-            Debug.Assert(appleStoreAppID != null && appleStoreAppID != "", "애플 앱스토어에서 사용하는 앱ID를 지정해주세요. 예) 1350067922");
         }
 
         void Awake()
         {
-            lastestVersion = null;            
-            currentPlatform = Application.platform;
-            currentVersion = new Version(Application.version);
+            lastestVersion = null;
+            Initialize();
+        }
+
+        /// <summary>초기화</summary>
+        public void Initialize(string bundleId=null, RuntimePlatform? platform=null, Version? version=null)
+        {
+            this.bundleId = bundleId ?? Application.identifier;
+            currentPlatform = platform ?? Application.platform;
+            currentVersion = version ?? new Version(Application.version);
 
             switch (currentPlatform)
             {
                 case RuntimePlatform.IPhonePlayer:
-                    appstore = new AppleAppstore();
-                    appID = appleStoreAppID;
+                    appStore = new AppleAppstore();
                     break;
 
                 case RuntimePlatform.Android:
-                    appstore = new GoogleAppstore();
-                    appID = Application.identifier;
+                    appStore = new GoogleAppstore();
                     break;
                 
                 default:
-                    appstore = null;
-                    appID = null;
+                    appStore = null;
                     break;
-            }
+            }            
         }
 
-        IEnumerator Start()
+        /// <summary>스토어로 부터 최신버젼값을 얻어 저장한다. 실패하면 콜백를 호출한다.</summary>
+        public IEnumerator UpdateLastestVersion()
         {
-            yield return UpdateLastestVersion();
-
-            if (lastestVersion.HasValue)
+            if (appStore != null)
             {
-                if (currentVersion < lastestVersion)
-                {
-                    Log.Warning($"앱 업데이트가 필요합니다. ({currentVersion} => {lastestVersion})");
-                    onUpdateRequired.Invoke();
-                }
-                else
-                {
-                    Log.Important($"앱이 최신버젼입니다. ({currentVersion})");
-                }
-            }
-            else
-            {
-                Log.Warning($"앱이 최신버젼인지 알 수 없습니다. ({currentVersion})");
-            }
-        }
-
-        IEnumerator UpdateLastestVersion()
-        {
-            if (appstore != null)
-            {
-                yield return appstore.GetVersion(appID, (Result result, Version? version) => {
+                yield return appStore.GetVersion(bundleId, (Result result, Version? version) => {
                     switch (result)
                     {
                         case Result.Success:
@@ -102,6 +83,29 @@ namespace Rano.App
             else
             {
                 Log.Warning("현재 플랫폼에 해당되는 앱스토어가 없으므로 앱버젼정보를 가져올 수 없습니다.");
+            }
+        }
+
+        /// <summary>최신버젼값을 얻고 현재버젼과 비교하여 업데이트가 필요하면 콜백을 호출한다.</summary>
+        public IEnumerator CheckUpdate()
+        {
+            yield return UpdateLastestVersion();
+
+            if (lastestVersion.HasValue)
+            {
+                if (currentVersion < lastestVersion)
+                {
+                    Log.Warning($"앱 업데이트가 필요합니다. ({currentVersion} => {lastestVersion})");
+                    onUpdateRequired.Invoke();
+                }
+                else
+                {
+                    Log.Important($"앱이 최신버젼입니다. ({currentVersion})");
+                }
+            }
+            else
+            {
+                Log.Warning($"앱이 최신버젼인지 알 수 없습니다. ({currentVersion})");
             }
         }
     }

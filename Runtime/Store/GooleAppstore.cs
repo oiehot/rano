@@ -15,16 +15,16 @@ namespace Rano.Store
     {
         public GoogleAppstore() : base() {}
 
-        protected override string GetPageUrl(string appId)
+        protected override string GetPageUrl(string bundleId)
         {
             // https://play.google.com/store/apps/details?id=com.oiehot.afo2
             // https://play.google.com/store/apps/details?id=com.oiehot.afo2&hl=en_US&gl=US
-            return $"https://play.google.com/store/apps/details?id={appId}";
+            return $"https://play.google.com/store/apps/details?id={bundleId}";
         }
 
-        protected override string GetBrowserUrl(string appId)
+        protected override string GetBrowserUrl(string bundleId)
         {
-            return $"market://details?id={appId}";
+            return $"market://details?id={bundleId}";
         }
 
         protected override Version? ParseVersion(string output)

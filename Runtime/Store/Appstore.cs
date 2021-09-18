@@ -22,10 +22,11 @@ namespace Rano.Store
     {
         protected Appstore() {}
 
-        protected IEnumerator Lookup(string appId, System.Action<UnityWebRequest.Result, string> callback)
+        /// <summary>앱스토어의 앱페이지 내용을 얻어 콜백호출시 전달한다.</summary>
+        protected IEnumerator Lookup(string bundleId, System.Action<UnityWebRequest.Result, string> callback)
         {
             string output;
-            UnityWebRequest request = UnityWebRequest.Get(GetPageUrl(appId));
+            UnityWebRequest request = UnityWebRequest.Get(GetPageUrl(bundleId));
             yield return request.SendWebRequest();
 
             if (request.result == UnityWebRequest.Result.Success)
@@ -40,9 +41,10 @@ namespace Rano.Store
             }
         }
 
-        public IEnumerator GetVersion(string appId, System.Action<Result, Version?> callback)
+        /// <summary>앱스토어의 앱페이지 내용을 얻은 뒤 파싱하여 버젼을 얻어내고, 콜백호출시 전달한다.</summary>
+        public IEnumerator GetVersion(string bundleId, System.Action<Result, Version?> callback)
         {
-            yield return Lookup(appId, (UnityWebRequest.Result result, string output) => {
+            yield return Lookup(bundleId, (UnityWebRequest.Result result, string output) => {
                 Version? version = null;
 
                 if (result == UnityWebRequest.Result.Success)
@@ -64,16 +66,16 @@ namespace Rano.Store
             });
         }
 
-        public void Open(string appId)
+        public void Open(string bundleId)
         {
-            Application.OpenURL(GetBrowserUrl(appId));
+            Application.OpenURL(GetBrowserUrl(bundleId));
         }
 
         /// <summary>앱페이지를 분석 할 때 GET하는 주소를 돌려준다.</summary>
-        protected abstract string GetPageUrl(string appId);
+        protected abstract string GetPageUrl(string bundleId);
 
         /// <summary>브라우져로 열 때 사용하는 주소를 돌려준다.</summary>
-        protected abstract string GetBrowserUrl(string appId);
+        protected abstract string GetBrowserUrl(string bundleId);
 
         /// <summary>GetVersion에서 사용하는 추상함수. TemplateMethodPattern</summary>
         protected abstract Version? ParseVersion(string output);

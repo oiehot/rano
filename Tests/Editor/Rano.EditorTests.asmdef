@@ -1,24 +1,14 @@
 {
-    "name": "Rano.EditorTests",
+    "name": "Rano.Editor.Tests",
     "references": [
         "Rano",
-        "Rano.Editor",
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "Rano.Editor"
     ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],    
     "includePlatforms": [
         "Editor"
     ],
-    "excludePlatforms": [],
-    "allowUnsafeCode": true,
-    "overrideReferences": true,
-    "precompiledReferences": [
-        "LitJson.dll",
-        "nunit.framework.dll"
-    ],
-    "autoReferenced": false,
-    "defineConstraints": [
-        "UNITY_INCLUDE_TESTS"
-    ],
-    "versionDefines": []
+    "excludePlatforms": []
 }

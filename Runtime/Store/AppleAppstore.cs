@@ -15,14 +15,18 @@ namespace Rano.Store
     {
         public AppleAppstore() : base() {}
 
-        protected override string GetPageUrl(string appId)
+        protected override string GetPageUrl(string bundleId)
         {
-            return $"http://itunes.apple.com/lookup?id={appId}";
+            return $"http://itunes.apple.com/lookup?bundleId={bundleId}";
         }
 
-        protected override string GetBrowserUrl(string appId)
+        // TODO: 앱스토어 브라우징시 com.oiehot.bigtree 형식이 아닌
+        // TODO: 1350067922 형식의 identifier를 사용해야 한다.
+        // TODO: 검사하여 경고하거나 다른 값을 사용할것.
+        protected override string GetBrowserUrl(string bundleId)
         {
-            return $"itms-apps://itunes.apple.com/app/id{appId}";
+            throw new System.Exception($"애플 앱스토어 브라우징시 앱스토어 브라우징시 com.oiehot.bigtree 형식이 아닌 1350067922 형식의 ID를 사용해야 한다.");
+            // return $"itms-apps://itunes.apple.com/app/id{bundleId}";
         }
 
         protected override Version? ParseVersion(string output)
