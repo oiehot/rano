@@ -3,7 +3,7 @@
 // Proprietary and confidential
 // Written by Taewoo Lee <oiehot@gmail.com>
 
-using System.Text; // StringBuilder
+using System.Text;
 
 namespace Rano
 {

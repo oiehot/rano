@@ -32,7 +32,10 @@ namespace Rano
 
                 lock (_lock)
                 {
-                    if (_instance == null)
+                    // UnityEngine.Object의 비교연산자는 오버로딩되어 성능이 떨어진다.
+                    // 네이티브 객체를 비교하지 않고 유니티 객체(래핑객체)만 비교하도록 한다.
+                    //if (_instance == null)
+                    if (object.ReferenceEquals(_instance, null))
                     {
                         _instance = (T)FindObjectOfType(typeof(T));
                         if (_instance == null)

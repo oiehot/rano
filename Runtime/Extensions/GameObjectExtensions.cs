@@ -3,7 +3,6 @@
 // Proprietary and confidential
 // Written by Taewoo Lee <oiehot@gmail.com>
 
-using System;
 using UnityEngine;
 
 namespace Rano

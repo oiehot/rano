@@ -3,11 +3,9 @@
 // Proprietary and confidential
 // Written by Taewoo Lee <oiehot@gmail.com>
 
-using System;
 using NUnit.Framework;
-using Rano;
 
-namespace Rano.Tests
+namespace Rano.Editor.Tests
 {
     public class NumberTests
     {
