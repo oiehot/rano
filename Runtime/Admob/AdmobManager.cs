@@ -13,7 +13,7 @@ using GoogleMobileAds.Api;
 
 namespace Rano.Admob
 {
-    public class AdmobManager : Singleton<AdmobManager>
+    public sealed class AdmobManager : Singleton<AdmobManager>
     {
         public string appId;
 

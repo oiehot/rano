@@ -12,7 +12,7 @@ using UnityEngine.TestTools;
 
 namespace Rano.Tests
 {
-    public class CoroutineTests
+    public sealed class CoroutineTests
     {
         [UnityTest]
         public IEnumerator CourtineTest()
@@ -20,7 +20,7 @@ namespace Rano.Tests
             yield return CoMethod();
         }
 
-        IEnumerator CoMethod()
+        private IEnumerator CoMethod()
         {
             yield return null;
         }
