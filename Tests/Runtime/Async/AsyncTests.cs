@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
-namespace Rano.Tests
+namespace Rano.Tests.Async
 {
     public class AsyncTests
     {

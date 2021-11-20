@@ -5,9 +5,9 @@
 
 using NUnit.Framework;
 
-namespace Rano.Editor.Tests
+namespace Rano.Tests.Extensions
 {
-    public class NumberTests
+    public class NumberExtensionsTests
     {
         [Test]
         public void Int_ToCommaStringTest()

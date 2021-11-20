@@ -278,7 +278,7 @@ namespace Rano.Addressable
             while (!handle.IsDone)
             {
                 info.percent = handle.PercentComplete;
-                yield return new WaitForEndOfFrame();
+                yield return YieldCache.WaitForEndOfFrame;
             }
         }        
 

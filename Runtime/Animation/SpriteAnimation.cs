@@ -63,6 +63,7 @@ namespace Rano
             for (int i=0; i<this.data.Length; i++)
             {
                 this.spriteRenderer.sprite = this.data[i].sprite;
+                Log.Warning("이 코루틴에서 WaitForSeconds 객체를 생성하고 있습니다. 성능이 저하될 수 있습니다.");
                 yield return new WaitForSeconds(this.data[i].delay / this.speed);
             }
             this.Close();        

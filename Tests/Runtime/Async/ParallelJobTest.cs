@@ -11,7 +11,7 @@ using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace Rano.Tests
+namespace Rano.Tests.Async
 {
     public partial class JobSystemTests
     {
