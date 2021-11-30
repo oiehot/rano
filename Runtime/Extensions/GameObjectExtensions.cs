@@ -38,5 +38,15 @@ namespace Rano
             else
                 return gameObject.AddComponent<T>();
         }
+
+        /// <summary>
+        /// 특정 컴포넌트 부착여부를 리턴한다.
+        /// </summary>
+        /// <typeparam name="T">컴포넌트 타입</typeparam>
+        /// <returns></returns>
+        public static bool HasComponent<T>(this GameObject gameObject) where T : Component
+        {
+            return gameObject.GetComponent<T>() != null;
+        }
     }
 }

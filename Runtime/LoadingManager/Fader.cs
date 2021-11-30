@@ -60,7 +60,7 @@ namespace Rano
             fadeGameObject.SetActive(true);
             yield return fadeImage.DOColor(new Color(0.0f, 0.0f, 0.0f, 1.0f), speed)
                 .SetEase(fadeEase)
-                .WaitForCompletion();               
+                .WaitForCompletion();
             status = Status.FadeOut;
         }
 
