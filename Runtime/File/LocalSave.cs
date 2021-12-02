@@ -42,7 +42,19 @@ namespace Rano.File
 
         public static void SaveToJson(string filePath, object obj)
         {
-            string jsonString = JsonConvert.SerializeObject(obj);
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.Formatting = Formatting.Indented;
+            //settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            //settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            //settings.NullValueHandling = NullValueHandling.Include;
+            //settings.DefaultValueHandling = DefaultValueHandling.Ignore;
+            //settings.StringEscapeHandling = StringEscapeHandling.Default;
+            //settings.MissingMemberHandling = MissingMemberHandling.Ignore;
+            //settings.MetadataPropertyHandling = MetadataPropertyHandling.Default;
+            //settings.TypeNameHandling = TypeNameHandling.Objects;
+            //settings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
+
+            string jsonString = JsonConvert.SerializeObject(obj, settings);
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes(jsonString);
             Write(filePath, bytes);
         }
