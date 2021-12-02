@@ -26,7 +26,7 @@ namespace Rano
             {
                 if (_shuttingDown)
                 {
-                    Debug.LogWarning($"싱글톤 인스턴스 '{typeof(T)}'가 제거되어 사용할 수 없습니다.");
+                    Log.Warning($"싱글톤 인스턴스 '{typeof(T)}'가 제거되어 사용할 수 없습니다.");
                     return null;
                 }
 
@@ -43,7 +43,7 @@ namespace Rano
                             GameObject gameObject = new GameObject();
                             _instance = gameObject.AddComponent<T>();
                             gameObject.name = typeof(T).ToString();
-                            Debug.LogWarning($"싱글톤 클래스 '{typeof(T)}'가 없는 상태에서 액세스되어 새로 생성했습니다. 이 경고가 보이면 발생하지 않도록 수정해주십시요. 퍼포먼스가 저하됩니다.");
+                            Log.Warning($"싱글톤 클래스 '{typeof(T)}'가 없는 상태에서 액세스되어 새로 생성했습니다. 이 경고가 보이면 발생하지 않도록 수정해주십시요. 퍼포먼스가 저하됩니다.");
                             DontDestroyOnLoad(gameObject);
                         }
                     }
