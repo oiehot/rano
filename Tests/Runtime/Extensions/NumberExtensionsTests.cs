@@ -25,6 +25,21 @@ namespace Rano.Tests.Extensions
         }
 
         [Test]
+        public void Long_ToCommaStringTest()
+        {
+            Assert.AreEqual(((long)1).ToCommaString(), "1");
+            Assert.AreEqual(((long)12).ToCommaString(), "12");
+            Assert.AreEqual(((long)123).ToCommaString(), "123");
+            Assert.AreEqual(((long)1234).ToCommaString(), "1,234");
+            Assert.AreEqual(((long)12345).ToCommaString(), "12,345");
+            Assert.AreEqual(((long)123456).ToCommaString(), "123,456");
+            Assert.AreEqual(((long)1234567).ToCommaString(), "1,234,567");
+            Assert.AreEqual(((long)12345678).ToCommaString(), "12,345,678");
+            Assert.AreEqual(((long)123456789).ToCommaString(), "123,456,789");
+            Assert.AreEqual(((long)1234567890).ToCommaString(), "1,234,567,890");
+        }
+
+        [Test]
         public void Int_ToUnitStringTest()
         {
             Assert.AreEqual(((int)1).ToUnitString(), "1");

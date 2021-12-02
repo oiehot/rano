@@ -15,6 +15,11 @@ namespace Rano
             return value.ToString("#,#", CultureInfo.InvariantCulture);
         }
 
+        public static string ToCommaString(this long value)
+        {
+            return value.ToString("#,#", CultureInfo.InvariantCulture);
+        }
+
         public static string ToUnitString(this int value)
         {
             if (value > 999999999 || value < -999999999)
