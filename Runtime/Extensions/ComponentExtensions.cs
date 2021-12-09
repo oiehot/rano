@@ -32,7 +32,7 @@ namespace Rano
             }
             else
             {
-                throw new MissingComponentException($"{component.gameObject.GetPath()} 게임오브젝트에 {nameof(T)} 컴포넌트가 부착되어있지 않음.");
+                throw new MissingComponentException($"{component.gameObject.GetPath()} 게임오브젝트에 {typeof(T)} 컴포넌트가 부착되어있지 않음.");
             }
         }
     }
