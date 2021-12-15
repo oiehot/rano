@@ -16,17 +16,19 @@ namespace Rano
     /// </remarks>    
     public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
+        static T _instance;
         static bool _shuttingDown = false;
         static object _lock = new object();
 
-        static T _instance;
         public static T Instance
         {
             get
             {
                 if (_shuttingDown)
                 {
-                    Log.Warning($"싱글톤 인스턴스 '{typeof(T)}'가 제거되어 사용할 수 없습니다.");
+#if UNITY_EDITOR
+                    Log.Warning($"싱글톤 인스턴스 {typeof(T)}가 제거된 상태에서 사용되었습니다.");
+#endif
                     return null;
                 }
 
