@@ -91,7 +91,7 @@ namespace Rano
                     for(int i=0; i<headerCount; i++)
                     {
                         string header = headers[i];
-                        string data = Rano.Json.EscapeString(tokens[i]); // json 파싱에 문제가되는 문자의 경우 Escape 한다.
+                        string data = Rano.Encoding.Utils.EscapeString(tokens[i]); // json 파싱에 문제가되는 문자의 경우 Escape 한다.
                         
                         if (header == "") continue;
                         if (data == "") continue;

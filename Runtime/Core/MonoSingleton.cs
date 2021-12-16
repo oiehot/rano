@@ -27,7 +27,7 @@ namespace Rano
                 if (_shuttingDown)
                 {
 #if UNITY_EDITOR
-                    Log.Warning($"싱글톤 인스턴스 {typeof(T)}가 제거된 상태에서 사용되었습니다.");
+                    Log.Warning($"싱글톤 {typeof(T)}가 제거된 상태에서 사용되었습니다.");
 #endif
                     return null;
                 }
@@ -45,7 +45,9 @@ namespace Rano
                             GameObject gameObject = new GameObject();
                             _instance = gameObject.AddComponent<T>();
                             gameObject.name = typeof(T).ToString();
-                            Log.Warning($"싱글톤 클래스 '{typeof(T)}'가 없는 상태에서 액세스되어 새로 생성했습니다. 이 경고가 보이면 발생하지 않도록 수정해주십시요. 퍼포먼스가 저하됩니다.");
+#if UNITY_EDITOR
+                            Log.Info($"싱글톤 {typeof(T)}가 자동으로 생성되었습니다.");
+#endif
                             DontDestroyOnLoad(gameObject);
                         }
                     }
@@ -54,10 +56,10 @@ namespace Rano
             }
         }
 
-        void OnApplicationQuit()
-        {
-            _shuttingDown = true;
-        }
+        //void OnApplicationQuit()
+        //{
+        //    _shuttingDown = true;
+        //}
 
         void OnDestroy()
         {

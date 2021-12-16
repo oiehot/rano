@@ -7,7 +7,9 @@
         "UnityEngine.Purchasing",
         "Unity.Addressables",
         "Unity.ResourceManager",
-        "DOTween.Modules"
+        "DOTween.Modules",
+        "VoxelBusters.CoreLibrary",
+        "VoxelBusters.EssentialKit"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -15,7 +17,9 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "Newtonsoft.Json.dll",
-        "DOTween.dll"
+        "DOTween.dll",
+        "GoogleMobileAds.dll",
+        "GoogleMobileAds.Core.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

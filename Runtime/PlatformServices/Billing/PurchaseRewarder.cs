@@ -1,0 +1,96 @@
+﻿// Copyright (C) OIEHOT - All Rights Reserved
+// Unauthorized copying of this file, via any medium is strictly prohibited
+// Proprietary and confidential
+// Written by Taewoo Lee <oiehot@gmail.com>
+
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Rano;
+
+namespace Rano.PlatformServices.Billing
+{
+    public abstract class PurchaseRewarder : MonoBehaviour
+    {
+        private bool _activated;
+
+        private Dictionary<string, Action> _rewardActions;
+
+        protected virtual void Awake()
+        {
+            _rewardActions = new Dictionary<string, Action>();
+        }
+
+        protected virtual void OnEnable()
+        {
+            _activated = true;
+            if (PurchaseManager.Instance.IsNotNull())
+            {
+                PurchaseManager.Instance.onPurchaseComplete.AddListener(OnPurchaseComplete);
+                PurchaseManager.Instance.onPurchaseFailed.AddListener(OnPurchaseFailed);
+                PurchaseManager.Instance.onRestorePurchase.AddListener(OnRestorePurchase);
+            }
+        }
+
+        protected virtual void OnDisable()
+        {
+            _activated = false;
+            if (PurchaseManager.Instance.IsNotNull())
+            {
+                PurchaseManager.Instance.onPurchaseComplete.RemoveListener(OnPurchaseComplete);
+                PurchaseManager.Instance.onPurchaseFailed.RemoveListener(OnPurchaseFailed);
+                PurchaseManager.Instance.onRestorePurchase.RemoveListener(OnRestorePurchase);
+            }
+        }
+
+        protected virtual void OnPurchaseComplete(string productId)
+        {
+            Reward(productId);
+        }
+
+        protected virtual void OnPurchaseFailed(string productId, string errorMessage)
+        {
+            // Pass   
+        }
+
+        protected virtual void OnRestorePurchase(string productId)
+        {
+            Log.Info($"구매하셨던 상품을 복구합니다. ({productId})");
+            Reward(productId);
+        }
+
+        protected void AddRewardAction(string productId, Action action)
+        {
+            _rewardActions.Add(productId, action);
+        }
+
+        protected void RemoveRewardAction(string productId)
+        {
+            _rewardActions.Remove(productId);
+        }
+
+        protected void RemoveAllRewardActions()
+        {
+            _rewardActions.Clear();
+        }
+
+        private void Reward(string productId)
+        {
+            if (_activated == false)
+            {
+                throw new Exception($"컴포넌트가 꺼져있어서 {productId} 상품의 보상을 처리할 수 없습니다.");
+            }
+
+            if (_rewardActions.ContainsKey(productId) == true)
+            {
+                _rewardActions[productId]();
+            }
+            else
+            {
+                throw new Exception($"{productId} 상품보상을 처리하는 함수가 추가되어있지 않습니다.");
+            }
+        }
+    }
+}
+
+    
