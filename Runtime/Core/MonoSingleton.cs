@@ -26,9 +26,6 @@ namespace Rano
             {
                 if (_shuttingDown)
                 {
-#if UNITY_EDITOR
-                    Log.Warning($"싱글톤 {typeof(T)}가 제거된 상태에서 사용되었습니다.");
-#endif
                     return null;
                 }
 

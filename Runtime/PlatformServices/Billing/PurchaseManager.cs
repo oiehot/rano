@@ -26,10 +26,9 @@ namespace Rano.PlatformServices.Billing
         /// PlatformId가 아닌 Settings에 적혀진 ProductId를 키로 사용한다.
         /// </summary>
         private Dictionary<string, IBillingProduct> _products;
-
-        public UnityEvent<string> onPurchaseComplete;
-        public UnityEvent<string, string> onPurchaseFailed;
-        public UnityEvent<string> onRestorePurchase;
+        public Action<string> onPurchaseComplete;
+        public Action<string, string> onPurchaseFailed;
+        public Action<string> onRestorePurchase;
 
         void Awake()
         {
@@ -108,7 +107,7 @@ namespace Rano.PlatformServices.Billing
                         if (transaction.ReceiptVerificationState == BillingReceiptVerificationState.Success)
                         {
                             Log.Important($"상품구매 성공. ({transaction.Payment.ProductId})");
-                            onPurchaseComplete.Invoke(transaction.Payment.ProductId);
+                            onPurchaseComplete?.Invoke(transaction.Payment.ProductId);
                         }
                         else
                         {
@@ -118,7 +117,7 @@ namespace Rano.PlatformServices.Billing
 
                     case BillingTransactionState.Failed:
                         Log.Info($"상품구매 실패. ({transaction.Error.Description})");
-                        onPurchaseFailed.Invoke(transaction.Payment.ProductId, transaction.Error.Description);
+                        onPurchaseFailed?.Invoke(transaction.Payment.ProductId, transaction.Error.Description);
                         break;
                 }
             }
@@ -140,7 +139,7 @@ namespace Rano.PlatformServices.Billing
                 {
                     IBillingTransaction transaction = transactions[i];
                     Log.Info($"[{i}]: {transaction.Payment.ProductId}");
-                    onRestorePurchase.Invoke(transaction.Payment.ProductId);
+                    onRestorePurchase?.Invoke(transaction.Payment.ProductId);
                 }
             }
             else

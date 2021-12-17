@@ -13,9 +13,11 @@ namespace Rano.PlatformServices.Cloud
 {
     public sealed class CloudManager : MonoSingleton<CloudManager>
     {
-        public UnityEvent onUserChange;
-        public UnityEvent onSavedDataChange;
-        public UnityEvent onSynchronizeComplete;
+        public bool InitialSynchornized { get; private set; }
+
+        public Action onUserChange;
+        public Action onSavedDataChange;
+        public Action onSynchronizeComplete;
 
         void OnEnable()
         {
@@ -46,7 +48,7 @@ namespace Rano.PlatformServices.Cloud
             CloudUserAccountStatus accountStatus = user.AccountStatus;
             Log.Info($"클라우드 계정 로그인 성공 (Id:{userId}, Status:{accountStatus})");
 
-            if (onUserChange != null) onUserChange.Invoke();
+            onUserChange?.Invoke();
         }
 
         private void OnSavedDataChange(CloudServicesSavedDataChangeResult result)
@@ -64,7 +66,7 @@ namespace Rano.PlatformServices.Cloud
             CloudSavedDataChangeReasonCode reason = result.ChangeReason;
             Log.Info($"이유: {reason.ToString()}");
 
-            if (onSavedDataChange != null) onSavedDataChange.Invoke();
+            onSavedDataChange?.Invoke();
         }
 
         private void OnSynchronizeComplete(CloudServicesSynchronizeResult result)
@@ -77,23 +79,10 @@ namespace Rano.PlatformServices.Cloud
             {
                 Log.Warning("클라우드 동기화 실패.");
             }
-
-            if (onSynchronizeComplete != null) onSynchronizeComplete.Invoke();
+            onSynchronizeComplete?.Invoke();
         }
 
-        public bool IsAvailable() => CloudServices.IsAvailable();
-        public void Synchronize()
-        {
-            Log.Info("클라우드 동기화 시작.");
-            CloudServices.Synchronize();
-        }
-        public void Synchronize(Callback<CloudServicesSynchronizeResult> callback)
-        {
-            Log.Info("클라우드 동기화 시작.");
-            CloudServices.Synchronize(callback);
-        }
-
-        public IEnumerator SynchronizeCoroutine(Action<bool> callback=null)
+        public IEnumerator SynchronizeCoroutine(Action<bool> callback = null)
         {
             bool syncResult = false;
             bool syncCompleted = false;
@@ -109,6 +98,9 @@ namespace Rano.PlatformServices.Cloud
                     syncResult = false;
                 }
                 syncCompleted = true;
+
+                // 최초로 싱크했다면 체크한다.
+                if (InitialSynchornized == false) InitialSynchornized = true;
             });
 
             while (syncCompleted == false)
@@ -117,8 +109,21 @@ namespace Rano.PlatformServices.Cloud
                 yield return YieldCache.WaitForFixedUpdate;
             }
 
-            if (callback != null) callback(syncResult);
+            callback?.Invoke(syncResult);
         }
+
+        //public void Synchronize()
+        //{
+        //    Log.Info("클라우드 동기화 시작.");
+        //    CloudServices.Synchronize();
+        //}
+        //public void Synchronize(Callback<CloudServicesSynchronizeResult> callback)
+        //{
+        //    Log.Info("클라우드 동기화 시작.");
+        //    CloudServices.Synchronize(callback);
+        //}
+
+        public bool IsAvailable() => CloudServices.IsAvailable();
 
         public bool GetBool(string key) => CloudServices.GetBool(key);
         public byte[] GetByteArray(string key) => CloudServices.GetByteArray(key);

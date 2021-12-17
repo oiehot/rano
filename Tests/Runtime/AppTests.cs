@@ -53,15 +53,10 @@ namespace Rano.Tests
                 new Version("1.0.6")
             );
 
-            updateChecker.onUpdateRequired = new UnityEvent();
-            updateChecker.onUpdateRequired.AddListener(() => {
-                // Done
-            });
-
-            updateChecker.onUpdateCheckFailed = new UnityEvent();
-            updateChecker.onUpdateCheckFailed.AddListener(() => {
+            updateChecker.onUpdateRequired += () => {};
+            updateChecker.onUpdateCheckFailed += () => {
                 throw new System.Exception("구글 플레이스토어 업데이트 체크 실패");
-            });
+            };
 
             yield return updateChecker.CheckUpdate();
         }
@@ -81,15 +76,12 @@ namespace Rano.Tests
                 new Version("1.0.0")
             );
 
-            updateChecker.onUpdateRequired = new UnityEvent();
-            updateChecker.onUpdateRequired.AddListener(() => {
+            updateChecker.onUpdateRequired += () => {
                 // Done
-            });
-
-            updateChecker.onUpdateCheckFailed = new UnityEvent();
-            updateChecker.onUpdateCheckFailed.AddListener(() => {
+            };
+            updateChecker.onUpdateCheckFailed += () => {
                 throw new System.Exception("애플 앱스토어 업데이트 체크 실패");
-            });
+            };
 
             yield return updateChecker.CheckUpdate();
         }

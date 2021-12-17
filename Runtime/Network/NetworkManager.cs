@@ -3,6 +3,7 @@
 // Proprietary and confidential
 // Written by Taewoo Lee <oiehot@gmail.com>
 
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
@@ -20,8 +21,8 @@ namespace Rano
         public float pingNextTime = 5.0f;
 
         [Header("Events")]
-        public UnityEvent onConnected;
-        public UnityEvent onDisconnected;
+        public Action onConnected;
+        public Action onDisconnected;
 
         void Awake()
         {
@@ -59,7 +60,7 @@ namespace Rano
                         // OFF > ON
                         if (isConnected == false)
                         {
-                            onConnected.Invoke();
+                            onConnected?.Invoke();
                             isConnected = true;
                         }
                     }
@@ -69,7 +70,7 @@ namespace Rano
                         // ON >> OFF
                         if (isConnected)
                         {
-                            onDisconnected.Invoke();
+                            onDisconnected?.Invoke();
                             isConnected = false;
                         }
                     }
@@ -79,7 +80,7 @@ namespace Rano
                     // Timeout 으로 인한 Ping 실패
                     if (isConnected)
                     {
-                        onDisconnected.Invoke();
+                        onDisconnected?.Invoke();
                         isConnected = false;
                     }
                 }

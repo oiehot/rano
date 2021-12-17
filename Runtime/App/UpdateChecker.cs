@@ -3,6 +3,7 @@
 // Proprietary and confidential
 // Written by Taewoo Lee <oiehot@gmail.com>
 
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -22,8 +23,8 @@ namespace Rano.App
         [ReadOnly] public RuntimePlatform currentPlatform;
         [ReadOnly] public Version currentVersion;
         [ReadOnly] public Version? lastestVersion;
-        public UnityEvent onUpdateRequired;
-        public UnityEvent onUpdateCheckFailed;
+        public Action onUpdateRequired;
+        public Action onUpdateCheckFailed;
 
         void OnValidate()
         {
@@ -71,11 +72,11 @@ namespace Rano.App
                             break;
                         case Result.ParsingError:
                             Log.Warning("앱스토어의 앱페이지에서 버젼정보를 파싱하는데 실패했습니다.");
-                            onUpdateCheckFailed.Invoke();
+                            onUpdateCheckFailed?.Invoke();
                             break;
                         case Result.ConnectionError:
                             Log.Warning("앱스토어에 연결하는데 실패했습니다.");
-                            onUpdateCheckFailed.Invoke();
+                            onUpdateCheckFailed?.Invoke();
                             break;
                     }
                 });
@@ -96,7 +97,7 @@ namespace Rano.App
                 if (currentVersion < lastestVersion)
                 {
                     Log.Warning($"앱 업데이트가 필요합니다. ({currentVersion} => {lastestVersion})");
-                    onUpdateRequired.Invoke();
+                    onUpdateRequired?.Invoke();
                 }
                 else
                 {

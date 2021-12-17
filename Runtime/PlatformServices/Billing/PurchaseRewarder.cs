@@ -26,9 +26,9 @@ namespace Rano.PlatformServices.Billing
             _activated = true;
             if (PurchaseManager.Instance.IsNotNull())
             {
-                PurchaseManager.Instance.onPurchaseComplete.AddListener(OnPurchaseComplete);
-                PurchaseManager.Instance.onPurchaseFailed.AddListener(OnPurchaseFailed);
-                PurchaseManager.Instance.onRestorePurchase.AddListener(OnRestorePurchase);
+                PurchaseManager.Instance.onPurchaseComplete += OnPurchaseComplete;
+                PurchaseManager.Instance.onPurchaseFailed += OnPurchaseFailed;
+                PurchaseManager.Instance.onRestorePurchase += OnRestorePurchase;
             }
         }
 
@@ -37,9 +37,9 @@ namespace Rano.PlatformServices.Billing
             _activated = false;
             if (PurchaseManager.Instance.IsNotNull())
             {
-                PurchaseManager.Instance.onPurchaseComplete.RemoveListener(OnPurchaseComplete);
-                PurchaseManager.Instance.onPurchaseFailed.RemoveListener(OnPurchaseFailed);
-                PurchaseManager.Instance.onRestorePurchase.RemoveListener(OnRestorePurchase);
+                PurchaseManager.Instance.onPurchaseComplete -= OnPurchaseComplete;
+                PurchaseManager.Instance.onPurchaseFailed -= OnPurchaseFailed;
+                PurchaseManager.Instance.onRestorePurchase -= OnRestorePurchase;
             }
         }
 

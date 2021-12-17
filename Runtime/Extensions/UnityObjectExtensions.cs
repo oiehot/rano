@@ -32,6 +32,7 @@ namespace Rano
 		{
 			return ReferenceEquals(obj, null);
 		}
+
 		public static bool IsNotNull(this UnityEngine.Object obj)
         {
 			return !ReferenceEquals(obj, null);
