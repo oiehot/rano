@@ -11,7 +11,7 @@ using Rano;
 
 namespace Rano
 {
-    public class SoundManager : MonoSingleton<SoundManager>
+    public sealed class SoundManager : MonoSingleton<SoundManager>
     {
         Dictionary<string, AudioClip> clips;
         Dictionary<string, SoundLayer> layers;
@@ -29,8 +29,9 @@ namespace Rano
             }
         }
 
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             clips = new Dictionary<string, AudioClip>();
             layers = new Dictionary<string, SoundLayer>();
 

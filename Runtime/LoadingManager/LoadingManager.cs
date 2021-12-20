@@ -13,7 +13,7 @@ namespace Rano
 {
     [AddComponentMenu("Rano/LoadingManager")]
     [RequireComponent(typeof(Fader))]
-    public partial class LoadingManager : MonoSingleton<LoadingManager>
+    public sealed partial class LoadingManager : MonoSingleton<LoadingManager>
     {
         public enum Status
         {
@@ -39,8 +39,9 @@ namespace Rano
         Fader _fader;
         public Status status {get; private set;}
 
-        void Awake()
+        protected override void Awake() 
         {
+            base.Awake();
             status = Status.None;
             _queue = new Queue<Command>();
             _fader = GetComponent<Fader>();

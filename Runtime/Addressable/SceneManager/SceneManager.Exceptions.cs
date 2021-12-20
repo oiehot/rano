@@ -8,7 +8,7 @@ using Rano;
 
 namespace Rano.Addressable
 {
-    public partial class SceneManager : MonoSingleton<SceneManager>
+    public sealed partial class SceneManager : MonoSingleton<SceneManager>
     {
         public class SceneManagerException : Exception
         {

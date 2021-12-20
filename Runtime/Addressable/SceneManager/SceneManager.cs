@@ -18,7 +18,7 @@ using UnityEngine.ResourceManagement.ResourceLocations;
 
 namespace Rano.Addressable
 {
-    public partial class SceneManager : MonoSingleton<SceneManager>
+    public sealed partial class SceneManager : MonoSingleton<SceneManager>
     {
         public enum Status
         {
@@ -28,8 +28,9 @@ namespace Rano.Addressable
         public Status status {get; private set;}
         Dictionary<Address, SceneInstance> _scenes;
 
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             status = Status.None;
             _scenes = new Dictionary<Address, SceneInstance>();
         }

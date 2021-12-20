@@ -27,16 +27,14 @@ namespace Rano
     /// https://ansohxxn.github.io/unity%20lesson%202/ch10/
     /// </refs>
     [AddComponentMenu("Rano/Pool/PoolManager")]
-    public class PoolManager : MonoSingleton<PoolManager>
+    public sealed class PoolManager : MonoSingleton<PoolManager>
     {
         Dictionary<string, Pool> _pools = new Dictionary<string, Pool>();
         Transform _rootTransform;
 
-        /// <summary>
-        /// 초기화
-        /// </summary>
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             if (_rootTransform == null)
             {
                 _rootTransform = new GameObject { name = "Pools" }.transform;

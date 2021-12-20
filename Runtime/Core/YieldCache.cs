@@ -3,6 +3,7 @@
 // Proprietary and confidential
 // Written by Taewoo Lee <oiehot@gmail.com>
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -38,7 +39,7 @@ namespace Rano
         /// </summary>
         public static WaitForSeconds WaitForSeconds(float seconds)
         {
-            Debug.Assert(seconds >= 0f, $"음수 값으로 WaitForSeconds 객체를 얻고 있습니다: {seconds}");
+            UnityEngine.Debug.Assert(seconds >= 0f, $"음수 값으로 WaitForSeconds 객체를 얻고 있습니다: {seconds}");
             if (seconds == 0f) return null;
 
             WaitForSeconds wfs;
@@ -48,7 +49,7 @@ namespace Rano
                 waitForSecondsCaches.Add(seconds, wfs = new WaitForSeconds(seconds));
 
                 // 캐싱 수가 지나치게 많아지면 경고한다.
-                Debug.Assert(waitForSecondsCaches.Count < bestWaitForSecondsCount,
+                UnityEngine.Debug.Assert(waitForSecondsCaches.Count < bestWaitForSecondsCount,
                     $"WaitForSeconds의 캐싱 수가 너무 많습니다: {waitForSecondsCaches.Count}");
             }
             return wfs;

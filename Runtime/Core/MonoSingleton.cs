@@ -16,20 +16,22 @@ namespace Rano
     /// </remarks>    
     public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
-        static T _instance;
-        static bool _shuttingDown = false;
-        static object _lock = new object();
+        private static T _instance;
+        private static bool _isAppQuitting = false;
+        private static readonly object Lock = new object();
 
         public static T Instance
         {
             get
             {
-                if (_shuttingDown)
+                if (_isAppQuitting)
                 {
+                    // TODO: 문구변경.
+                    Log.Warning($"MonoSingleton Instance {typeof(T)} already destroyed on application quit. Won't create again - returning null.");
                     return null;
                 }
 
-                lock (_lock)
+                lock (Lock)
                 {
                     // UnityEngine.Object의 비교연산자는 오버로딩되어 성능이 떨어진다.
                     // 네이티브 객체를 비교하지 않고 유니티 객체(래핑객체)만 비교하도록 한다.
@@ -53,14 +55,25 @@ namespace Rano
             }
         }
 
-        //void OnApplicationQuit()
-        //{
-        //    _shuttingDown = true;
-        //}
-
-        void OnDestroy()
+        protected virtual void Awake()
         {
-            _shuttingDown = true;
+            if (_instance && _instance != this)
+            {
+                Log.Error($"{typeof(T)} 가 이미 존재합니다!");
+                Destroy(gameObject);
+                return;
+            }
+        }
+
+        protected virtual void OnDestroy()
+        {
+            // _isAppQuitting = true;
+        }
+
+        // TODO: OnDestory가 맞을까 여기가 맞을까?
+        protected virtual void OnApplicationQuit()
+        {
+            _isAppQuitting = true;
         }
     }
 }

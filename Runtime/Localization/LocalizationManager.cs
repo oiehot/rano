@@ -11,14 +11,15 @@ using Rano;
 
 namespace Rano
 {
-    public class LocalizationManager : MonoSingleton<LocalizationManager>
+    public sealed class LocalizationManager : MonoSingleton<LocalizationManager>
     {
         private LocalizationLanguage language;
         private Dictionary<string, string> dict;
         private Dictionary<LocalizationLanguage, LocalizationFont> fonts;
 
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             this.dict = new Dictionary<string, string>();
             this.fonts = new Dictionary<LocalizationLanguage, LocalizationFont>();
         }

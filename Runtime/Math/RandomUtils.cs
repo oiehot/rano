@@ -19,7 +19,7 @@ namespace Rano
         /// <returns>랜덤한 bool 값</returns>
         public static bool GetRandomBool(float trueProbability=0.5f)
         {
-            Debug.Assert(
+            UnityEngine.Debug.Assert(
                 trueProbability >= 0.0f && trueProbability <= 1.0f,
                 "참 확률은 0이상 1이하여야 합니다."
             );

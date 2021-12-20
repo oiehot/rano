@@ -11,7 +11,7 @@ using Rano;
 
 namespace Rano
 {
-    public class NetworkManager : MonoSingleton<NetworkManager>
+    public sealed class NetworkManager : MonoSingleton<NetworkManager>
     {
         public bool isConnected { get; private set; }
 
@@ -24,8 +24,9 @@ namespace Rano
         public Action onConnected;
         public Action onDisconnected;
 
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             isConnected = false;
         }
 

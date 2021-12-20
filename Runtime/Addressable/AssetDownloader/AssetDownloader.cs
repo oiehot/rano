@@ -29,7 +29,7 @@ namespace Rano.Addressable
         DownloadFailed
     }
 
-    public partial class AssetDownloader : MonoSingleton<AssetDownloader>
+    public sealed class AssetDownloader : MonoSingleton<AssetDownloader>
     {
         private Dictionary<string, DownloadTask> tasks;
         private List<DownloadTask> currentTasks;
@@ -91,8 +91,9 @@ namespace Rano.Addressable
             return $"AssetDownloader(status:{this.status}, percent:{this.percent}, size:{this.downloadedSize}/{this.size})";
         }
 
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             this.status = AssetDownloaderStatus.None;
             this.tasks = new Dictionary<string, DownloadTask>();
             this.currentTasks = new List<DownloadTask>();

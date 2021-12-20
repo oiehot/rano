@@ -30,8 +30,9 @@ namespace Rano.PlatformServices.Billing
         public Action<string, string> onPurchaseFailed;
         public Action<string> onRestorePurchase;
 
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             _products = new Dictionary<string, IBillingProduct>();
             if (BillingServices.IsAvailable())
             {
