@@ -3,9 +3,6 @@
 // Proprietary and confidential
 // Written by Taewoo Lee <oiehot@gmail.com>
 
-// TODO: 에드몹 테스트 디바이스의 처리
-//#define ADMOB_TEST_DEVICE
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,16 +17,21 @@ namespace Rano.PlatformServices.Admob
     /// </summary>
     public sealed class AdmobManager : MonoSingleton<AdmobManager>
     {
+        private string _testDeviceId
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            = "60170BB4E800B2E49C50C2E22050016E";
+#else
+            = null;
+#endif
+
         void Start()
         {
             Log.Info($"에드몹 초기화 요청.");
-#if ADMOB_TEST_DEVICE
-            string testDeviceId = null;
-            if (testDeviceId != null)
+            if (_testDeviceId != null)
             {
-                Log.Info($"테스트 디바이스 지정 ({testDeviceId})");
+                Log.Info($"테스트 디바이스 지정 ({_testDeviceId})");
                 List<string> testDevices = new List<string>();
-                testDevices.Add(testDeviceId);
+                testDevices.Add(_testDeviceId);
                 RequestConfiguration requestConfiguration = new RequestConfiguration
                     .Builder()
                     .SetTestDeviceIds(testDevices)
@@ -38,9 +40,11 @@ namespace Rano.PlatformServices.Admob
             }
             else
             {
-                throw new Exception("테스트 디바이스 Id가 없음.");
-            }
+#if DEVELOPMENT_BUILD
+                Log.Warning("테스트 디바이스 Id가 지정되어있지 않음");
 #endif
+            }
+
             MobileAds.Initialize(OnInitComplete);
         }
 

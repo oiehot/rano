@@ -84,6 +84,7 @@ namespace Rano.PlatformServices.Cloud
 
         public IEnumerator SynchronizeCoroutine(Action<bool> callback = null)
         {
+            // TODO: 이미 동기화 중이면 생략한다 or Queue 처리한다.
             bool syncResult = false;
             bool syncCompleted = false;
 

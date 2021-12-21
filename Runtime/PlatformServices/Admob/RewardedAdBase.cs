@@ -55,12 +55,12 @@ namespace Rano.PlatformServices.Admob
         /// <summary>
         /// 안드로이드용 광고유닛Id.
         /// </summary>
-        [SerializeField] protected string _androidAdUnitId;
+        [SerializeField] protected string _androidAdUnitId = "";
 
         /// <summary>
         /// iOS용 광고유닛Id.
         /// </summary>
-        [SerializeField] protected string _iosAdUnitId;
+        [SerializeField] protected string _iosAdUnitId = "";
 
         protected virtual void Awake()
         {
@@ -70,39 +70,44 @@ namespace Rano.PlatformServices.Admob
         protected virtual void Start()
         {
 
-#if (UNITY_ANDROID && !DEVELOPMENT_BUILD)
+#if UNITY_ANDROID
 
-            if (_androidAdUnitId != null)
+            if (_androidAdUnitId != "")
             {
                 _adUnitId = _androidAdUnitId;
             }
             else
             {
+#if DEVELOPMENT_BUILD
+                Log.Info($"{_adName} - 안드로이드 테스트광고Id 사용.");
+                _adUnitId = "ca-app-pub-3940256099942544/5224354917"; // Android 테스트광고
+#else
                 throw new Exception($"{_adName} - 안드로이드 광고Id가 없음.");
+#endif
             }
 
-#elif (UNITY_ANDROID && DEVELOPMENT_BUILD)
-
-            _adUnitId = "ca-app-pub-3940256099942544/5224354917"; // Android 테스트광고
-
-#elif (UNITY_IOS && !DEVELOPMENT_BUILD)
-
-            if (_iosAdUnitId != null)
+#elif UNITY_IOS
+            if (_iosAdUnitId != "")
             {
                 _adUnitId = _iosAdUnitId;
             }
             else
             {
-                throw new Exception("iOS 광고Id가 없음");
+#if DEVELOPMENT_BUILD
+                Log.Info($"{_adName} - iOS 테스트광고Id 사용.");
+                _adUnitId = "ca-app-pub-3940256099942544/1712485313"; // iOS 테스트광고
+#else
+                throw new Exception($"{_adName} - iOS 광고Id가 없음.");
+#endif
             }
-
-#elif (UNITY_IOS && DEVELOPMENT_BUILD)
-
-            _adUnitId = "ca-app-pub-3940256099942544/1712485313"; // iOS 테스트광고
-
 #else
 
+#if DEVELOPMENT_BUILD
+            Log.Info($"{_adName} - 기타플랫폼 테스트광고Id 사용.");
             _adUnitId = "ca-app-pub-3940256099942544/5224354917"; // Android 테스트광고
+#else
+            throw new Exception($"{_adName} - 기타 플랫폼용 광고Id가 없음.");
+#endif
 
 #endif
         }
