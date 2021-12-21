@@ -76,6 +76,7 @@ namespace Rano
                     switch (command.type)
                     {
                         case Command.Type.AddScene:
+                            Log.Info($"씬 추가 {command.address}");
                             status = Status.LoadingScene;
                             yield return Rano.Addressable.SceneManager.Instance.AddSceneAsync(command.address);
                             // 마지막으로 Add된 Scene이 Instatiable Active Scene이 됨.
@@ -84,28 +85,34 @@ namespace Rano
                             break;
 
                         case Command.Type.RemoveScene:
+                            Log.Info($"씬 삭제 {command.address}");
                             status = Status.UnloadingScene;
                             yield return Rano.Addressable.SceneManager.Instance.RemoveSceneAsync(command.address);
                             status = Status.UnloadingSceneCompleted;
                             break;
 
                         case Command.Type.ActiveScene:
+                            Log.Info($"씬 활성화 {command.address}");
                             Rano.Addressable.SceneManager.Instance.ActivateScene(command.address);
                             break;
 
                         case Command.Type.FadeOut:
+                            Log.Info($"페이드 아웃");
                             yield return _fader.FadeOut(command.fadeSpeed);
                             break;
 
                         case Command.Type.FadeIn:
+                            Log.Info($"페이드 인");
                             yield return _fader.FadeIn(command.fadeSpeed);
                             break;
 
                         case Command.Type.ShowText:
+                            Log.Info($"텍스트 보이기");
                             yield return _fader.ShowText(command.fadeSpeed);
                             break;
 
                         case Command.Type.HideText:
+                            Log.Info($"텍스트 숨기기");
                             yield return _fader.HideText(command.fadeSpeed);
                             break;
                     }
