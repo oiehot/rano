@@ -14,15 +14,15 @@ namespace RanoEditor.Build
 {
     public class Builder : IBuilder
     {
-        protected BuildPlayerOptions options;
+        protected BuildPlayerOptions _options;
 
         public Builder()
         {
-            this.options = new BuildPlayerOptions();
-            this.options.scenes = BuildHelper.GetEnableScenes();
-            this.options.locationPathName = null;
+            _options = new BuildPlayerOptions();
+            _options.scenes = BuildHelper.GetEnableScenes();
+            _options.locationPathName = null;
             // this.options.target = BuildTarget.iOS;
-            this.options.options = BuildOptions.None;
+            _options.options = BuildOptions.None;
                 // | BuildOptions.AutoRunPlayer
                 // | BuildOptions.Development
                 // | BuildOptions.ConnectWithProfiler
@@ -48,7 +48,7 @@ namespace RanoEditor.Build
 
         private string GetOutputPath()
         {
-            return $"{this.GetOutputDirectory()}/{this.GetOutputFilename()}{this.GetOutputExtension()}";
+            return $"{GetOutputDirectory()}/{GetOutputFilename()}{GetOutputExtension()}";
         }
 
         public virtual BuildReport Build()
@@ -56,31 +56,34 @@ namespace RanoEditor.Build
             BuildReport report;
 
             // 빌드 아웃풋 디렉토리가 없으면 생성한다.
-            DirectoryInfo buildDirectory = new DirectoryInfo(this.GetOutputDirectory());
+            DirectoryInfo buildDirectory = new DirectoryInfo(GetOutputDirectory());
             if (!buildDirectory.Exists)
             {
                 buildDirectory.Create();
             }
 
             // 빌드 아웃풋 경로 설정 (파일 경로)
-            this.options.locationPathName = this.GetOutputPath();
+            _options.locationPathName = GetOutputPath();
 
-            // 빌드 시작전 로그
-            Log.Important("Building...");
-            Log.Info($"Target: {this.options.target}");
-            Log.Info($"Output: {this.options.locationPathName}");
-            
+            // 빌드 시작 전 로그
+            string buildVersionStr = VersionManager.GetCurrentVersion().ToString();
+            Log.Important($"Building... {buildVersionStr}");
+            Log.Info($"Target: {_options.target}");
+            Log.Info($"Output: {_options.locationPathName}");
+
             // 빌드
-            report = BuildPipeline.BuildPlayer(this.options);
+            report = BuildPipeline.BuildPlayer(_options);
             switch (report.summary.result)
             {
                 case BuildResult.Unknown:
-                    Log.Important($"Build Completed {PlayerSettings.bundleVersion} (with some warnings)");
+                    Log.Important($"Build Completed {buildVersionStr} (with some warnings)");
+                    Log.Info($"Output: {_options.locationPathName}");
                     break;
 
                 case BuildResult.Succeeded:
-                    Log.Important($"Build Completed {PlayerSettings.bundleVersion}");
-                    // Debug.Log($"{report.summary.totalSize} 바이트");
+                    Log.Important($"Build Completed {buildVersionStr}");
+                    Log.Info($"Output: {_options.locationPathName}");
+                    //Log.Info($"{report.summary.totalSize} 바이트");
                     break;
 
                 default:

@@ -55,7 +55,8 @@ namespace RanoEditor.Build
             currentVersion = version;
             PlayerSettings.bundleVersion = version.ToString();
             PlayerSettings.Android.bundleVersionCode = version.buildVersionCode;
-            Log.Important($"Change Version: {lastVersion.ToString()} => {currentVersion.ToString()}");            
+            PlayerSettings.iOS.buildNumber = version.buildVersionCode.ToString();
+            Log.Info($"Change Version: {lastVersion.ToString()} => {currentVersion.ToString()}");            
         }
 
         /// <summary>버젼 증가시키고 적용하기</summary>

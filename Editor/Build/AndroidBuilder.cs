@@ -14,7 +14,7 @@ namespace RanoEditor.Build
     {
         public AndroidBuilder()
         {
-            this.options.target = BuildTarget.Android;        
+            _options.target = BuildTarget.Android;        
         }
 
         protected override string GetOutputDirectory()

@@ -8,9 +8,6 @@ using Rano;
 
 namespace Rano.App
 {
-    /// <summary>
-    /// 버젼 데이터를 다루는 데이터 타입
-    /// </summary>
     [System.Serializable]
     public struct Version
     {
@@ -18,7 +15,6 @@ namespace Rano.App
         public int minor;
         public int build;
 
-        /// <summary>빌드 버젼 코드</summary>
         public int buildVersionCode
         {
             get
@@ -31,16 +27,14 @@ namespace Rano.App
             }
         }
 
-        /// <summary>풀 버젼 스트링</summary>
         public string fullVersion
         {
             get
             {
                 return $"{major}.{minor}.{build} ({buildVersionCode})";
             }
-        }        
+        }
 
-        /// <summary>숫자를 통한 생성자</summary>
         public Version(int majorVer, int minorVer, int buildVer)
         {
             if (majorVer < 0) majorVer = 0;
@@ -51,7 +45,6 @@ namespace Rano.App
             build = buildVer;
         }
 
-        /// <summary>버젼 문자열을 통한 생성자</summary>
         public Version(string versionString)
         {
             string[] tokens;
