@@ -14,6 +14,7 @@
     "url": "https://www.oiehot.com"
   },
   "dependencies": {
-    "com.unity.addressables": "1.18.19"
+    "com.unity.addressables": "1.18.19",
+    "com.unity.nuget.newtonsoft-json": "2.0.2"
   }
 }
