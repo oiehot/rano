@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEditor.Build.Reporting;
 using Rano;
 using Rano.App;
+using System.Reflection;
 
 namespace RanoEditor.Build
 {
@@ -16,17 +17,15 @@ namespace RanoEditor.Build
     {
         protected BuildPlayerOptions _options;
 
-        public Builder()
+        public Builder(bool developmentBuild)
         {
             _options = new BuildPlayerOptions();
             _options.scenes = BuildHelper.GetEnableScenes();
             _options.locationPathName = null;
-            // this.options.target = BuildTarget.iOS;
-            _options.options = BuildOptions.None;
-                // | BuildOptions.AutoRunPlayer
-                // | BuildOptions.Development
-                // | BuildOptions.ConnectWithProfiler
-                // | BuildOptions.AllowDebugging;
+
+            // TODO: Develpoment 이외의 옵션도 처리
+            //_options.options = BuildOptions.None;
+            _options.options |= BuildOptions.Development;
         }
 
         protected virtual string GetOutputDirectory()
@@ -43,7 +42,13 @@ namespace RanoEditor.Build
 
         private string GetOutputFilename()
         {
-            return $"{Application.productName}_{VersionManager.GetCurrentVersion().ToString()}";
+            string filename;
+            filename = $"{Application.productName}_{VersionManager.GetCurrentVersion().ToString()}";
+            if (_options.options.HasFlag(BuildOptions.Development))
+            {
+                filename += "_dev";
+            }
+            return filename;
         }
 
         private string GetOutputPath()
@@ -68,6 +73,7 @@ namespace RanoEditor.Build
             // 빌드 시작 전 로그
             string buildVersionStr = VersionManager.GetCurrentVersion().ToString();
             Log.Important($"Building... {buildVersionStr}");
+            Log.Info($"Options: {_options}");
             Log.Info($"Target: {_options.target}");
             Log.Info($"Output: {_options.locationPathName}");
 
