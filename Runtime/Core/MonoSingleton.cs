@@ -26,8 +26,9 @@ namespace Rano
             {
                 if (_isAppQuitting)
                 {
-                    // TODO: 문구변경.
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                     Log.Warning($"MonoSingleton Instance {typeof(T)} already destroyed on application quit. Won't create again - returning null.");
+#endif
                     return null;
                 }
 
@@ -44,10 +45,9 @@ namespace Rano
                             GameObject gameObject = new GameObject();
                             _instance = gameObject.AddComponent<T>();
                             gameObject.name = typeof(T).ToString();
-#if UNITY_EDITOR
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                             Log.Info($"싱글톤 {typeof(T)}가 자동으로 생성되었습니다.");
 #endif
-                            DontDestroyOnLoad(gameObject);
                         }
                     }
                     return _instance;
@@ -63,6 +63,9 @@ namespace Rano
                 Destroy(gameObject);
                 return;
             }
+
+            gameObject.name = typeof(T).ToString();
+            DontDestroyOnLoad(gameObject);
         }
 
         protected virtual void OnDestroy()
