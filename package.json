@@ -14,7 +14,6 @@
     "url": "https://www.oiehot.com"
   },
   "dependencies": {
-    "com.unity.purchasing": "2.1.1",
     "com.unity.addressables": "1.18.19"
   }
 }

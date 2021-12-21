@@ -45,7 +45,6 @@
         "**/*.prefab":true,
         "**/*.unity":true,
         "**/*.asmdef":true,
-        "**/package.json":true,
         "build/":true,
         "Build/":true,
         "Library/":true,
