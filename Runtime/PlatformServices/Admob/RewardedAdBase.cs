@@ -78,7 +78,7 @@ namespace Rano.PlatformServices.Admob
             }
             else
             {
-#if DEVELOPMENT_BUILD
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
                 Log.Info($"{_adName} - 안드로이드 테스트광고Id 사용.");
                 _adUnitId = "ca-app-pub-3940256099942544/5224354917"; // Android 테스트광고
 #else
@@ -93,7 +93,7 @@ namespace Rano.PlatformServices.Admob
             }
             else
             {
-#if DEVELOPMENT_BUILD
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
                 Log.Info($"{_adName} - iOS 테스트광고Id 사용.");
                 _adUnitId = "ca-app-pub-3940256099942544/1712485313"; // iOS 테스트광고
 #else
@@ -102,7 +102,7 @@ namespace Rano.PlatformServices.Admob
             }
 #else
 
-#if DEVELOPMENT_BUILD
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
             Log.Info($"{_adName} - 기타플랫폼 테스트광고Id 사용.");
             _adUnitId = "ca-app-pub-3940256099942544/5224354917"; // Android 테스트광고
 #else
