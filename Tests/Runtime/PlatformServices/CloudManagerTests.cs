@@ -44,12 +44,6 @@ namespace Rano.Tests.PlatformServices
         }
 
         [Test]
-        public void InitializeTest()
-        {
-            Assert.IsTrue(_cloudManager.IsAvailable());
-        }
-
-        [Test]
         public void SetBoolTest()
         {
             _cloudManager.SetBool(_keys["bool"], true);

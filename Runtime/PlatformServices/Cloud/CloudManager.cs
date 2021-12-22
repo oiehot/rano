@@ -13,7 +13,23 @@ namespace Rano.PlatformServices.Cloud
 {
     public sealed class CloudManager : MonoSingleton<CloudManager>
     {
-        public bool InitialSynchornized { get; private set; }
+        public bool IsFeatureAvailable => CloudServices.IsAvailable();
+        public bool IsInitialSynchornized { get; private set; }
+        public bool IsSynchronizing { get; private set; }
+        public bool IsAvailable
+        {
+            get
+            {
+                if (IsFeatureAvailable && GameServices.IsAuthenticated)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
 
         public Action onUserChange;
         public Action onSavedDataChange;
@@ -82,14 +98,24 @@ namespace Rano.PlatformServices.Cloud
             onSynchronizeComplete?.Invoke();
         }
 
-        public IEnumerator SynchronizeCoroutine(Action<bool> callback = null)
+        public IEnumerator SynchronizeCoroutine(Action<bool> onResult=null)
         {
             // TODO: 이미 동기화 중이면 생략한다 or Queue 처리한다.
             bool syncResult = false;
             bool syncCompleted = false;
 
+            if (IsSynchronizing == true)
+            {
+                // TODO: 추후 Queue형태로 변환 필요.
+                Log.Info("클라우드 동기화가 요청되었으나 이미 진행중이므로 생략합니다.");
+                onResult?.Invoke(false);
+                yield break;
+            }
+
             Log.Info("클라우드 동기화 시작.");
-            CloudServices.Synchronize((CloudServicesSynchronizeResult result) => {
+            IsSynchronizing = true;
+            CloudServices.Synchronize((CloudServicesSynchronizeResult result) =>
+            {
                 if (result.Success)
                 {
                     syncResult = true;
@@ -101,7 +127,7 @@ namespace Rano.PlatformServices.Cloud
                 syncCompleted = true;
 
                 // 최초로 싱크했다면 체크한다.
-                if (InitialSynchornized == false) InitialSynchornized = true;
+                if (IsInitialSynchornized == false) IsInitialSynchornized = true;
             });
 
             while (syncCompleted == false)
@@ -110,7 +136,9 @@ namespace Rano.PlatformServices.Cloud
                 yield return YieldCache.WaitForFixedUpdate;
             }
 
-            callback?.Invoke(syncResult);
+            IsSynchronizing = false;
+            if (syncResult == true) onResult?.Invoke(true);
+            else onResult?.Invoke(false);
         }
 
         //public void Synchronize()
@@ -123,8 +151,6 @@ namespace Rano.PlatformServices.Cloud
         //    Log.Info("클라우드 동기화 시작.");
         //    CloudServices.Synchronize(callback);
         //}
-
-        public bool IsAvailable() => CloudServices.IsAvailable();
 
         public bool GetBool(string key) => CloudServices.GetBool(key);
         public byte[] GetByteArray(string key) => CloudServices.GetByteArray(key);
@@ -143,11 +169,5 @@ namespace Rano.PlatformServices.Cloud
         public void SetString(string key, string value) => CloudServices.SetString(key, value);
 
         public void RemoveKey(string key) => CloudServices.RemoveKey(key);
-
-        public override string ToString()
-        {
-            if (IsAvailable()) return $"CloudManager(Online)";
-            else return $"CloudManager(Offline)";
-        }
     }
 }

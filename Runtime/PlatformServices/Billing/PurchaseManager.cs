@@ -21,6 +21,16 @@ namespace Rano.PlatformServices.Billing
 
     public sealed class PurchaseManager : MonoSingleton<PurchaseManager>
     {
+        public bool IsFeatureAvailable => BillingServices.IsAvailable();
+        public bool IsAvailable
+        {
+            get
+            {
+                if (IsFeatureAvailable) return true;
+                else return false;
+            }
+        }
+
         /// <summary>
         /// PlatformId에 매칭되는 Product 객체를 담는 사전.
         /// PlatformId가 아닌 Settings에 적혀진 ProductId를 키로 사용한다.
@@ -192,15 +202,6 @@ namespace Rano.PlatformServices.Billing
             Log.Info("구매복구 요청.");
             BillingServices.RestorePurchases();
         }
-
-        /// <summary>
-        /// 결제서비스 가능 여부 리턴.
-        /// </summary>
-        /// <returns>결제서비스 가능 여부</returns>
-        public bool IsAvailable()
-        {
-            return BillingServices.IsAvailable();
-        }        
 
         /// <summary>
         /// 상품의 구매가능 여부를 리턴한다.
