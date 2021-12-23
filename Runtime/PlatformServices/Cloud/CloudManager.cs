@@ -67,12 +67,17 @@ namespace Rano.PlatformServices.Cloud
             onUserChange?.Invoke();
         }
 
+        /// <summary>
+        /// 로컬데이터에서 수정사항이 생기면 콜백된다.
+        /// 동기화시 클라우드로 부터 최신데이터를 다운로드 받고 로컬카피본과 비교하여 차이점이 있으면 콜백됨.
+        /// 이 콜백이 호출된 쯤이면 클라우드데이터가 로컬에 덮어씌어진 이후다.
+        /// </summary>
+        /// <param name="result"></param>
         private void OnSavedDataChange(CloudServicesSavedDataChangeResult result)
         {
-            Log.Info("OnSavedDataChange 이벤트 발생.");
-            Log.Info("결과: " + result.ToString());
-
             string[] changedKeys = result.ChangedKeys;
+
+            Log.Info("OnSavedDataChange 이벤트 발생.");
             Log.Info($"총 바뀐 키: {changedKeys.Length}");
             foreach (string key in changedKeys)
             {
@@ -80,6 +85,21 @@ namespace Rano.PlatformServices.Cloud
             }
 
             CloudSavedDataChangeReasonCode reason = result.ChangeReason;
+            switch (reason)
+            {
+                case CloudSavedDataChangeReasonCode.ServerChange:
+                    Log.Info($"이유: 서버가 변경됨.");
+                    break;
+                case CloudSavedDataChangeReasonCode.InitialSyncChange:
+                    Log.Info($"이유: 최초 동기화.");
+                    break;
+                case CloudSavedDataChangeReasonCode.QuotaViolationChange:
+                    Log.Info($"이유: 쿼터 위반.");
+                    break;
+                case CloudSavedDataChangeReasonCode.AccountChange:
+                    Log.Info($"이유: 계정 변경.");
+                    break;
+            }
             Log.Info($"이유: {reason.ToString()}");
 
             onSavedDataChange?.Invoke();
@@ -98,6 +118,13 @@ namespace Rano.PlatformServices.Cloud
             onSynchronizeComplete?.Invoke();
         }
 
+        /// <summary>
+        /// 로컬카피와 클라우드카피를 동기화한다.
+        /// 클라우드에 있는 복사본이 로컬메모리로 덮어씌어진다.
+        /// 차이점이 있으면 OnSavedDataChange이 콜백된다.
+        /// </summary>
+        /// <param name="onResult">완료 콜백</param>
+        /// <returns></returns>
         public IEnumerator SynchronizeCoroutine(Action<bool> onResult=null)
         {
             // TODO: 이미 동기화 중이면 생략한다 or Queue 처리한다.
@@ -106,14 +133,13 @@ namespace Rano.PlatformServices.Cloud
 
             if (IsSynchronizing == true)
             {
-                // TODO: 추후 Queue형태로 변환 필요.
                 Log.Info("클라우드 동기화가 요청되었으나 이미 진행중이므로 생략합니다.");
                 onResult?.Invoke(false);
                 yield break;
             }
 
-            Log.Info("클라우드 동기화 시작.");
             IsSynchronizing = true;
+            Log.Info("클라우드 동기화 시작.");
             CloudServices.Synchronize((CloudServicesSynchronizeResult result) =>
             {
                 if (result.Success)
@@ -141,24 +167,7 @@ namespace Rano.PlatformServices.Cloud
             else onResult?.Invoke(false);
         }
 
-        //public void Synchronize()
-        //{
-        //    Log.Info("클라우드 동기화 시작.");
-        //    CloudServices.Synchronize();
-        //}
-        //public void Synchronize(Callback<CloudServicesSynchronizeResult> callback)
-        //{
-        //    Log.Info("클라우드 동기화 시작.");
-        //    CloudServices.Synchronize(callback);
-        //}
-
-        public bool GetBool(string key) => CloudServices.GetBool(key);
-        public byte[] GetByteArray(string key) => CloudServices.GetByteArray(key);
-        public double GetDouble(string key) => CloudServices.GetDouble(key);
-        public float GetFloat(string key) => CloudServices.GetFloat(key);
-        public int GetInt(string key) => CloudServices.GetInt(key);
-        public long GetLong(string key) => CloudServices.GetLong(key);
-        public string GetString(string key) => CloudServices.GetString(key);
+        #region 로컬카피 편집 메소드들
 
         public void SetBool(string key, bool value) => CloudServices.SetBool(key, value);
         public void SetByteArray(string key, byte[] value) => CloudServices.SetByteArray(key, value);
@@ -168,6 +177,16 @@ namespace Rano.PlatformServices.Cloud
         public void SetLong(string key, long value) => CloudServices.SetLong(key, value);
         public void SetString(string key, string value) => CloudServices.SetString(key, value);
 
+        public bool GetBool(string key) => CloudServices.GetBool(key);
+        public byte[] GetByteArray(string key) => CloudServices.GetByteArray(key);
+        public double GetDouble(string key) => CloudServices.GetDouble(key);
+        public float GetFloat(string key) => CloudServices.GetFloat(key);
+        public int GetInt(string key) => CloudServices.GetInt(key);
+        public long GetLong(string key) => CloudServices.GetLong(key);
+        public string GetString(string key) => CloudServices.GetString(key);
+
         public void RemoveKey(string key) => CloudServices.RemoveKey(key);
+
+        #endregion
     }
 }
