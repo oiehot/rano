@@ -8,13 +8,13 @@ using UnityEngine;
 namespace Rano
 {
     /// <summary>
-    /// 안전한 MonoBehaviour 싱글톤
+    /// MonoBehaviour 싱글톤
     /// </summary>
     /// <remarks>
     /// 준비된 게임오브젝트와 컴포넌트가 없으면 새로 만든다.
     /// 한번 Unload 후 다시 Load 되면 셧다운 플래그로 인해서 에러가 발생한다.
     /// </remarks>    
-    public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
+    public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
         private static T _instance;
         private static bool _isAppQuitting = false;
