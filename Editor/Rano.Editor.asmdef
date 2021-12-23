@@ -3,7 +3,7 @@
     "rootNamespace": "",
     "references": [
         "Rano",
-        "UnityEditor.Purchasing"
+        "Unity.Addressables.Editor"
     ],
     "includePlatforms": [
         "Editor"
