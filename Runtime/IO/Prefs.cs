@@ -8,7 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine;
 
-namespace Rano.File
+namespace Rano.IO
 {   
     public static class Prefs
     {

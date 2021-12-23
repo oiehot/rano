@@ -4,9 +4,9 @@
 // Written by Taewoo Lee <oiehot@gmail.com>
 
 using NUnit.Framework;
-using Rano.File;
+using Rano.IO;
 
-namespace Rano.Tests.File
+namespace Rano.Tests.IO
 {
     public class LocalSaveTests
     {
@@ -15,9 +15,9 @@ namespace Rano.Tests.File
         {
             byte[] bytes = { 0x00, 0x01, 0xff };
             string filePath = "Byte_WriteRead_Test.txt";
-            LocalSave.Write(filePath, bytes);
+            LocalFile.WriteBytes(filePath, bytes);
 
-            byte[] result = LocalSave.Read(filePath);
+            byte[] result = LocalFile.ReadBytes(filePath);
             Assert.AreEqual(result[0], 0x00);
             Assert.AreEqual(result[1], 0x01);
             Assert.AreEqual(result[2], 0xff);

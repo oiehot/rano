@@ -13,19 +13,22 @@ using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Rano.File
+namespace Rano.IO
 {
-    public static class LocalSave
+    public static class LocalFile
     {
-        #region Byte
-
-        public static void Write(string filePath, byte[] bytes)
+        public static void WriteBytes(string filePath, byte[] bytes)
         {
             string path = $"{Application.persistentDataPath}/{filePath}";
             System.IO.File.WriteAllBytes(path, bytes);
         }
 
-        public static byte[] Read(string filePath)
+        public static void WriteString(string filePath, string str)
+        {
+            WriteBytes(filePath, System.Text.Encoding.UTF8.GetBytes(str));
+        }
+
+        public static byte[] ReadBytes(string filePath)
         {
             string path = $"{Application.persistentDataPath}/{filePath}";
             if (!System.IO.File.Exists(path))
@@ -36,6 +39,10 @@ namespace Rano.File
             return bytes;
         }
 
-        #endregion
+        public static string ReadString(string filePath)
+        {
+            byte[] bytes = ReadBytes(filePath);
+            return System.Text.Encoding.UTF8.GetString(bytes);
+        }
     }
 }
