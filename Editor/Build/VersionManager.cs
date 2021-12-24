@@ -20,46 +20,55 @@ namespace RanoEditor.Build
     [InitializeOnLoad]
     public class VersionManager : IPostprocessBuildWithReport
     {
-        private static bool autoIncrease = true;
-        private const string autoIncreaseMenuName = "Build/Auto Increase Build Version";
-        private static Version lastVersion;
-        private static Version currentVersion;
+        private const string _autoIncreaseMenuName = "Build/Auto Increase Build Version";
+        public static bool IsAutoIncrease { get; private set; } = true;
+        public static Version LastVersion { get; private set; }
+        public static Version CurrentVersion { get; private set; }
+        public static string CurrentVersionString
+        {
+            get
+            {
+                Version version = GetCurrentVersion();
+                if (BuildManager.IsDevelopmentBuild)
+                    return $"{version.ToString()}_dev";
+                else
+                    return $"{version.ToString()}";
+            }
+        }
 
-        /// <summary>생성자</summary>
         static VersionManager()
         {
             // 환경세팅에 자동 빌드 버젼 증가여부 저장
-            autoIncrease = EditorPrefs.GetBool(autoIncreaseMenuName, true);
-            currentVersion = GetCurrentVersion(); 
-            lastVersion = currentVersion;
+            IsAutoIncrease = EditorPrefs.GetBool(_autoIncreaseMenuName, true);
+            CurrentVersion = GetCurrentVersion(); 
+            LastVersion = CurrentVersion;
         }
 
-        /// <todo>자동 빌드 버젼 증가 속성에 따라 메뉴 활성화 여부 결정</todo>
-        [MenuItem(autoIncreaseMenuName, true)]
+        /// <todo>
+        /// 자동 빌드 버젼 증가 속성에 따라 메뉴 활성화 여부 결정
+        /// </todo>
+        [MenuItem(_autoIncreaseMenuName, true)]
         private static bool SetAutoIncreaseValidate()
         {
-            Menu.SetChecked(autoIncreaseMenuName, autoIncrease);
+            Menu.SetChecked(_autoIncreaseMenuName, IsAutoIncrease);
             return true;
         }
 
-        /// <summary>현재 버젼 구조체 얻기</summary>
         public static Version GetCurrentVersion()
         {
             return new Version(PlayerSettings.bundleVersion);
         }
 
-        /// <summary>버젼 구조체로 PlayerSettings를 설정한다</summary>
         public static void ApplyVersion(Version version)
         {
-            lastVersion = GetCurrentVersion();
-            currentVersion = version;
+            LastVersion = GetCurrentVersion();
+            CurrentVersion = version;
             PlayerSettings.bundleVersion = version.ToString();
             PlayerSettings.Android.bundleVersionCode = version.buildVersionCode;
             PlayerSettings.iOS.buildNumber = version.buildVersionCode.ToString();
-            Log.Info($"Change Version: {lastVersion.ToString()} => {currentVersion.ToString()}");            
+            Log.Info($"Change Version: {LastVersion.ToString()} => {CurrentVersion.ToString()}");            
         }
 
-        /// <summary>버젼 증가시키고 적용하기</summary>
         private static void IncreaseVersion(int majorInc, int minorInc, int buildInc)
         {
             Version version;
@@ -70,21 +79,21 @@ namespace RanoEditor.Build
             ApplyVersion(version);
         }
 
-        /// <summary>자동 빌드 버젼 증가 체크</summary>
-        [MenuItem(autoIncreaseMenuName, false, 1)]
+        /// <summary>
+        /// 자동 빌드 버젼 증가 체크
+        /// </summary>
+        [MenuItem(_autoIncreaseMenuName, false, 1)]
         private static void SetAutoIncrease()
         {
-            autoIncrease = !autoIncrease;
-            EditorPrefs.SetBool(autoIncreaseMenuName, autoIncrease);
-            Log.Info($"Auto Increase Build Version: {autoIncrease}");
+            IsAutoIncrease = !IsAutoIncrease;
+            EditorPrefs.SetBool(_autoIncreaseMenuName, IsAutoIncrease);
+            Log.Info($"Auto Increase Build Version: {IsAutoIncrease}");
         }
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         [MenuItem("Build/Check Current Version", false, 2)]
         private static void CheckCurrentVersion()
         {
-            Version version = GetCurrentVersion();
-            Log.Info($"Build v{version.ToString()}");
+            Log.Info($"Build v{CurrentVersionString}");
         }
 
         [MenuItem("Build/Edit Version", false, 3)]
@@ -96,9 +105,6 @@ namespace RanoEditor.Build
             window.ShowUtility();
         }
     
-        /// <summary>
-        /// 빌드 후 실행되는 콜백 함수
-        /// </summary>
         public int callbackOrder { get { return 0; } }
         public void OnPostprocessBuild(BuildReport report)
         {   
@@ -106,7 +112,7 @@ namespace RanoEditor.Build
             {
                 case BuildResult.Unknown:
                 case BuildResult.Succeeded:
-                    if (autoIncrease) IncreaseVersion(0, 0, 1);
+                    if (IsAutoIncrease) IncreaseVersion(0, 0, 1);
                     break;
                 case BuildResult.Cancelled:
                 case BuildResult.Failed:
@@ -114,42 +120,5 @@ namespace RanoEditor.Build
                     break;
             }
         }
-
-        /// <summary>
-        /// ex) 0.7.3 => 1.0.0
-        /// </summary>
-        // [MenuItem("Build/Increase Major Version", false, 51)]
-        // private static void IncreaseMajorVersion()
-        // {
-        //     Version version = GetCurrentVersion();
-        //     IncreaseVersion(1, -version.minor, -version.build);
-        // }
-
-        /// <summary>
-        /// ex) 0.7.3 => 0.8.0
-        /// </summary>
-        // [MenuItem("Build/Increase Minor Version", false, 52)]
-        // private static void IncreaseMinorVersion()
-        // {
-        //     Version version = GetCurrentVersion();
-        //     IncreaseVersion(0, 1, -version.build);
-        // }
-
-        /// <summary>
-        /// ex) 0.7.3 => 0.7.4
-        /// </summary>
-        // private static void IncreaseBuildVersion()
-        // {
-        //     IncreaseVersion(0, 0, 1);
-        // }
-
-        /// <summary>
-        /// 최근에 Increase 하기 전 버젼으로 돌아간다.
-        /// </summray>
-        // [MenuItem("Build/Undo", false, 53)]
-        // public static void RestoreVersion()
-        // {
-        //     ApplyVersion(lastVersion);
-        // }        
     }
 }

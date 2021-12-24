@@ -34,13 +34,15 @@ namespace Rano.PlatformServices.Gaming
             }
         }
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             GameServices.OnAuthStatusChange += OnAuthStatusChange;
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             GameServices.OnAuthStatusChange -= OnAuthStatusChange;
         }
 

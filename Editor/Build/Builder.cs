@@ -72,6 +72,7 @@ namespace RanoEditor.Build
             // 빌드 아웃풋 경로 설정 (파일 경로)
             _options.locationPathName = GetOutputPath();
 
+
             // TODO: 어드레서블 빌드
             Log.Important($"Building Addressable Assets...");
             UnityEditor.AddressableAssets.Settings.AddressableAssetSettings.BuildPlayerContent();
@@ -101,7 +102,8 @@ namespace RanoEditor.Build
                 default:
                     Log.Warning("Build Failed");
                     break;
-            }            
+            }
+
             return report;
         }
     }

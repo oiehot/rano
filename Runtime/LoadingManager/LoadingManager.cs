@@ -48,15 +48,15 @@ namespace Rano
             if (_fader == null) throw new LoadingManagerException("Fader 컴포넌트가 없음.");
         }
 
-        void OnEnable()
+        protected override void OnEnable()
         {
-            Log.Info("LoadingManager Enabled");
+            base.OnEnable();
             StartCoroutine(nameof(CoUpdate));
         }
 
-        void OnDisable()
+        protected override void OnDisable()
         {
-            Log.Info("LoadingManager Disabled");
+            base.OnDisable();
             StopCoroutine(nameof(CoUpdate));
         }
 

@@ -43,16 +43,6 @@ namespace Rano
             }
         }
 
-        void OnEnable()
-        {
-            Log.Info("SoundManager Enabled");
-        }
-
-        void OnDisable()
-        {
-            Log.Info("SoundManager Disabled");
-        }
-
         /// <summary>
         /// 사운드 레이어를 추가한다.
         /// </summary>

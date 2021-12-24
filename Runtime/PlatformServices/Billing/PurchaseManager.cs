@@ -54,17 +54,17 @@ namespace Rano.PlatformServices.Billing
             }
         }
 
-        void OnEnable()
+        protected override void OnEnable()
         {
-            Log.Info("PurchaseManager Enabled");
+            base.OnEnable();
             BillingServices.OnInitializeStoreComplete += OnInitializeStoreComplete;
             BillingServices.OnTransactionStateChange += OnTransactionStateChange;
             BillingServices.OnRestorePurchasesComplete += OnRestorePurchasesComplete;
         }
 
-        void OnDisable()
+        protected override void OnDisable()
         {
-            Log.Info("PurchaseManager Disabled");
+            base.OnDisable();
             BillingServices.OnInitializeStoreComplete -= OnInitializeStoreComplete;
             BillingServices.OnTransactionStateChange -= OnTransactionStateChange;
             BillingServices.OnRestorePurchasesComplete -= OnRestorePurchasesComplete;

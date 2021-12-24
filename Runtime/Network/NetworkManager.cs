@@ -30,15 +30,15 @@ namespace Rano
             isConnected = false;
         }
 
-        void OnEnable()
+        protected override void OnEnable()
         {
-            Log.Info("NetworkManager Enabled");
+            base.OnEnable();
             StartCoroutine(nameof(CoUpdate));
         }
 
-        void OnDisable()
+        protected override void OnDisable()
         {
-            Log.Info("NetworkManager Disabled");
+            base.OnDisable();
             StopCoroutine(nameof(CoUpdate));
         }
 

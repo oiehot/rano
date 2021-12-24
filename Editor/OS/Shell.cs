@@ -3,19 +3,15 @@
 // Proprietary and confidential
 // Written by Taewoo Lee <oiehot@gmail.com>
 
-#if false
-
 using UnityEngine;
 using UnityEditor;
 using System.Diagnostics;
 using Rano;
 
-namespace RanoEditor.System
+namespace RanoEditor.OS
 {
 	public static class Shell
 	{
-		// static string pythonPath;
-		
 		static Shell()
 		{
 			// if (Application.platform == RuntimePlatform.WindowsEditor)
@@ -42,22 +38,11 @@ namespace RanoEditor.System
 			
 			return proc.ExitCode;
 		}
-		
-		public static int Python(string scriptPath, string arg, out string result)
-		{
-			UnityEngine.Debug.Log($"python {scriptPath} {arg}");
-			return Run("python", $"{scriptPath} {arg}", out result);
-		}
-		
-		// [MenuItem("Rano/Test/Python Test")]
-		// public static void PythonTest()
-		// {
-		// 	string result;
-		// 	int exitCode = Python("o:/project/afo2/bin/xls2json.py","--xlsPath o:/project/afo2/unity/Assets/Data/StageData01.xlsx --jsonPath o:/project/afo2/unity/Assets/Data/StageData01.json --sheetName StageData", out result);
-		// 	// UnityEngine.Debug.Log(exitCode);
-		// 	// UnityEngine.Debug.Log(result);
-		// }
+
+		//public static int Python(string scriptPath, string arg, out string result)
+		//{
+		//	UnityEngine.Debug.Log($"python {scriptPath} {arg}");
+		//	return Run("python", $"{scriptPath} {arg}", out result);
+		//}
 	}
 }
-
-#endif

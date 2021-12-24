@@ -35,17 +35,17 @@ namespace Rano.PlatformServices.Cloud
         public Action onSavedDataChange;
         public Action onSynchronizeComplete;
 
-        void OnEnable()
+        protected override void OnEnable()
         {
-            Log.Info("CloudManager Enabled");
+            base.OnEnable();
             CloudServices.OnUserChange += OnUserChange;
             CloudServices.OnSavedDataChange += OnSavedDataChange;
             CloudServices.OnSynchronizeComplete += OnSynchronizeComplete;
         }
 
-        void OnDisable()
+        protected override void OnDisable()
         {
-            Log.Info("CloudManager Disabled");
+            base.OnDisable();
             CloudServices.OnUserChange -= OnUserChange;
             CloudServices.OnSavedDataChange -= OnSavedDataChange;
             CloudServices.OnSynchronizeComplete -= OnSynchronizeComplete;

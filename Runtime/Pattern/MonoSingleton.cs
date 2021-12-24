@@ -27,7 +27,7 @@ namespace Rano
                 if (_isAppQuitting)
                 {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                    Log.Warning($"MonoSingleton Instance {typeof(T)} already destroyed on application quit. Won't create again - returning null.");
+                    Log.Warning($"모노싱글톤 인스턴스 {typeof(T)}가 종료되었음에도 사용되었습니다.");
 #endif
                     return null;
                 }
@@ -46,7 +46,7 @@ namespace Rano
                             _instance = gameObject.AddComponent<T>();
                             gameObject.name = typeof(T).ToString();
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                            Log.Info($"싱글톤 {typeof(T)}가 자동으로 생성되었습니다.");
+                            Log.Warning($"싱글톤 {typeof(T)}가 자동으로 생성되었습니다.");
 #endif
                         }
                     }
@@ -63,9 +63,19 @@ namespace Rano
                 Destroy(gameObject);
                 return;
             }
-
+            Log.Sys($"{typeof(T).ToString()}: Awake", caller:false);
             gameObject.name = typeof(T).ToString();
             DontDestroyOnLoad(gameObject);
+        }
+
+        protected virtual void OnEnable()
+        {
+            Log.Sys($"{typeof(T).ToString()}: OnEnable", caller:false);
+        }
+
+        protected virtual void OnDisable()
+        {
+            Log.Sys($"{typeof(T).ToString()}: OnDisable", caller:false);
         }
 
         protected virtual void OnDestroy()

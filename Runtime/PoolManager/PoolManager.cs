@@ -42,16 +42,6 @@ namespace Rano
             }
         }
 
-        void OnEnable()
-        {
-            Log.Info("PoolManager Enabled");
-        }
-
-        void OnDisable()
-        {
-            Log.Info("PoolManager Disabled");
-        }
-
         /// <summary>
         /// 주어진 프리팹의 오브젝트 풀을 생성한다.
         /// </summary>
