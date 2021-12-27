@@ -3,11 +3,10 @@
 // Proprietary and confidential
 // Written by Taewoo Lee <oiehot@gmail.com>
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
-using Rano;
 
 namespace Rano.SaveSystem
 {
@@ -15,6 +14,8 @@ namespace Rano.SaveSystem
     public class SaveableEntity : MonoBehaviour
     {
         [SerializeField] private string _id = string.Empty;
+        [SerializeField] private bool _autoLoadOnAwake = true;
+        [SerializeField] private bool _autoSaveOnDestroy = false;
         public string Id => _id;
 
 #if UNITY_EDITOR
@@ -23,36 +24,55 @@ namespace Rano.SaveSystem
             GenerateId();
         }
 
-        [ContextMenu("Print JsonString", false, 1100)]
-        private void PrintJsonString()
-        {
-            Log.Info($"{_id} States:");
-            Debug.Log(ToJsonString());
-        }
-
+        // 실수로 Id를 바꿀 수 있기 때문에 해제함.
         //[ContextMenu("Generate Id", false, 1200)]
         private void GenerateId()
         {
             _id = System.Guid.NewGuid().ToString();
         }
 
-#endif
-
-        public object CaptureComponentStates()
+        [ContextMenu("Print Json", false, 1200)]
+        private void PrintJsonString()
         {
-            var componentStates = new Dictionary<string, object>();
-            foreach (var component in GetComponents<ISaveable>())
-            {
-                // TODO: 두 개 이상의 컴포넌트가 있는 예외상황 대처.
-                componentStates[component.GetType().ToString()] = component.CaptureState();
-            }
-            return componentStates;
+            Log.Info($"{_id}:");
+            Debug.Log(ToJsonString());
         }
 
-        public void RestoreComponentStates(object state)
+        private string ToJsonString()
         {
-            var componentStates = (Dictionary<string, object>)state;
-            foreach (var component in GetComponents<ISaveable>())
+            var dict = CaptureToDict();
+            return Rano.Encoding.Json.ConvertObjectToString(dict);
+        }
+
+#endif
+
+        public Dictionary<string,object> CaptureToDict()
+        {
+            var dict = new Dictionary<string,object>();
+            foreach (var component in GetComponents<ISaveLoadable>())
+            {
+                // TODO: 두 개 이상의 컴포넌트가 있는 예외상황 대처.
+                dict[component.GetType().ToString()] = component.CaptureState();
+            }
+            return dict;
+        }
+
+        public byte[] CaptureToBinary()
+        {
+            byte[] bytes = null;
+            BinaryFormatter bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bf.Serialize(ms, CaptureToDict());
+                bytes = ms.ToArray();
+            }
+            return bytes;
+        }
+
+        public void RestoreFromDict(object dict)
+        {
+            var componentStates = (Dictionary<string, object>)dict;
+            foreach (var component in GetComponents<ISaveLoadable>())
             {
                 // TODO: 두 개 이상의 컴포넌트가 있는 예외상황 대처.
                 string componentName = component.GetType().ToString();
@@ -63,24 +83,50 @@ namespace Rano.SaveSystem
             }
         }
 
-        public void Save()
+        public void RestoreFromBinary(byte[] bytes)
         {
-            object state = CaptureComponentStates();
-            string jsonString = Rano.Encoding.Json.ConvertObjectToString(state);
-            AppStorage.SetString(_id, jsonString);
+            var bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream(bytes))
+            {
+                object obj = bf.Deserialize(ms);
+                RestoreFromDict(obj);
+            }
         }
 
-        public void Load()
+        // TODO: AutoLoad
+        [ContextMenu("Load", false, 1101)]
+        private void Load()
         {
-            string jsonString = AppStorage.GetString(_id);
-            object state = Rano.Encoding.Json.ConvertStringToObject<Dictionary<string, object>>(jsonString)
-            RestoreComponentStates(state);
+            if (InMemoryDatabase.Instance.HasKey(_id) == true)
+            {
+                Log.Info($"상태복구 {_id} (InMemoryDatabase)");
+                RestoreFromDict(InMemoryDatabase.Instance.GetDictionary(_id));
+            }
+            else Log.Info($"상태복구생략 {_id} (NotInMemoryDatabase)");
         }
 
-        public string ToJsonString()
+        [ContextMenu("Save", false, 1102)]
+        private void Save()
         {
-            var states = CaptureComponentStates();
-            return Rano.Encoding.Json.ConvertObjectToString(states);
+            Log.Info($"상태저장 {_id} (InMemoryDatabase)");
+            var dict = CaptureToDict();
+            InMemoryDatabase.Instance.SetDictionary(_id, dict);
+        }
+
+        private void Awake()
+        {
+            //Log.Info("Awake");
+            if (_autoLoadOnAwake == true) Load();
+        }
+
+        private void OnDestroy()
+        {
+            //Log.Info("OnDestroy");
+            if (_autoSaveOnDestroy && InMemoryDatabase.Instance != null)
+            {
+                Log.Info("OnDestroy => AutoSave");
+                Save();
+            }
         }
     }
 }

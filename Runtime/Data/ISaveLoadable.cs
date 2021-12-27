@@ -5,8 +5,11 @@
 
 namespace Rano.SaveSystem
 {
-    public interface ISaveable
+    public interface ISaveLoadable
     {
+        void ClearState();
+        void DefaultState();
         object CaptureState();
+        void RestoreState(object state);
     }
 }

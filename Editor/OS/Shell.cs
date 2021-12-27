@@ -12,6 +12,18 @@ namespace RanoEditor.OS
 {
 	public static class Shell
 	{
+		public static string ShellAppName
+		{
+			get
+			{
+#if UNITY_EDITOR_OSX
+				return "bash";
+#elif UNITY_EDITOR_WIN
+				return "cmd.exe";
+#endif
+			}
+		}
+
 		static Shell()
 		{
 			// if (Application.platform == RuntimePlatform.WindowsEditor)

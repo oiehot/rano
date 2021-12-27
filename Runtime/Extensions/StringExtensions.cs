@@ -3,6 +3,7 @@
 // Proprietary and confidential
 // Written by Taewoo Lee <oiehot@gmail.com>
 
+using System;
 using System.Text;
 
 namespace Rano
@@ -22,6 +23,29 @@ namespace Rano
                 }
                 return sb.ToString();
             }
+        }
+
+        public static DateTime ToDateTime(this string str)
+        {
+            DateTime result;
+
+            if (str != null)
+            {
+                try
+                {
+                    result = DateTime.Parse(str);
+                }
+                catch
+                {
+                    result = DateTime.MinValue;
+                }
+            }
+            else
+            {
+                result = DateTime.MinValue;
+            }
+
+            return result;
         }
     }
 }

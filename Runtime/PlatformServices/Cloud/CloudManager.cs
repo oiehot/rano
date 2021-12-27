@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections;
+using UnityEngine;
 using UnityEngine.Events;
 using VoxelBusters.CoreLibrary;
 using VoxelBusters.EssentialKit;
@@ -13,9 +14,16 @@ namespace Rano.PlatformServices.Cloud
 {
     public sealed class CloudManager : MonoSingleton<CloudManager>
     {
+        /// <summary>
+        /// 기능의 활성화 여부. 계정에 로그인된 사용가능여부가 아니다.
+        /// </summary>
         public bool IsFeatureAvailable => CloudServices.IsAvailable();
         public bool IsInitialSynchornized { get; private set; }
         public bool IsSynchronizing { get; private set; }
+
+        /// <summary>
+        /// 사용가능 여부. 기능이 활성화 되어있고 계정에 로그인되어 있는 상태.
+        /// </summary>
         public bool IsAvailable
         {
             get
@@ -167,6 +175,11 @@ namespace Rano.PlatformServices.Cloud
             else onResult?.Invoke(false);
         }
 
+        public void Synchronize(Action<bool> onResult=null)
+        {
+            StartCoroutine(SynchronizeCoroutine(onResult));
+        }
+
         #region 로컬카피 편집 메소드들
 
         public void SetBool(string key, bool value) => CloudServices.SetBool(key, value);
@@ -184,9 +197,28 @@ namespace Rano.PlatformServices.Cloud
         public int GetInt(string key) => CloudServices.GetInt(key);
         public long GetLong(string key) => CloudServices.GetLong(key);
         public string GetString(string key) => CloudServices.GetString(key);
-
         public void RemoveKey(string key) => CloudServices.RemoveKey(key);
 
-        #endregion
+        public IDictionary GetDict()
+        {
+            return CloudServices.GetSnapshot();
+        }
+
+        /// <summary>
+        /// 모든 키를 찾아 제거.
+        /// </summary>
+        public void Clear()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TryGetByteArray(string key, out byte[] result)
+        {
+            result = CloudServices.GetByteArray(key);
+            if (result != null) return true;
+            else return false;
+        }
+
+#endregion
     }
 }

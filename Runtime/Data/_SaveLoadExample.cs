@@ -1,4 +1,4 @@
-﻿#if RANO_DATA_EXAMPLE
+﻿#if false
 
 // Copyright (C) OIEHOT - All Rights Reserved
 // Unauthorized copying of this file, via any medium is strictly prohibited

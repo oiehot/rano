@@ -27,7 +27,7 @@ namespace Rano
                 if (_isAppQuitting)
                 {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                    Log.Warning($"모노싱글톤 인스턴스 {typeof(T)}가 종료되었음에도 사용되었습니다.");
+                    Log.Info($"모노싱글톤 인스턴스 {typeof(T)}가 종료되었음에도 사용되었습니다.");
 #endif
                     return null;
                 }
@@ -46,7 +46,7 @@ namespace Rano
                             _instance = gameObject.AddComponent<T>();
                             gameObject.name = typeof(T).ToString();
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                            Log.Warning($"싱글톤 {typeof(T)}가 자동으로 생성되었습니다.");
+                            Log.Info($"싱글톤 {typeof(T)}가 자동으로 생성되었습니다.");
 #endif
                         }
                     }
@@ -64,13 +64,20 @@ namespace Rano
                 return;
             }
             Log.Sys($"{typeof(T).ToString()}: Awake", caller:false);
-            gameObject.name = typeof(T).ToString();
+            //gameObject.name = typeof(T).ToString();
             DontDestroyOnLoad(gameObject);
         }
 
         protected virtual void OnEnable()
         {
             Log.Sys($"{typeof(T).ToString()}: OnEnable", caller:false);
+        }
+
+        protected virtual void OnApplicationQuit()
+        {
+            //Log.Sys($"{typeof(T).ToString()}: OnApplicationQuit", caller: false);
+            // OnApplicationQuit => OnDisable => OnDestroy
+            _isAppQuitting = true;
         }
 
         protected virtual void OnDisable()
@@ -80,13 +87,8 @@ namespace Rano
 
         protected virtual void OnDestroy()
         {
-            // _isAppQuitting = true;
-        }
-
-        // TODO: OnDestory가 맞을까 여기가 맞을까?
-        protected virtual void OnApplicationQuit()
-        {
-            _isAppQuitting = true;
+            //Log.Sys($"{typeof(T).ToString()}: OnDestroy", caller: false);
+            // pass
         }
     }
 }

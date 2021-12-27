@@ -19,8 +19,7 @@ namespace Rano.IO
     {
         public static void WriteBytes(string filePath, byte[] bytes)
         {
-            string path = $"{Application.persistentDataPath}/{filePath}";
-            System.IO.File.WriteAllBytes(path, bytes);
+            System.IO.File.WriteAllBytes(filePath, bytes);
         }
 
         public static void WriteString(string filePath, string str)
@@ -30,12 +29,11 @@ namespace Rano.IO
 
         public static byte[] ReadBytes(string filePath)
         {
-            string path = $"{Application.persistentDataPath}/{filePath}";
-            if (!System.IO.File.Exists(path))
+            if (!System.IO.File.Exists(filePath))
             {
-                throw new System.IO.FileNotFoundException($"로드할 파일을 찾지 못했습니다: {filePath}");
+                throw new System.IO.FileNotFoundException($"파일을 찾지 못했습니다 ({filePath})");
             }
-            byte[] bytes = System.IO.File.ReadAllBytes(path);
+            byte[] bytes = System.IO.File.ReadAllBytes(filePath);
             return bytes;
         }
 
@@ -43,6 +41,21 @@ namespace Rano.IO
         {
             byte[] bytes = ReadBytes(filePath);
             return System.Text.Encoding.UTF8.GetString(bytes);
+        }
+
+        public static void Move(string srcPath, string destPath, bool overwrite)
+        {
+            if(overwrite == false && System.IO.File.Exists(destPath))
+            {
+                return;
+            }
+
+            if(overwrite == true && System.IO.File.Exists(destPath))
+            {
+                System.IO.File.Delete(destPath);
+            }
+            System.IO.File.Move(srcPath, destPath);
+            return;
         }
     }
 }

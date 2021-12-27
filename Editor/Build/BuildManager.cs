@@ -7,14 +7,16 @@ using System.IO;
 using UnityEngine;
 using UnityEditor;
 using Rano;
-using Rano.App;
+using RanoEditor.OS;
 
 namespace RanoEditor.Build
 {
     public static class BuildManager
     {
-        private const string _devBuildMenuName = "Build/Development Build";
+        public const string DevelopmentBuildName = "Build/Development Build";
+        public const string AddressableBuildName = "Build/Adressable Build";
         public static bool IsDevelopmentBuild { get; private set; } = true;
+        public static bool IsAdressableBuild { get; private set; } = true;
         public static string BuildPath { get; private set; }
 
         static BuildManager()
@@ -24,25 +26,46 @@ namespace RanoEditor.Build
             string unityProjectPath = unityDirInfo.FullName;
             BuildPath = $"{unityProjectPath}/Builds";
             
-            IsDevelopmentBuild = EditorPrefs.GetBool(_devBuildMenuName, true);
+            IsDevelopmentBuild = EditorPrefs.GetBool(DevelopmentBuildName, true);
+            IsAdressableBuild = EditorPrefs.GetBool(AddressableBuildName, true);
         }
 
-        #region 개발빌드 토글
+        #region ToggleDevelopmentBuild
+
 
         /// <todo>자동 빌드 버젼 증가 속성에 따라 메뉴 활성화 여부 결정</todo>
-        [MenuItem(_devBuildMenuName, true)]
+        [MenuItem(DevelopmentBuildName, true)]
         private static bool SetDevelopmentBuildValidate()
         {
-            Menu.SetChecked(_devBuildMenuName, IsDevelopmentBuild);
+            Menu.SetChecked(DevelopmentBuildName, IsDevelopmentBuild);
             return true;
         }
         /// <summary>자동 빌드 버젼 증가 체크</summary>
-        [MenuItem(_devBuildMenuName, false, 100)]
+        [MenuItem(DevelopmentBuildName, false, 100)]
         private static void SetDevelopmentBuild()
         {
             IsDevelopmentBuild = !IsDevelopmentBuild;
-            EditorPrefs.SetBool(_devBuildMenuName, IsDevelopmentBuild);
-            Log.Info($"Development Build: {IsDevelopmentBuild}");
+            EditorPrefs.SetBool(DevelopmentBuildName, IsDevelopmentBuild);
+            Log.Info($"DevelopmentBuild: {IsDevelopmentBuild}");
+        }
+
+        #endregion
+
+        #region ToggleAddressableBuild
+
+        [MenuItem(AddressableBuildName, true)]
+        private static bool SetAddressableBuildValidate()
+        {
+            Menu.SetChecked(AddressableBuildName, IsAdressableBuild);
+            return true;
+        }
+        /// <summary>자동 빌드 버젼 증가 체크</summary>
+        [MenuItem(AddressableBuildName, false, 101)]
+        private static void SetAddressableBuild()
+        {
+            IsAdressableBuild = !IsAdressableBuild;
+            EditorPrefs.SetBool(AddressableBuildName, IsAdressableBuild);
+            Log.Info($"AddressableBuild: {IsAdressableBuild}");
         }
 
         #endregion

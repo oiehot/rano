@@ -17,10 +17,15 @@ namespace Rano.Encoding
 {
     public static class Json
     {
-        public static string ConvertObjectToString(object obj)
+        public static JsonSerializerSettings SerializerSettings;
+
+        static Json()
         {
             JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.Formatting = Formatting.Indented;
+
+            //settings.Formatting = Formatting.Indented;
+            settings.Formatting = Formatting.None;
+
             //settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             //settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             //settings.NullValueHandling = NullValueHandling.Include;
@@ -28,18 +33,30 @@ namespace Rano.Encoding
             //settings.StringEscapeHandling = StringEscapeHandling.Default;
             //settings.MissingMemberHandling = MissingMemberHandling.Ignore;
             //settings.MetadataPropertyHandling = MetadataPropertyHandling.Default;
-            //settings.TypeNameHandling = TypeNameHandling.Objects;
-            //settings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
 
-            string jsonString = JsonConvert.SerializeObject(obj, settings);
+            //settings.TypeNameHandling = TypeNameHandling.All;
+            //settings.TypeNameHandling = TypeNameHandling.Objects;
+            settings.TypeNameHandling = TypeNameHandling.None;
+
+            //settings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full;
+            settings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
+
+            SerializerSettings = settings;
+        }
+
+        public static string ConvertObjectToString(object obj)
+        {
+            
+            string jsonString = JsonConvert.SerializeObject(obj, SerializerSettings);
             return jsonString;
         }
 
         public static T ConvertStringToObject<T>(string jsonString)
         {
-            return JsonConvert.DeserializeObject<T>(jsonString);
+            return JsonConvert.DeserializeObject<T>(jsonString, SerializerSettings);
         }
 
+        [Obsolete("IL2CPP 런타임에서는 사용할 수 없기 때문에 추후 제거될것임.")]
         public static dynamic ConvertStringToDynamic(string jsonString)
         {
             return JObject.Parse(jsonString);

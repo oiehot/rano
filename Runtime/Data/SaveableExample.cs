@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+﻿#if UNITY_EDITOR || DEVELOPMENT_BUILD
 
 // Copyright (C) OIEHOT - All Rights Reserved
 // Unauthorized copying of this file, via any medium is strictly prohibited
@@ -11,7 +11,7 @@ using Rano;
 
 namespace Rano.SaveSystem
 {
-    public class SaveableExample : MonoBehaviour, ISaveable
+    public class SaveableExample : MonoBehaviour, ISaveLoadable
     {
         [SerializeField] private int level;
         [SerializeField] private int exp;
@@ -23,6 +23,26 @@ namespace Rano.SaveSystem
             public int level;
             public int exp;
             public int extra;
+        }
+
+        void Awake()
+        {
+            Log.Info("Awake");
+        }
+
+        void OnEnable()
+        {
+            Log.Info("OnEnable");
+        }
+
+        void OnDisable()
+        {
+            Log.Info("OnDisable");
+        }
+
+        void Start()
+        {
+            Log.Info("Start");
         }
 
         public virtual void ClearState()
