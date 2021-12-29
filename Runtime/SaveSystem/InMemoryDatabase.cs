@@ -13,10 +13,12 @@ namespace Rano.SaveSystem
 {
     public sealed class InMemoryDatabase : MonoSingleton<InMemoryDatabase>
     {
+        private Dictionary<string, object> _dict;
         public string LastModifiedDateField => "$InMemoryDatabase.LastModifiedDate";
         public string SavePath { get; private set; }
         public string TemporarySavePath { get; private set; }
-        private Dictionary<string, object> _dict;
+        public bool AutoSaveOnQuit { get; private set; } = true;
+        public bool IncludeInactive { get; private set; } = true;
 
         protected override void Awake()
         {
@@ -29,7 +31,7 @@ namespace Rano.SaveSystem
         protected override void OnEnable()
         {
             base.OnEnable();
-            Load();
+            LoadFromFile();
         }
 
         private void UpdateLastModifiedDate()
@@ -37,6 +39,7 @@ namespace Rano.SaveSystem
             _dict[LastModifiedDateField] = DateTime.Now.ToString();
         }
 
+#if !UNITY_EDITOR
         private void OnApplicationPause(bool pause)
         {
             if (pause == true)
@@ -56,6 +59,7 @@ namespace Rano.SaveSystem
                 Save();
             }
         }
+#endif
 
         /// <summary>
         /// 모바일앱에서 앱 종료시 이 함수의 실행을 보증하지 않음.
@@ -63,20 +67,22 @@ namespace Rano.SaveSystem
         protected override void OnApplicationQuit()
         {
             base.OnApplicationQuit();
-            UpdateAllSaveEntities();
-            Save();
+            if (AutoSaveOnQuit)
+            {
+                Log.Info("OnApplicationQuit");
+                CaptureAllSaveableEntities();
+                SaveToFile();
+            }
         }
 
-        private void UpdateAllSaveEntities()
+        private void CaptureAllSaveableEntities()
         {
-            // TODO: IncludeInactive 설정화
-            bool IncludeInactive = true;
             foreach (var saveable in FindObjectsOfType<SaveableEntity>(IncludeInactive))
             {
                 // TODO: 같은 Id로 두번 저장하는 경우 경고처리.
                 string id = saveable.Id;
                 Log.Info($"{id} 게임오브젝트 상태저장");
-                _dict[id] = saveable.CaptureToDict();
+                _dict[id] = saveable.CaptureState();
             }
         }
 
@@ -85,20 +91,10 @@ namespace Rano.SaveSystem
             return _dict.ContainsKey(key);
         }
 
-        //public void Set(string key, object value)
-        //{
-        //    Dict[key] = value;
-        //}
-
         public void SetDictionary(string key, Dictionary<string, object> value)
         {
             _dict[key] = value;
             UpdateLastModifiedDate();
-        }
-
-        public Dictionary<string, object> GetDictionary(string key)
-        {
-            return (Dictionary<string,object>)_dict[key];
         }
 
         public void SetString(string key, string value)
@@ -121,20 +117,31 @@ namespace Rano.SaveSystem
             }
         }
 
-        // TODO: 압축 및 암호화 필요.
+        public Dictionary<string, object> GetDictionary(string key)
+        {
+            return (Dictionary<string, object>)_dict[key];
+        }
+
+        public void Clear()
+        {
+            _dict.Clear();
+        }
+
         /// <summary>
         /// 메모리DB를 로컬파일에 저장한다.
+        /// TODO: 압축 및 암호화 필요.
         /// </summary>
-        public void Save()
+        public void SaveToFile()
         {
             Log.Info($"{TemporarySavePath} 저장중...");
             try
             {
-                using (var fileStream = File.Open(TemporarySavePath, FileMode.Create))
-                {
-                    BinaryFormatter binaryFormatter = new BinaryFormatter();
-                    binaryFormatter.Serialize(fileStream, _dict);
-                }
+                // TODO: Save using FileStream
+                string jsonString = Rano.Encoding.Json.ConvertObjectToString(_dict);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Debug.Log(jsonString);
+#endif
+                Rano.IO.LocalFile.WriteString(TemporarySavePath, jsonString);
             }
             catch (Exception e)
             {
@@ -151,9 +158,9 @@ namespace Rano.SaveSystem
         /// <summary>
         /// 로컬파일을 읽어 메모리DB로 로드한다.
         /// </summary>
-        public bool Load()
+        public bool LoadFromFile()
         {
-            Dictionary<string, object> dict;
+            Dictionary<string, object> loadedDict;
 
             // 세이브 파일 체크
             if (!System.IO.File.Exists(SavePath))
@@ -166,36 +173,33 @@ namespace Rano.SaveSystem
             Log.Info($"{SavePath} 읽는중...");
             try
             {
-                using (FileStream fileStream = File.Open(SavePath, FileMode.Open))
-                {
-                    var binaryFormatter = new BinaryFormatter();
-                    dict = (Dictionary<string, object>)binaryFormatter.Deserialize(fileStream);
-                }
+                // TODO: Load using FileStream
+                string jsonString = Rano.IO.LocalFile.ReadString(SavePath);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Debug.Log(jsonString);
+#endif
+                object result = Rano.Encoding.Json.ConvertStringToObject(jsonString);
+                loadedDict = (Dictionary<string, object>)result;
             }
-            catch
+            catch (Exception e)
             {
+                Debug.Log(e);
                 Log.Warning($"{SavePath} 읽기 실패.");
                 return false;
             }
 
             _dict.Clear();
-            _dict = dict;
+            _dict = loadedDict;
             Log.Info($"{SavePath} 읽기완료.");
             return true;
         }
 
-        [ContextMenu("Clear Data", false, 1001)]
-        public void Clear()
-        {
-            _dict.Clear();
-        }
-
 #if UNITY_EDITOR
-        [ContextMenu("Print Json", false, 1002)]
+        [ContextMenu("Print Json", false, 1302)]
         private void PrintJsonString()
         {
-            string str = Rano.Encoding.Json.ConvertObjectToString(_dict);
-            Debug.Log(str);
+            string jsonString = Rano.Encoding.Json.ConvertObjectToString(_dict);
+            Debug.Log(jsonString);
         }
 #endif
     }

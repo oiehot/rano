@@ -26,7 +26,6 @@ namespace Rano
     /// <ref>
     /// https://ansohxxn.github.io/unity%20lesson%202/ch10/
     /// </refs>
-    [AddComponentMenu("Rano/Pool/PoolManager")]
     public sealed class PoolManager : MonoSingleton<PoolManager>
     {
         Dictionary<string, Pool> _pools = new Dictionary<string, Pool>();

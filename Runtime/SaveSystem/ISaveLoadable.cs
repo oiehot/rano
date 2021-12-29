@@ -10,6 +10,7 @@ namespace Rano.SaveSystem
         void ClearState();
         void DefaultState();
         object CaptureState();
+        void ValidateState(object state);
         void RestoreState(object state);
     }
 }

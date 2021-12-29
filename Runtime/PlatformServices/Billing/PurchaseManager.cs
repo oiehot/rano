@@ -91,9 +91,9 @@ namespace Rano.PlatformServices.Billing
             }
 
             string[] invalidIds = result.InvalidProductIds;
-            Log.Info($"총 {invalidIds.Length} 개의 잘못된 상품이 있습니다:");
             if (invalidIds.Length > 0)
             {
+                Log.Info($"총 {invalidIds.Length} 개의 잘못된 상품이 있습니다:");
                 for (int i = 0; i < invalidIds.Length; i++)
                 {
                     Log.Info($"[{i}] {invalidIds[i]}");
