@@ -13,14 +13,14 @@ namespace Rano.SaveSystem
     public class SaveableEntity : MonoBehaviour
     {
         [SerializeField] private string _id = string.Empty;
-        [SerializeField] private bool _autoLoadOnAwake = true;
+        [SerializeField] private bool _autoLoadOnAwake = false;
         [SerializeField] private bool _autoSaveOnDestroy = false;
         public string Id => _id;
 
         void Awake()
         {
             //Log.Info("Awake");
-            if (_autoLoadOnAwake == true) LoadFromMemory();
+            if (_autoLoadOnAwake == true) RestoreFromMemory();
         }
 
         void OnDestroy()
@@ -29,7 +29,7 @@ namespace Rano.SaveSystem
             if (_autoSaveOnDestroy && InMemoryDatabase.Instance != null)
             {
                 Log.Info("OnDestroy => AutoSave");
-                SaveToMemory();
+                CaptureToMemory();
             }
         }
 
@@ -43,6 +43,12 @@ namespace Rano.SaveSystem
         private void GenerateId()
         {
             _id = System.Guid.NewGuid().ToString();
+        }
+
+        public void SetId(string id)
+        {
+            // TODO: Validate
+            _id = id;
         }
 
         public void ClearState()
@@ -110,14 +116,14 @@ namespace Rano.SaveSystem
             }
         }
 
-        private void SaveToMemory()
+        public void CaptureToMemory()
         {
             Log.Info($"상태저장 {_id} (InMemoryDatabase)");
             var dict = CaptureState();
             InMemoryDatabase.Instance.SetDictionary(_id, dict);
         }
 
-        private void LoadFromMemory()
+        public void RestoreFromMemory()
         {
             if (InMemoryDatabase.Instance.HasKey(_id) == true)
             {
@@ -131,14 +137,14 @@ namespace Rano.SaveSystem
             }
         }
 
-        private string ToJsonString()
+        public string ToJsonString()
         {
             var dict = CaptureState();
             return Rano.Encoding.Json.ConvertObjectToString(dict);
         }
 
         [ContextMenu("Print Json", false, 1301)]
-        private void PrintJsonString()
+        public void PrintJsonString()
         {
             Log.Info($"{_id}:");
             Debug.Log(ToJsonString());

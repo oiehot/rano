@@ -17,8 +17,9 @@ namespace Rano.SaveSystem
         public string LastModifiedDateField => "$InMemoryDatabase.LastModifiedDate";
         public string SavePath { get; private set; }
         public string TemporarySavePath { get; private set; }
-        public bool AutoSaveOnQuit { get; private set; } = true;
+        public bool AutoSaveOnExit { get; private set; } = true;
         public bool IncludeInactive { get; private set; } = true;
+        public Action OnExit { get; set; }
 
         protected override void Awake()
         {
@@ -44,34 +45,48 @@ namespace Rano.SaveSystem
         {
             if (pause == true)
             {
-                Log.Info("애플리케이션 포커스 일시정지 => 저장.");
-                UpdateAllSaveEntities();
-                Save();
+                Log.Info("OnApplicationPause");
+                OnApplicationPauseOrQuit();
+            }
+            else
+            {
+                Log.Info("OnApplicationResume");
             }
         }
 
         private void OnApplicationFocus(bool focus)
         {
-            if (focus == false)
+            if (focus == true)
             {
-                Log.Info("애플리케이션 포커스 아웃 => 저장.");
-                UpdateAllSaveEntities();
-                Save();
+                Log.Info("OnApplicationFocusIn");
+            }
+            else
+            {
+                Log.Info("OnApplicationFocusOut");
+                OnApplicationPauseOrQuit();
             }
         }
 #endif
 
-        /// <summary>
-        /// 모바일앱에서 앱 종료시 이 함수의 실행을 보증하지 않음.
-        /// </summary>
         protected override void OnApplicationQuit()
         {
             base.OnApplicationQuit();
-            if (AutoSaveOnQuit)
+            Log.Info("OnApplicationQuit");
+            OnApplicationPauseOrQuit();
+        }
+
+        private void OnApplicationPauseOrQuit()
+        {
+            if (AutoSaveOnExit)
             {
-                Log.Info("OnApplicationQuit");
+                Log.Info("OnApplicationPauseOrQuit");
+                OnExit?.Invoke();
                 CaptureAllSaveableEntities();
                 SaveToFile();
+            }
+            else
+            {
+                Log.Info("AutoSaveOnExit가 켜져있지 않아 자동으로 저장하지 않습니다");
             }
         }
 
