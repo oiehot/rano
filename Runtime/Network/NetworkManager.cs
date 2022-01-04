@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Rano;
 
-namespace Rano
+namespace Rano.Network
 {
     public sealed class NetworkManager : MonoSingleton<NetworkManager>
     {
