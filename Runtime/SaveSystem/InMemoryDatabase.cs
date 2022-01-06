@@ -77,16 +77,17 @@ namespace Rano.SaveSystem
 
         private void OnApplicationPauseOrQuit()
         {
+            Log.Info("OnApplicationPauseOrQuit");
             if (AutoSaveOnExit)
             {
-                Log.Info("OnApplicationPauseOrQuit");
+                Log.Info("AutoSaveOnExit가 켜져있어 자동으로 파일에 저장합니다");
                 OnExit?.Invoke();
                 CaptureAllSaveableEntities();
                 SaveToFile();
             }
             else
             {
-                Log.Info("AutoSaveOnExit가 켜져있지 않아 자동으로 저장하지 않습니다");
+                Log.Info("AutoSaveOnExit가 켜져있지 않아 파일에 저장하지 않습니다");
             }
         }
 

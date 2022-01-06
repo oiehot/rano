@@ -93,12 +93,12 @@ namespace Rano
 
         public static void Warning(string text, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            UnityEngine.Debug.Log($"<size={fontSize}><color={warningTitleColor}>[INFO]</color> <color={warningCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={warningTextColor}>{text}</color></size>");
+            UnityEngine.Debug.Log($"<size={fontSize}><color={warningTitleColor}>[WARN]</color> <color={warningCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={warningTextColor}>{text}</color></size>");
         }
 
         public static void Error(string text, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            UnityEngine.Debug.Log($"<size={fontSize}><color={errorTitleColor}>[INFO]</color> <color={errorCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={errorTextColor}>{text}</color></size>");
+            UnityEngine.Debug.Log($"<size={fontSize}><color={errorTitleColor}>[ERR]</color> <color={errorCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={errorTextColor}>{text}</color></size>");
         }
 
         public static void Exception(Exception e)
@@ -133,12 +133,12 @@ namespace Rano
 
         public static void Warning(string text, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            UnityEngine.Debug.Log($"[INFO] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
+            UnityEngine.Debug.Log($"[WARN] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
         }
 
         public static void Error(string text, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            UnityEngine.Debug.Log($"[INFO] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
+            UnityEngine.Debug.Log($"[ERR] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
         }
 
         public static void Exception(Exception e)

@@ -31,6 +31,7 @@ namespace Rano
 
         void Awake()
         {
+            // TODO: 씬 안의 모든 Canvas에 대해서 수행할것.
             // 캔버스들의 SortingOrder 들을 기억해둔다.
             foreach (Canvas canvas in _canvases)
             {
@@ -44,6 +45,7 @@ namespace Rano
         /// <param name="offset">이동시킬 값. 음수도 가능하다.</param>
         public void MoveSortingOrder(int offset)
         {
+            // TODO: offset 기본값 설정할것.
             Log.Info($"모든 캔버스들의 SortingOrder를 {offset} 만큼 이동.");
             foreach (Canvas canvas in _canvases)
             {
