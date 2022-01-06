@@ -59,22 +59,22 @@ namespace Rano.LoadingSystem
                         case LoadingManagerCommand.Type.AddScene:
                             Log.Info($"씬 추가 {command.address}");
                             Status = LoadingManagerStatus.LoadingScene;
-                            yield return Rano.Addressable.SceneManager.Instance.AddSceneAsync(command.address);
+                            yield return Rano.Addressable.AddressableSceneManager.Instance.AddSceneAsync(command.address);
                             // 마지막으로 Add된 Scene이 Instatiable Active Scene이 됨.
-                            Rano.Addressable.SceneManager.Instance.ActivateScene(command.address);
+                            Rano.Addressable.AddressableSceneManager.Instance.ActivateScene(command.address);
                             Status = LoadingManagerStatus.LoadingSceneCompleted;
                             break;
 
                         case LoadingManagerCommand.Type.RemoveScene:
                             Log.Info($"씬 삭제 {command.address}");
                             Status = LoadingManagerStatus.UnloadingScene;
-                            yield return Rano.Addressable.SceneManager.Instance.RemoveSceneAsync(command.address);
+                            yield return Rano.Addressable.AddressableSceneManager.Instance.RemoveSceneAsync(command.address);
                             Status = LoadingManagerStatus.UnloadingSceneCompleted;
                             break;
 
                         case LoadingManagerCommand.Type.ActiveScene:
                             Log.Info($"씬 활성화 {command.address}");
-                            Rano.Addressable.SceneManager.Instance.ActivateScene(command.address);
+                            Rano.Addressable.AddressableSceneManager.Instance.ActivateScene(command.address);
                             break;
 
                         case LoadingManagerCommand.Type.EnableUI:

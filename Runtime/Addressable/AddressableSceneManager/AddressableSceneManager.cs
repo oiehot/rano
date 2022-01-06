@@ -18,7 +18,7 @@ using UnityEngine.ResourceManagement.ResourceLocations;
 
 namespace Rano.Addressable
 {
-    public sealed partial class SceneManager : MonoSingleton<SceneManager>
+    public sealed class AddressableSceneManager : MonoSingleton<AddressableSceneManager>
     {
         public enum Status
         {
@@ -42,7 +42,7 @@ namespace Rano.Addressable
         {
             if (_scenes.ContainsKey(address))
             {
-                throw new SceneManagerException($"씬 교체 실패: {address}는 이미 로드되어 있음");
+                throw new AddressableSceneManagerException($"씬 교체 실패: {address}는 이미 로드되어 있음");
             }
 
             AsyncOperationHandle<SceneInstance> handle;
@@ -56,7 +56,7 @@ namespace Rano.Addressable
                 }
                 else
                 {
-                    throw new SceneManagerException($"씬 교체 실패: {address}");
+                    throw new AddressableSceneManagerException($"씬 교체 실패: {address}");
                 }
             };
             return handle;
@@ -69,7 +69,7 @@ namespace Rano.Addressable
         {
             if (_scenes.ContainsKey(address))
             {
-                throw new SceneManagerException($"씬 추가 실패: {address}는 이미 로드되어 있음");
+                throw new AddressableSceneManagerException($"씬 추가 실패: {address}는 이미 로드되어 있음");
             }
 
             AsyncOperationHandle<SceneInstance> handle;
@@ -82,7 +82,7 @@ namespace Rano.Addressable
                 }
                 else
                 {
-                    throw new SceneManagerException($"씬 추가 실패: {address}");
+                    throw new AddressableSceneManagerException($"씬 추가 실패: {address}");
                 }
             };
             return handle;
@@ -96,7 +96,7 @@ namespace Rano.Addressable
         {
             if (_scenes.ContainsKey(address) == false)
             {
-                throw new SceneManagerException($"씬 제거 실패: {address}가 로드되어있지 않음");
+                throw new AddressableSceneManagerException($"씬 제거 실패: {address}가 로드되어있지 않음");
             }
 
             AsyncOperationHandle<SceneInstance> handle;
@@ -110,7 +110,7 @@ namespace Rano.Addressable
                 }
                 else
                 {
-                    throw new SceneManagerException($"씬 제거 실패: {address}");
+                    throw new AddressableSceneManagerException($"씬 제거 실패: {address}");
                 }
             };
             return handle;
@@ -126,7 +126,7 @@ namespace Rano.Addressable
         {
             if (_scenes.ContainsKey(address) == false)
             {
-                throw new SceneManagerException($"씬 활성화 실패: {address}가 로드 되어있지 않음");
+                throw new AddressableSceneManagerException($"씬 활성화 실패: {address}가 로드 되어있지 않음");
             }
             else
             {
