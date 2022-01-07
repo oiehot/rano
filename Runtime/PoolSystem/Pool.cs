@@ -6,7 +6,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Rano
+namespace Rano.PoolSystem
 {
     public class Pool
     {

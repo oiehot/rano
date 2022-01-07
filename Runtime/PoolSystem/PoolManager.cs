@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Rano
+namespace Rano.PoolSystem
 {
     /// <summary>
     /// 이미 로드된 프리팹을 통해 오브젝트 풀을 만들고 생성(Pop)과 삭제(Push)를 관리한다.
@@ -15,13 +15,14 @@ namespace Rano
     /// <remarks>
     /// PoolManager는 여러개의 Pool을 가지고 있다.
     /// 다음과 같은 계층구조로 풀과 게임오브젝트들이 생성된다:
-    /// DontDestroyOnLoad
-    ///     + Pools
-    ///         + PrefabA_Pool
-    ///             + PrefabA
-    ///         + PrefabB_Pool
-    ///             + PrefabB
-    ///             + PrefabB
+    /// 
+    /// Pools
+    ///   PrefabA_Pool
+    ///     PrefabA
+    ///   PrefabB_Pool
+    ///     PrefabB
+    ///     PrefabB
+    ///   
     /// </remarks>
     /// <ref>
     /// https://ansohxxn.github.io/unity%20lesson%202/ch10/
