@@ -11,131 +11,31 @@ using UnityEngine;
 
 namespace Rano.SaveSystem
 {
-    public sealed class InMemoryDatabase : MonoSingleton<InMemoryDatabase>
+    public sealed class InMemoryDatabase : Singleton<InMemoryDatabase>
     {
         private Dictionary<string, object> _dict;
         public string LastModifiedDateField => "$InMemoryDatabase.LastModifiedDate";
         public string SavePath { get; private set; }
         public string TemporarySavePath { get; private set; }
-        public bool AutoSaveOnExit { get; private set; } = true;
-        public bool IncludeInactive { get; private set; } = true;
-        public Action OnExit { get; set; }
 
-        protected override void Awake()
+        public InMemoryDatabase()
         {
-            base.Awake();
+            Log.Sys($"{typeof(InMemoryDatabase).ToString()}: Construction", caller: false);
             _dict = new Dictionary<string, object>();
             SavePath = $"{Application.persistentDataPath}/memory.db";
             TemporarySavePath = $"{SavePath}.tmp";
+            Load();
         }
 
-        protected override void OnEnable()
+        ~InMemoryDatabase()
         {
-            base.OnEnable();
-            LoadFromFile();
+            Log.Sys($"{typeof(InMemoryDatabase).ToString()}: Finalize", caller: false);
+            Save();
         }
 
         private void UpdateLastModifiedDate()
         {
             _dict[LastModifiedDateField] = DateTime.Now.ToString();
-        }
-
-#if !UNITY_EDITOR
-        private void OnApplicationPause(bool pause)
-        {
-            if (pause == true)
-            {
-                Log.Info("OnApplicationPause");
-                OnApplicationPauseOrQuit();
-            }
-            else
-            {
-                Log.Info("OnApplicationResume");
-            }
-        }
-
-        private void OnApplicationFocus(bool focus)
-        {
-            if (focus == true)
-            {
-                Log.Info("OnApplicationFocusIn");
-            }
-            else
-            {
-                Log.Info("OnApplicationFocusOut");
-                OnApplicationPauseOrQuit();
-            }
-        }
-#endif
-
-        protected override void OnApplicationQuit()
-        {
-            base.OnApplicationQuit();
-            Log.Info("OnApplicationQuit");
-            OnApplicationPauseOrQuit();
-        }
-
-        private void OnApplicationPauseOrQuit()
-        {
-            Log.Info("OnApplicationPauseOrQuit");
-            if (AutoSaveOnExit)
-            {
-                Log.Info("AutoSaveOnExit가 켜져있어 자동으로 파일에 저장합니다");
-                OnExit?.Invoke();
-                CaptureAllSaveableEntities();
-                SaveToFile();
-            }
-            else
-            {
-                Log.Info("AutoSaveOnExit가 켜져있지 않아 파일에 저장하지 않습니다");
-            }
-        }
-
-        private void CaptureAllSaveableEntities()
-        {
-            foreach (var saveable in FindObjectsOfType<SaveableEntity>(IncludeInactive))
-            {
-                // TODO: 같은 Id로 두번 저장하는 경우 경고처리.
-                string id = saveable.Id;
-                Log.Info($"{id} 게임오브젝트 상태저장");
-                _dict[id] = saveable.CaptureState();
-            }
-        }
-
-        public bool HasKey(string key)
-        {
-            return _dict.ContainsKey(key);
-        }
-
-        public void SetDictionary(string key, Dictionary<string, object> value)
-        {
-            _dict[key] = value;
-            UpdateLastModifiedDate();
-        }
-
-        public void SetString(string key, string value)
-        {
-            _dict[key] = value;
-            UpdateLastModifiedDate();
-        }
-
-        public string GetString(string key, string defaultValue = null)
-        {
-            object value;
-
-            if (_dict.TryGetValue(key, out value))
-            {
-                return (string)value;
-            }
-            else
-            {
-                return defaultValue;
-            }
-        }
-
-        public Dictionary<string, object> GetDictionary(string key)
-        {
-            return (Dictionary<string, object>)_dict[key];
         }
 
         public void Clear()
@@ -147,7 +47,7 @@ namespace Rano.SaveSystem
         /// 메모리DB를 로컬파일에 저장한다.
         /// TODO: 압축 및 암호화 필요.
         /// </summary>
-        public void SaveToFile()
+        public void Save()
         {
             Log.Info($"{TemporarySavePath} 저장중...");
             try
@@ -174,7 +74,7 @@ namespace Rano.SaveSystem
         /// <summary>
         /// 로컬파일을 읽어 메모리DB로 로드한다.
         /// </summary>
-        public bool LoadFromFile()
+        public bool Load()
         {
             Dictionary<string, object> loadedDict;
 
@@ -210,13 +110,41 @@ namespace Rano.SaveSystem
             return true;
         }
 
-#if UNITY_EDITOR
-        [ContextMenu("Print Json", false, 1302)]
-        private void PrintJsonString()
+        public void SetDictionary(string key, Dictionary<string, object> value)
         {
-            string jsonString = Rano.Encoding.Json.ConvertObjectToString(_dict);
-            Debug.Log(jsonString);
+            _dict[key] = value;
+            UpdateLastModifiedDate();
         }
-#endif
+
+        public void SetString(string key, string value)
+        {
+            _dict[key] = value;
+            UpdateLastModifiedDate();
+        }
+
+        public string GetString(string key, string defaultValue = null)
+        {
+            object value;
+
+            if (_dict.TryGetValue(key, out value))
+            {
+                return (string)value;
+            }
+            else
+            {
+                return defaultValue;
+            }
+        }
+
+        public Dictionary<string, object> GetDictionary(string key)
+        {
+            return (Dictionary<string, object>)_dict[key];
+        }
+
+        public bool HasKey(string key)
+        {
+            return _dict.ContainsKey(key);
+        }
+
     }
 }

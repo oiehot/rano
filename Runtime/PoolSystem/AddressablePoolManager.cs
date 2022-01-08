@@ -34,7 +34,7 @@ namespace Rano.PoolSystem
 
         public AddressablePoolManager()
         {
-            Log.Sys($"{typeof(AddressablePoolManager).ToString()}: Construct", caller: false);
+            Log.Sys($"{typeof(AddressablePoolManager).ToString()}: Construction", caller: false);
             _pools = new Dictionary<string, AddressablePool>();
             if (_rootTransform == null)
             {
