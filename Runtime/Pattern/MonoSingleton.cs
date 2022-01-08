@@ -63,16 +63,20 @@ namespace Rano
                 Destroy(gameObject);
                 return;
             }
-            Log.Sys($"{typeof(T).ToString()}: Awake", caller:false);
+            Log.Sys($"{typeof(T).ToString()}: Awake", caller: false);
             //gameObject.name = typeof(T).ToString();
             DontDestroyOnLoad(gameObject);
         }
 
         protected virtual void OnEnable()
         {
-            Log.Sys($"{typeof(T).ToString()}: OnEnable", caller:false);
+            Log.Sys($"{typeof(T).ToString()}: OnEnable", caller: false);
         }
 
+        /// <summary>
+        /// 앱을 종료하면 실행된다.
+        /// OnApplicationQuit > OnDisable > OnDestroy 순서로 실행됨.
+        /// </summary>
         protected virtual void OnApplicationQuit()
         {
             //Log.Sys($"{typeof(T).ToString()}: OnApplicationQuit", caller: false);
@@ -82,13 +86,20 @@ namespace Rano
 
         protected virtual void OnDisable()
         {
-            Log.Sys($"{typeof(T).ToString()}: OnDisable", caller:false);
+            Log.Sys($"{typeof(T).ToString()}: OnDisable", caller: false);
         }
+
 
         protected virtual void OnDestroy()
         {
             //Log.Sys($"{typeof(T).ToString()}: OnDestroy", caller: false);
-            // pass
+        }
+
+        /// <summary>
+        /// Instance를 생성하기 위한 빈 메소드.
+        /// </summary>
+        public void EmptyMethod()
+        {
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Rano.PlatformServices.Billing
         protected virtual void OnEnable()
         {
             _activated = true;
-            if (PurchaseManager.Instance.IsNotNull())
+            if (PurchaseManager.Instance != null)
             {
                 PurchaseManager.Instance.onPurchaseComplete += OnPurchaseComplete;
                 PurchaseManager.Instance.onPurchaseFailed += OnPurchaseFailed;
@@ -35,7 +35,7 @@ namespace Rano.PlatformServices.Billing
         protected virtual void OnDisable()
         {
             _activated = false;
-            if (PurchaseManager.Instance.IsNotNull())
+            if (PurchaseManager.Instance != null)
             {
                 PurchaseManager.Instance.onPurchaseComplete -= OnPurchaseComplete;
                 PurchaseManager.Instance.onPurchaseFailed -= OnPurchaseFailed;

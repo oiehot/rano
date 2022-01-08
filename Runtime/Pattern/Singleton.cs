@@ -21,5 +21,12 @@ namespace Rano
                 }
             }
         }
+
+        /// <summary>
+        /// Instance를 생성하기 위한 빈 메소드.
+        /// </summary>
+        public void EmptyMethod()
+        {
+        }
     }
 }
