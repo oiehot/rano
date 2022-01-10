@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using Rano;
+using Rano.IO;
 using VoxelBusters.CoreLibrary;
 using VoxelBusters.EssentialKit;
 
@@ -21,6 +22,13 @@ namespace Rano.PlatformServices.Billing
 
     public sealed class PurchaseManager : MonoSingleton<PurchaseManager>
     {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        /// <summary>
+        /// 이 값이 켜져있으면 시작시 로컬구매목록을 삭제한다. 시뮬레이터가 클라우드의 값이 사라지는 것은 아니다.
+        /// </summary>
+        public PrefsBool ClearPurchaseHistoryOnStart { get; private set; } =
+            new PrefsBool($"{typeof(PurchaseManager).ToString()}.ClearPurchaseHistoryOnStart", false);
+#endif
         public bool IsFeatureAvailable => BillingServices.IsAvailable();
         public bool IsAvailable
         {
@@ -46,6 +54,12 @@ namespace Rano.PlatformServices.Billing
             _products = new Dictionary<string, IBillingProduct>();
             if (BillingServices.IsAvailable())
             {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                if (ClearPurchaseHistoryOnStart.Value == true)
+                {
+                    ClearPurchaseHistory();
+                }
+#endif
                 BillingServices.InitializeStore();
             }
             else
@@ -191,6 +205,15 @@ namespace Rano.PlatformServices.Billing
                 Log.Warning($"이미 구매한 상품이어서 재구매할 수 없습니다: {product}");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// 구매목록을 삭제한다. 클라우드 혹은 시뮬레이터에 남아있는 구매목록이 삭제되는 것은 아니다.
+        /// </summary>
+        public void ClearPurchaseHistory()
+        {
+            Log.Info("구매목록 삭제.");
+            BillingServices.ClearPurchaseHistory();
         }
 
         /// <summary>

@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Rano.IO
 {
-    public struct PrefsBool
+    public class PrefsBool
     {
         public string Key { get; private set; }
         public bool DefaultValue { get; private set; }
@@ -21,17 +21,28 @@ namespace Rano.IO
             DefaultValue = defaultValue;
         }
 
-        // Getter, Setter는 클래스에서만 사용가능하므로 메소드를 사용하는 방식으로 변경.
-
-        public void SetValue(bool value)
+        public bool Value
         {
-            Rano.IO.Prefs.SetBool(Key, value);
+            get
+            {
+                return Rano.IO.Prefs.GetBool(Key, DefaultValue);
+            }
+            set
+            {
+                Rano.IO.Prefs.SetBool(Key, value);
+            }
         }
 
-        public bool GetValue()
-        {
-            return Rano.IO.Prefs.GetBool(Key, DefaultValue);
-        }
+        // 구조체인 경우 getter, setter 삭제하고 이 메소드를 사용.
+        //public void SetValue(bool value)
+        //{
+        //    Rano.IO.Prefs.SetBool(Key, value);
+        //}
+
+        //public bool GetValue()
+        //{
+        //    return Rano.IO.Prefs.GetBool(Key, DefaultValue);
+        //}
     }
 
     public static class Prefs

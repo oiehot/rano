@@ -20,7 +20,8 @@ namespace Rano.SaveSystem
         public string SavePath { get; private set; }
         public string TemporarySavePath { get; private set; }
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-        public PrefsBool ResetOnStart = new PrefsBool($"{typeof(InMemoryDatabase).ToString()}.ResetOnStart");
+        public PrefsBool ResetOnStart { get; private set; } =
+            new PrefsBool($"{typeof(InMemoryDatabase).ToString()}.ResetOnStart");
 #endif
 
         public InMemoryDatabase()
@@ -30,7 +31,7 @@ namespace Rano.SaveSystem
             SavePath = $"{Application.persistentDataPath}/memory.db";
             TemporarySavePath = $"{SavePath}.tmp";
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (ResetOnStart.GetValue() == true)
+            if (ResetOnStart.Value == true)
             {
                 Log.Warning($"{ResetOnStart.Key}가 켜져있어 로드하지 않고 시작합니다.");
             }
