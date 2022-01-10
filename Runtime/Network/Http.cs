@@ -27,13 +27,34 @@ namespace Rano.Network
             throw new NotImplementedException();
         }
 
-        public static async Task<string> GetTextAsync(string url)
+        public static async Task<string> GetStringAsync(string url)
         {
-            await Task.FromResult(0);
-            throw new NotImplementedException();
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
+
+                // TODO: Wait for done
+                while (!asyncOperation.isDone)
+                {
+                    await Task.Delay(100);
+                }
+
+                UnityWebRequest.Result requestResult;
+                requestResult = request.result;
+                if (request.error == null)
+                {
+                    Log.Info($"GET Success ({url})");
+                    return request.downloadHandler.text;
+                }
+                else
+                {
+                    Log.Info($"GET Failed ({url})");
+                    throw new HttpRequestException($"{request.error} ({url})");
+                }
+            }
         }
 
-        public static IEnumerator CoGetText(string url, Action<HttpRequestResult, string> onResult)
+        public static IEnumerator CoGetString(string url, Action<HttpRequestResult, string> onResult)
         {
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -45,19 +66,13 @@ namespace Rano.Network
                 switch (requestResult)
                 {
                     case UnityWebRequest.Result.ConnectionError:
-                        Log.Warning($"GET {url} => ConnectionError ({request.error})");
-                        onResult?.Invoke(HttpRequestResult.Error, null);
-                        break;
                     case UnityWebRequest.Result.DataProcessingError:
-                        Log.Warning($"GET {url} => DataProcessingError ({request.error})");
-                        onResult?.Invoke(HttpRequestResult.Error, null);
-                        break;
                     case UnityWebRequest.Result.ProtocolError:
-                        Log.Warning($"GET {url} => ProtocolError ({request.error})");
+                        Log.Warning($"GET {url} => Failed ({request.error})");
                         onResult?.Invoke(HttpRequestResult.Error, null);
                         break;
                     case UnityWebRequest.Result.Success:
-                        Log.Warning($"GET {url} => Success");
+                        Log.Info($"GET {url} => Success");
                         DownloadHandler downloadHandler = request.downloadHandler;
                         string result = downloadHandler.text;
                         onResult?.Invoke(HttpRequestResult.Success, result);

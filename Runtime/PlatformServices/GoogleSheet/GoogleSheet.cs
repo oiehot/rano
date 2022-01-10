@@ -16,16 +16,9 @@ namespace Rano.PlatformServices.GoogleDocuments
 
     public struct GoogleSheetId
     {
-        public string Id { get; }
-        public string Gid { get; }
-        public string Range { get; }
-
-        public GoogleSheetId(string id, string gid, string range=null)
-        {
-            Id = id;
-            Gid = gid;
-            Range = range;
-        }
+        public string Id;
+        public string Gid;
+        public string Range;
     }
 
     public static class GoogleSheet
@@ -46,7 +39,7 @@ namespace Rano.PlatformServices.GoogleDocuments
             url = $"https://docs.google.com/spreadsheets/d/{id}/export?";
             url += $"gid={gid}";
             url += $"&format={format.ToString().ToLower()}";
-            if (range != null)
+            if (range != null && range != "")
             {
                 url += $"&range={range}";
             }
