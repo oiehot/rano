@@ -8,15 +8,20 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
 using UnityEngine;
+using Rano.IO;
 
 namespace Rano.SaveSystem
 {
     public sealed class InMemoryDatabase : Singleton<InMemoryDatabase>
     {
+
         private Dictionary<string, object> _dict;
-        public string LastModifiedDateField => "$InMemoryDatabase.LastModifiedDate";
+        public string LastModifiedDateField => $"${typeof(InMemoryDatabase).ToString()}.LastModifiedDate";
         public string SavePath { get; private set; }
         public string TemporarySavePath { get; private set; }
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        public PrefsBool ResetOnStart = new PrefsBool($"{typeof(InMemoryDatabase).ToString()}.ResetOnStart");
+#endif
 
         public InMemoryDatabase()
         {
@@ -24,21 +29,32 @@ namespace Rano.SaveSystem
             _dict = new Dictionary<string, object>();
             SavePath = $"{Application.persistentDataPath}/memory.db";
             TemporarySavePath = $"{SavePath}.tmp";
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (ResetOnStart.GetValue() == true)
+            {
+                Log.Warning($"{ResetOnStart.Key}가 켜져있어 로드하지 않고 시작합니다.");
+            }
+            else
+            {
+                Load();
+            }
+#else
             Load();
+#endif
         }
 
-        ~InMemoryDatabase()
-        {
-            Log.Sys($"{typeof(InMemoryDatabase).ToString()}: Finalize", caller: false);
-            Save();
-        }
+        //~InMemoryDatabase()
+        //{
+        //    Log.Sys($"{typeof(InMemoryDatabase).ToString()}: Finalize", caller: false);
+        //    Save();
+        //}
 
         private void UpdateLastModifiedDate()
         {
             _dict[LastModifiedDateField] = DateTime.Now.ToString();
         }
 
-        public void Clear()
+        private void Clear()
         {
             _dict.Clear();
         }

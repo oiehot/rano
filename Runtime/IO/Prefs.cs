@@ -9,7 +9,31 @@ using System.IO;
 using UnityEngine;
 
 namespace Rano.IO
-{   
+{
+    public struct PrefsBool
+    {
+        public string Key { get; private set; }
+        public bool DefaultValue { get; private set; }
+
+        public PrefsBool(string key, bool defaultValue = false)
+        {
+            Key = key;
+            DefaultValue = defaultValue;
+        }
+
+        // Getter, Setter는 클래스에서만 사용가능하므로 메소드를 사용하는 방식으로 변경.
+
+        public void SetValue(bool value)
+        {
+            Rano.IO.Prefs.SetBool(Key, value);
+        }
+
+        public bool GetValue()
+        {
+            return Rano.IO.Prefs.GetBool(Key, DefaultValue);
+        }
+    }
+
     public static class Prefs
     {
         public static void SetInt(string key, int value)
@@ -19,7 +43,7 @@ namespace Rano.IO
 
         public static int GetInt(string key, int defaultValue = 0)
         {
-            return PlayerPrefs.GetInt(key);
+            return PlayerPrefs.GetInt(key, defaultValue);
         }
 
         public static void SetFloat(string key, float value)
@@ -29,7 +53,7 @@ namespace Rano.IO
 
         public static float GetFloat(string key, float defaultValue = 0.0f)
         {
-            return PlayerPrefs.GetFloat(key);
+            return PlayerPrefs.GetFloat(key, defaultValue);
         }
 
         public static void SetString(string key, string value)
@@ -37,11 +61,25 @@ namespace Rano.IO
             PlayerPrefs.SetString(key, value);
         }
 
-        public static string GetString(string key, string defaultValue = "")
+        public static string GetString(string key, string defaultValue = null)
         {
             return PlayerPrefs.GetString(key);
         }
 
+        public static void SetBool(string key, bool b)
+        {
+            int i = b ? 1 : 0;
+            PlayerPrefs.SetInt(key, i);
+        }
+
+        public static bool GetBool(string key, bool defaultValue = false)
+        {
+            int defaultInt = defaultValue ? 1 : 0;
+            int i = PlayerPrefs.GetInt(key, defaultInt);
+            return i != 0 ? true : false;
+        }
+
+#if false
         public static void SetToBinary<T>(string key, T value)
         {
             var binaryFormatter = new BinaryFormatter(); // System.Runtime.Serialization.Formatters.Binary
@@ -68,6 +106,6 @@ namespace Rano.IO
             }
             return default(T); // replace from return null;
         }
+#endif
     }
 }
-
