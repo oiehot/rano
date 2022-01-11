@@ -132,7 +132,7 @@ namespace Rano.SaveSystem
             }
             else
             {
-                Log.Info($"저장데이터 없음 {_id}");
+                Log.Info($"저장데이터 없음 ({_id})");
                 DefaultState();
             }
         }

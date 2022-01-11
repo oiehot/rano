@@ -14,23 +14,27 @@ namespace Rano.SaveSystem
 {
     public sealed class InMemoryDatabase : Singleton<InMemoryDatabase>
     {
-
         private Dictionary<string, object> _dict;
-        public string LastModifiedDateField => $"${typeof(InMemoryDatabase).ToString()}.LastModifiedDate";
+        public string LastModifiedDateField => $"{typeof(InMemoryDatabase).ToString()}.LastModifiedDate";
         public string SavePath { get; private set; }
         public string TemporarySavePath { get; private set; }
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+
+        #if UNITY_EDITOR || DEVELOPMENT_BUILD
+        public string JsonSavePath => $"{SavePath}.json";
+        public string TemporaryJsonSavePath => $"{JsonSavePath}.tmp";
         public PrefsBool ResetOnStart { get; private set; } =
             new PrefsBool($"{typeof(InMemoryDatabase).ToString()}.ResetOnStart");
-#endif
+        #endif
 
         public InMemoryDatabase()
         {
             Log.Sys($"{typeof(InMemoryDatabase).ToString()}: Construction", caller: false);
+
             _dict = new Dictionary<string, object>();
-            SavePath = $"{Application.persistentDataPath}/memory.db";
+            SavePath = $"{Application.persistentDataPath}/save";
             TemporarySavePath = $"{SavePath}.tmp";
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (ResetOnStart.Value == true)
             {
                 Log.Warning($"{ResetOnStart.Key}가 켜져있어 로드하지 않고 시작합니다.");
@@ -39,9 +43,9 @@ namespace Rano.SaveSystem
             {
                 Load();
             }
-#else
+            #else
             Load();
-#endif
+            #endif
         }
 
         //~InMemoryDatabase()
@@ -69,12 +73,16 @@ namespace Rano.SaveSystem
             Log.Info($"{TemporarySavePath} 저장중...");
             try
             {
-                // TODO: Save using FileStream
-                string jsonString = Rano.Encoding.Json.ConvertObjectToString(_dict);
+                var bytes = Rano.Encoding.Binary.ConvertObjectToBinary(_dict);
+                Rano.IO.LocalFile.WriteBytes(TemporarySavePath, bytes);
+
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.Log(jsonString);
-#endif
-                Rano.IO.LocalFile.WriteString(TemporarySavePath, jsonString);
+                // 개발판에서는 json 파일도 저장한다.
+                Log.Info($"{TemporaryJsonSavePath} 저장중...");
+                var jsonString = Rano.Encoding.Json.ConvertObjectToString(_dict); // TODO: Save using FileStream
+                Rano.IO.LocalFile.WriteString(TemporaryJsonSavePath, jsonString);
+                #endif
+
             }
             catch (Exception e)
             {
@@ -84,6 +92,9 @@ namespace Rano.SaveSystem
             }
             // 임시로 저장한 파일을 정식파일로 승격.
             Rano.IO.LocalFile.Move(TemporarySavePath, SavePath, true);
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Rano.IO.LocalFile.Move(TemporaryJsonSavePath, JsonSavePath, true);
+            #endif
 
             Log.Info($"{SavePath} 저장완료.");
         }
@@ -106,13 +117,9 @@ namespace Rano.SaveSystem
             Log.Info($"{SavePath} 읽는중...");
             try
             {
-                // TODO: Load using FileStream
-                string jsonString = Rano.IO.LocalFile.ReadString(SavePath);
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.Log(jsonString);
-#endif
-                object result = Rano.Encoding.Json.ConvertStringToObject(jsonString);
-                loadedDict = (Dictionary<string, object>)result;
+                var bytes = Rano.IO.LocalFile.ReadBytes(SavePath);
+                object data = Rano.Encoding.Binary.ConvertBinaryToObject(bytes);
+                loadedDict = (Dictionary<string, object>)data;
             }
             catch (Exception e)
             {
@@ -162,6 +169,5 @@ namespace Rano.SaveSystem
         {
             return _dict.ContainsKey(key);
         }
-
     }
 }

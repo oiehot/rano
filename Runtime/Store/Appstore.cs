@@ -1,3 +1,6 @@
+#if false
+
+/* 코루틴 몰이해로 인한 수정이 필요함 */
 
 // Copyright (C) OIEHOT - All Rights Reserved
 // Unauthorized copying of this file, via any medium is strictly prohibited
@@ -81,3 +84,5 @@ namespace Rano.Store
         protected abstract Version? ParseVersion(string output);
     }
 }
+
+#endif

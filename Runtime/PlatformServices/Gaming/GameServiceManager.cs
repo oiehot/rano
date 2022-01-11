@@ -77,29 +77,33 @@ namespace Rano.PlatformServices.Gaming
             }
             else
             {
-                Log.Warning($"게임서비스 로그인 실패");
+                // TODO: => Log.Warning
+                Log.Important($"게임서비스 로그인 실패 ({error})");
                 _lastResult = false;
                 IsAuthWorking = false;
             }
         }
 
-        public void Authenticate(Action<bool> onResult)
+        public void Authenticate(Action<bool> onResult=null)
         {
             StartCoroutine(AuthenticateCoroutine(onResult));
         }
 
-        public IEnumerator AuthenticateCoroutine(Action<bool> onResult)
+        public IEnumerator AuthenticateCoroutine(Action<bool> onResult=null)
         {
             if (IsAuthWorking == true) yield break;
-
             IsAuthWorking = true;
+
+            Log.Info("게임서비스 로그인 요청.");
             GameServices.Authenticate();
+            Log.Info($"게임서비스 로그인 절차 종료A");
             while (IsAuthWorking == true)
             {
                 yield return null;
             }
-
+            Log.Info($"게임서비스 로그인 절차 종료B");
             onResult?.Invoke(_lastResult);
+            Log.Info($"게임서비스 로그인 절차 종료C");
         }
     }
 }

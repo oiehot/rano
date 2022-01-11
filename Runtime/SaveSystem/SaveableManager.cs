@@ -15,9 +15,11 @@ namespace Rano.SaveSystem
     public sealed class SaveableManager : MonoSingleton<SaveableManager>
     {
         private InMemoryDatabase _db;
-        public bool AutoSaveOnExit { get; private set; } = true;
         public bool IncludeInactive { get; private set; } = true;
-        public Action OnExit { get; set; }
+        public bool AutoSaveOnPause { get; private set; } = true;
+        public bool AutoSaveOnFocusOut { get; private set; } = false;
+        public bool AutoSaveOnExit { get; private set; } = true;
+        public Action OnSave { get; set; }
 
         protected override void Awake()
         {
@@ -29,26 +31,41 @@ namespace Rano.SaveSystem
         {
             base.OnApplicationQuit();
             Log.Info("OnApplicationQuit");
-            OnApplicationPauseOrQuit();
-        }
-
-        private void OnApplicationPauseOrQuit()
-        {
-            Log.Info("OnApplicationPauseOrQuit");
-            if (AutoSaveOnExit)
+            if (AutoSaveOnExit == true)
             {
                 Log.Info("AutoSaveOnExit가 켜져 있으므로 모든Saveable 상태를 InMemoryDB에 저장합니다");
-                OnExit?.Invoke();
-                CaptureAllSaveableEntities();
-                _db.Save();
-            }
-            else
-            {
-                Log.Info("AutoSaveOnExit가 꺼져 있으므로 모든Saveable 상태를 InMemoryDB에 저장하지 않습니다");
+                SaveAllSaveableEntities();
             }
         }
 
-        public void CaptureAllSaveableEntities()
+        private void OnApplicationPause(bool pause)
+        {
+            Log.Info($"OnApplicationPause({pause})");
+            if (pause == true && AutoSaveOnPause)
+            {
+                Log.Info("AutoSaveOnPause가 켜져 있으므로 모든Saveable 상태를 InMemoryDB에 저장합니다");
+                SaveAllSaveableEntities();
+            }
+        }
+
+        private void OnApplicationFocus(bool focus)
+        {
+            Log.Info($"OnApplicationFocus({focus})");
+            if (focus == false && AutoSaveOnFocusOut)
+            {
+                Log.Info("OnApplicationFocus가 켜져 있으므로 모든Saveable 상태를 InMemoryDB에 저장합니다");
+                SaveAllSaveableEntities();
+            }
+        }
+
+        public void SaveAllSaveableEntities()
+        {
+            OnSave?.Invoke();
+            CaptureAllSaveableEntities();
+            _db.Save();
+        }
+
+        private void CaptureAllSaveableEntities()
         {
             foreach (var saveable in GameObject.FindObjectsOfType<SaveableEntity>(IncludeInactive))
             {

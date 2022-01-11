@@ -23,10 +23,10 @@ namespace RanoEditor.Build
             _options = new BuildPlayerOptions();
             _options.scenes = BuildHelper.GetEnableScenes();
             _options.locationPathName = null;
-
-            // TODO: Develpoment 이외의 옵션도 처리
-            //_options.options = BuildOptions.None;
-            _options.options |= BuildOptions.Development;
+            if (developmentBuild)
+            {
+                _options.options |= BuildOptions.Development;
+            }
         }
 
         protected virtual string GetOutputDirectory()
@@ -57,7 +57,6 @@ namespace RanoEditor.Build
             return $"{GetOutputDirectory()}/{GetOutputFilename()}{GetOutputExtension()}";
         }
 
-
         public virtual BuildReport Build()
         {
             BuildReport report;
@@ -80,7 +79,8 @@ namespace RanoEditor.Build
             // 빌드 시작 전 로그
             string buildVersionStr = VersionManager.GetCurrentVersion().ToString();
             Log.Important($"Building... {buildVersionStr}");
-            Log.Info($"Options: {_options}");
+            Log.Info($"BuildPlayerOptions: {_options}");
+            Log.Info($"BuildOptions: {_options.options}");
             Log.Info($"Target: {_options.target}");
             Log.Info($"Output: {_options.locationPathName}");
 

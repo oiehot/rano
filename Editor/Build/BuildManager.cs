@@ -15,8 +15,10 @@ namespace RanoEditor.Build
     {
         public const string DevelopmentBuildName = "Build/Development Build";
         public const string AddressableBuildName = "Build/Adressable Build";
-        public static bool IsDevelopmentBuild { get; private set; } = true;
-        public static bool IsAdressableBuild { get; private set; } = true;
+        public const string AutoRunBuildName = "Build/Auto Run";
+        public static bool IsDevelopmentBuild { get; private set; }
+        public static bool IsAdressableBuild { get; private set; }
+        public static bool IsAutoRun { get; private set; }
         public static string BuildPath { get; private set; }
 
         static BuildManager()
@@ -25,13 +27,14 @@ namespace RanoEditor.Build
             DirectoryInfo unityDirInfo = System.IO.Directory.GetParent(assetPath);
             string unityProjectPath = unityDirInfo.FullName;
             BuildPath = $"{unityProjectPath}/Builds";
-            
+
+            // TODO: Remove space and convert slash to dot
             IsDevelopmentBuild = EditorPrefs.GetBool(DevelopmentBuildName, true);
             IsAdressableBuild = EditorPrefs.GetBool(AddressableBuildName, true);
+            IsAutoRun = EditorPrefs.GetBool(AutoRunBuildName, false);
         }
 
         #region ToggleDevelopmentBuild
-
 
         /// <todo>자동 빌드 버젼 증가 속성에 따라 메뉴 활성화 여부 결정</todo>
         [MenuItem(DevelopmentBuildName, true)]
@@ -59,6 +62,7 @@ namespace RanoEditor.Build
             Menu.SetChecked(AddressableBuildName, IsAdressableBuild);
             return true;
         }
+
         /// <summary>자동 빌드 버젼 증가 체크</summary>
         [MenuItem(AddressableBuildName, false, 101)]
         private static void SetAddressableBuild()
@@ -70,10 +74,29 @@ namespace RanoEditor.Build
 
         #endregion
 
+        #region AutoRun
+
+        [MenuItem(AutoRunBuildName, true)]
+        private static bool SetAutoRunValidate()
+        {
+            Menu.SetChecked(AutoRunBuildName, IsAutoRun);
+            return true;
+        }
+
+        [MenuItem(AutoRunBuildName, false, 102)]
+        private static void SetAutoRun()
+        {
+            IsAutoRun = !IsAutoRun;
+            EditorPrefs.SetBool(AutoRunBuildName, IsAutoRun);
+            Log.Info($"AutoRun: {IsAutoRun}");
+        }
+
+        #endregion
+
         [MenuItem("Build/Build Android APK", false, 201)]
         public static void BuildAndroidAPK()
         {
-            var builder = new AndroidBuilderAPK(IsDevelopmentBuild);
+            var builder = new AndroidBuilderAPK(IsDevelopmentBuild, IsAutoRun);
             builder.Build();
         }
 

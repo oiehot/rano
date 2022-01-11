@@ -93,7 +93,7 @@ namespace Rano.SaveSystem
             bool isCloud = CloudManager.Instance.IsFeatureAvailable;
 
             // TODO:
-            //CloudManager.Instance.SynchronizeCoroutine();
+            //CloudManager.Instance.CoSynchronize();
 
             DataSource dataSource;
             if (isMemory && isCloud)

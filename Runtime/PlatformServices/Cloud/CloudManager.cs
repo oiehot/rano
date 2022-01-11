@@ -133,7 +133,7 @@ namespace Rano.PlatformServices.Cloud
         /// </summary>
         /// <param name="onResult">완료 콜백</param>
         /// <returns></returns>
-        public IEnumerator SynchronizeCoroutine(Action<bool> onResult=null)
+        public IEnumerator CoSynchronize(Action<bool> onResult=null)
         {
             // TODO: 이미 동기화 중이면 생략한다 or Queue 처리한다.
             bool syncResult = false;
@@ -177,7 +177,7 @@ namespace Rano.PlatformServices.Cloud
 
         public void Synchronize(Action<bool> onResult=null)
         {
-            StartCoroutine(SynchronizeCoroutine(onResult));
+            StartCoroutine(CoSynchronize(onResult));
         }
 
         #region 로컬카피 편집 메소드들

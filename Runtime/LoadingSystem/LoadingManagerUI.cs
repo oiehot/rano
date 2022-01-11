@@ -72,7 +72,7 @@ namespace Rano.LoadingSystem
             _canvasGameObject.SetActive(false);
         }
 
-        public IEnumerator FadeOut(float speed)
+        public IEnumerator CoFadeOut(float speed)
         {
             FadeOutGameObject.SetActive(true);
             yield return fadeOutImage.DOColor(new Color(0.0f, 0.0f, 0.0f, 1.0f), speed)
@@ -80,7 +80,7 @@ namespace Rano.LoadingSystem
                 .WaitForCompletion();
         }
 
-        public IEnumerator FadeIn(float speed)
+        public IEnumerator CoFadeIn(float speed)
         {
             FadeOutGameObject.SetActive(true);
             yield return fadeOutImage.DOColor(new Color(0.0f, 0.0f, 0.0f, 0.0f), speed)

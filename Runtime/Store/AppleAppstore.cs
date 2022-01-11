@@ -1,3 +1,4 @@
+#if false
 // Copyright (C) OIEHOT - All Rights Reserved
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
@@ -50,3 +51,5 @@ namespace Rano.Store
         }
     }
 }
+
+#endif

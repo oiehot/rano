@@ -17,11 +17,6 @@ namespace Rano.Tests.Async
         [UnityTest]
         public IEnumerator CourtineTest()
         {
-            yield return CoMethod();
-        }
-
-        private IEnumerator CoMethod()
-        {
             yield return null;
         }
     }

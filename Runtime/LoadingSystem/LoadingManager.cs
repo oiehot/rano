@@ -14,7 +14,6 @@ using UnityEngine.AddressableAssets;
 namespace Rano.LoadingSystem
 {
     [DisallowMultipleComponent]
-    // TODO: 코루틴이 아닌 async로 변경해야함.
     // TODO: 씬unload 실패시 예외처리.
     public sealed class LoadingManager : MonoSingleton<LoadingManager>
     {
@@ -44,7 +43,7 @@ namespace Rano.LoadingSystem
             StopCoroutine(nameof(CoUpdate));
         }
 
-        IEnumerator CoUpdate()
+        private IEnumerator CoUpdate()
         {
             while (true)
             {
@@ -59,22 +58,22 @@ namespace Rano.LoadingSystem
                         case LoadingManagerCommand.Type.AddScene:
                             Log.Info($"씬 추가 {command.address}");
                             Status = LoadingManagerStatus.LoadingScene;
-                            yield return Rano.Addressable.AddressableSceneManager.Instance.AddSceneAsync(command.address);
-                            // 마지막으로 Add된 Scene이 Instatiable Active Scene이 됨.
-                            Rano.Addressable.AddressableSceneManager.Instance.ActivateScene(command.address);
+                            yield return AddressableSceneManager.Instance.AddSceneAsync(command.address);
+                            // 마지막으로 Add된 Scene이 Active Scene이 됨.
+                            AddressableSceneManager.Instance.ActivateScene(command.address);
                             Status = LoadingManagerStatus.LoadingSceneCompleted;
                             break;
 
                         case LoadingManagerCommand.Type.RemoveScene:
                             Log.Info($"씬 삭제 {command.address}");
                             Status = LoadingManagerStatus.UnloadingScene;
-                            yield return Rano.Addressable.AddressableSceneManager.Instance.RemoveSceneAsync(command.address);
+                            yield return AddressableSceneManager.Instance.RemoveSceneAsync(command.address);
                             Status = LoadingManagerStatus.UnloadingSceneCompleted;
                             break;
 
                         case LoadingManagerCommand.Type.ActiveScene:
                             Log.Info($"씬 활성화 {command.address}");
-                            Rano.Addressable.AddressableSceneManager.Instance.ActivateScene(command.address);
+                            AddressableSceneManager.Instance.ActivateScene(command.address);
                             break;
 
                         case LoadingManagerCommand.Type.EnableUI:
@@ -89,22 +88,22 @@ namespace Rano.LoadingSystem
 
                         case LoadingManagerCommand.Type.FadeOut:
                             Log.Info($"페이드 아웃");
-                            yield return FadeOut(command.fadeSpeed);
+                            yield return StartCoroutine(CoFadeOut(command.fadeSpeed));
                             break;
 
                         case LoadingManagerCommand.Type.FadeIn:
                             Log.Info($"페이드 인");
-                            yield return FadeIn(command.fadeSpeed);
+                            yield return StartCoroutine(CoFadeIn(command.fadeSpeed));
                             break;
 
                         case LoadingManagerCommand.Type.ShowBodyText:
                             Log.Info($"Body텍스트 보이기");
-                            yield return ShowBodyText(command.fadeSpeed);
+                            yield return StartCoroutine(CoShowBodyText(command.fadeSpeed));
                             break;
 
                         case LoadingManagerCommand.Type.HideBodyText:
                             Log.Info($"Body텍스트 숨기기");
-                            yield return HideBodyText(command.fadeSpeed);
+                            yield return StartCoroutine(CoHideBodyText(command.fadeSpeed));
                             break;
                     }
                 }
@@ -112,7 +111,7 @@ namespace Rano.LoadingSystem
             }
         }
 
-        public IEnumerator FadeOut(float speed)
+        private IEnumerator CoFadeOut(float speed)
         {
             // 이미 페이드아웃 되어 있다면 실행하지 않는다.
             if (FadeStatus == LoadingManagerFadeStatus.FadeOut)
@@ -120,11 +119,11 @@ namespace Rano.LoadingSystem
                 Log.Warning("페이드아웃 생략: 이중 페이드아웃 실행");
                 yield break;
             }
-            yield return _ui.FadeOut(speed);
+            yield return StartCoroutine(_ui.CoFadeOut(speed));
             FadeStatus = LoadingManagerFadeStatus.FadeOut;
         }
 
-        public IEnumerator FadeIn(float speed)
+        private IEnumerator CoFadeIn(float speed)
         {
             // 이미 페이드인 되어 있다면 실행하지 않는다.
             if (FadeStatus == LoadingManagerFadeStatus.FadeIn)
@@ -133,16 +132,16 @@ namespace Rano.LoadingSystem
                 yield break;
             }
 
-            yield return _ui.FadeIn(speed);
+            yield return StartCoroutine(_ui.CoFadeIn(speed));
             FadeStatus = LoadingManagerFadeStatus.FadeIn;
         }
-        
-        public IEnumerator ShowBodyText(float speed)
+
+        private IEnumerator CoShowBodyText(float speed)
         {
             yield return _ui.ShowBodyText(speed);
         }
 
-        public IEnumerator HideBodyText(float speed)
+        private IEnumerator CoHideBodyText(float speed)
         {
             yield return _ui.HideBodyText(speed);
         }

@@ -1,3 +1,7 @@
+#if false
+
+/* 코루틴 몰이해로 인한 수정이 필요함 */
+
 // Copyright (C) OIEHOT - All Rights Reserved
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
@@ -131,10 +135,10 @@ namespace Rano.Addressable
 
         private IEnumerator RunCoroutine()
         {
-            yield return this.Initialize();
-            yield return this.WaitInitialize();
-            yield return this.Download();
-            yield return this.WaitDownload();
+            yield return StartCoroutine(nameof(Initialize));
+            yield return StartCoroutine(nameof(WaitInitialize());
+            yield return StartCoroutine(nameof(Download());
+            yield return StartCoroutine(nameof(WaitDownload());
         }
 
         private IEnumerator Initialize()
@@ -319,3 +323,5 @@ namespace Rano.Addressable
         }
     }
 }
+
+#endif

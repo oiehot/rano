@@ -27,7 +27,7 @@ namespace Rano.SaveSystem
 
         public IEnumerator SyncCoroutine()
         {
-            yield return CloudManager.Instance.SynchronizeCoroutine();
+            yield return StartCoroutine(CloudManager.Instance.CoSynchronize());
 
             // 수정날짜를 얻고 비교한다.
             string localStr;
@@ -50,7 +50,7 @@ namespace Rano.SaveSystem
                 CopyCloudToMemory();
             }
 
-            yield return CloudManager.Instance.SynchronizeCoroutine();
+            yield return StartCoroutine(CloudManager.Instance.CoSynchronize());
         }
 
         [ContextMenu("Copy Memory To Cloud",false,1002)]

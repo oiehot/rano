@@ -9,7 +9,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.TestTools;  
 using Rano.App;
-using Rano.Store;
 
 namespace Rano.Tests
 {   
@@ -40,50 +39,6 @@ namespace Rano.Tests
 
             Version v2 = new Version(1,2,3);
             Assert.AreEqual(v2.ToString(), "1.2.3");
-        }
-
-        [UnityTest]
-        public IEnumerator UpdateCheckerGoogle_Test()
-        {
-            GameObject go = new GameObject();
-            UpdateChecker updateChecker = go.AddComponent<UpdateChecker>();
-            updateChecker.Initialize(
-                "com.oiehot.afo2",
-                RuntimePlatform.Android,
-                new Version("1.0.6")
-            );
-
-            updateChecker.onUpdateRequired += () => {};
-            updateChecker.onUpdateCheckFailed += () => {
-                throw new System.Exception("구글 플레이스토어 업데이트 체크 실패");
-            };
-
-            yield return updateChecker.CheckUpdate();
-        }
-
-        [UnityTest]
-        /// <comments>
-        /// 테스트용 bundleId: com.ninecatsgames.logalaxy
-        /// 테스트용 trackId: 1350067922
-        /// </comments>
-        public IEnumerator UpdateCheckerApple_Test()
-        {
-            GameObject go = new GameObject();
-            UpdateChecker updateChecker = go.AddComponent<UpdateChecker>();
-            updateChecker.Initialize(
-                "com.ninecatsgames.logalaxy",
-                RuntimePlatform.IPhonePlayer,
-                new Version("1.0.0")
-            );
-
-            updateChecker.onUpdateRequired += () => {
-                // Done
-            };
-            updateChecker.onUpdateCheckFailed += () => {
-                throw new System.Exception("애플 앱스토어 업데이트 체크 실패");
-            };
-
-            yield return updateChecker.CheckUpdate();
         }
     }
 }

@@ -1,3 +1,4 @@
+#if false
 // Copyright (C) OIEHOT - All Rights Reserved
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
@@ -60,7 +61,7 @@ namespace Rano.App
         }
 
         /// <summary>스토어로 부터 최신버젼값을 얻어 저장한다. 실패하면 콜백를 호출한다.</summary>
-        public IEnumerator UpdateLastestVersion()
+        public IEnumerator CoUpdateLastestVersion()
         {
             if (appStore != null)
             {
@@ -88,9 +89,9 @@ namespace Rano.App
         }
 
         /// <summary>최신버젼값을 얻고 현재버젼과 비교하여 업데이트가 필요하면 콜백을 호출한다.</summary>
-        public IEnumerator CheckUpdate()
+        public IEnumerator CoCheckUpdate()
         {
-            yield return UpdateLastestVersion();
+            yield return StartCoroutine(CoUpdateLastestVersion());
 
             if (lastestVersion.HasValue)
             {
@@ -111,3 +112,4 @@ namespace Rano.App
         }
     }
 }
+#endif
