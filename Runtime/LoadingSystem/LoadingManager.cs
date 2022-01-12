@@ -88,22 +88,22 @@ namespace Rano.LoadingSystem
 
                         case LoadingManagerCommand.Type.FadeOut:
                             Log.Info($"페이드 아웃");
-                            yield return StartCoroutine(CoFadeOut(command.fadeSpeed));
+                            yield return CoFadeOut(command.fadeSpeed);
                             break;
 
                         case LoadingManagerCommand.Type.FadeIn:
                             Log.Info($"페이드 인");
-                            yield return StartCoroutine(CoFadeIn(command.fadeSpeed));
+                            yield return CoFadeIn(command.fadeSpeed);
                             break;
 
                         case LoadingManagerCommand.Type.ShowBodyText:
                             Log.Info($"Body텍스트 보이기");
-                            yield return StartCoroutine(CoShowBodyText(command.fadeSpeed));
+                            yield return CoShowBodyText(command.fadeSpeed);
                             break;
 
                         case LoadingManagerCommand.Type.HideBodyText:
                             Log.Info($"Body텍스트 숨기기");
-                            yield return StartCoroutine(CoHideBodyText(command.fadeSpeed));
+                            yield return CoHideBodyText(command.fadeSpeed);
                             break;
                     }
                 }
@@ -119,7 +119,7 @@ namespace Rano.LoadingSystem
                 Log.Warning("페이드아웃 생략: 이중 페이드아웃 실행");
                 yield break;
             }
-            yield return StartCoroutine(_ui.CoFadeOut(speed));
+            yield return _ui.CoFadeOut(speed);
             FadeStatus = LoadingManagerFadeStatus.FadeOut;
         }
 
@@ -132,7 +132,7 @@ namespace Rano.LoadingSystem
                 yield break;
             }
 
-            yield return StartCoroutine(_ui.CoFadeIn(speed));
+            yield return _ui.CoFadeIn(speed);
             FadeStatus = LoadingManagerFadeStatus.FadeIn;
         }
 

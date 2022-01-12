@@ -77,8 +77,7 @@ namespace Rano.PlatformServices.Gaming
             }
             else
             {
-                // TODO: => Log.Warning
-                Log.Important($"게임서비스 로그인 실패 ({error})");
+                Log.Warning($"게임서비스 로그인 실패 ({error})");
                 _lastResult = false;
                 IsAuthWorking = false;
             }
@@ -96,14 +95,11 @@ namespace Rano.PlatformServices.Gaming
 
             Log.Info("게임서비스 로그인 요청.");
             GameServices.Authenticate();
-            Log.Info($"게임서비스 로그인 절차 종료A");
             while (IsAuthWorking == true)
             {
                 yield return null;
             }
-            Log.Info($"게임서비스 로그인 절차 종료B");
             onResult?.Invoke(_lastResult);
-            Log.Info($"게임서비스 로그인 절차 종료C");
         }
     }
 }

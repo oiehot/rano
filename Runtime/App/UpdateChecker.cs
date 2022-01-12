@@ -91,7 +91,7 @@ namespace Rano.App
         /// <summary>최신버젼값을 얻고 현재버젼과 비교하여 업데이트가 필요하면 콜백을 호출한다.</summary>
         public IEnumerator CoCheckUpdate()
         {
-            yield return StartCoroutine(CoUpdateLastestVersion());
+            yield return CoUpdateLastestVersion();
 
             if (lastestVersion.HasValue)
             {

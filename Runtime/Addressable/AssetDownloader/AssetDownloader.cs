@@ -124,7 +124,7 @@ namespace Rano.Addressable
 
         public void Run()
         {
-            StartCoroutine(this.RunCoroutine());
+            StartCoroutine(RunCoroutine());
         }
 
         public bool IsDownloaded()
@@ -135,10 +135,10 @@ namespace Rano.Addressable
 
         private IEnumerator RunCoroutine()
         {
-            yield return StartCoroutine(nameof(Initialize));
-            yield return StartCoroutine(nameof(WaitInitialize());
-            yield return StartCoroutine(nameof(Download());
-            yield return StartCoroutine(nameof(WaitDownload());
+            yield return Initialize();
+            yield return WaitInitialize();
+            yield return Download();
+            yield return WaitDownload();
         }
 
         private IEnumerator Initialize()
