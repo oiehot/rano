@@ -3,13 +3,15 @@
 // Proprietary and confidential
 // Written by Taewoo Lee <oiehot@gmail.com>
 
+using System;
+
 namespace Rano
 {
     public abstract class Singleton<T> where T : class, new()
     {
         private static T _instance;
         private static readonly object Lock = new object();
-
+                
         public static T Instance
         {
             get

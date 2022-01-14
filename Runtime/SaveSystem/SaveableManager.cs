@@ -15,10 +15,10 @@ namespace Rano.SaveSystem
     public sealed class SaveableManager : MonoSingleton<SaveableManager>
     {
         private InMemoryDatabase _db;
-        public bool IncludeInactive { get; private set; } = true;
-        public bool AutoSaveOnPause { get; private set; } = true;
-        public bool AutoSaveOnFocusOut { get; private set; } = false;
-        public bool AutoSaveOnExit { get; private set; } = true;
+        public bool IncludeInactive { get; set; } = true;
+        public bool AutoSaveOnPause { get; set; } = false;
+        public bool AutoSaveOnFocusOut { get; set; } = false;
+        public bool AutoSaveOnExit { get; set; } = false;
         public Action OnSave { get; set; }
 
         protected override void Awake()
@@ -30,9 +30,9 @@ namespace Rano.SaveSystem
         protected override void OnApplicationQuit()
         {
             base.OnApplicationQuit();
-            Log.Info("OnApplicationQuit");
             if (AutoSaveOnExit == true)
             {
+                Log.Info("OnApplicationQuit");
                 Log.Info("AutoSaveOnExit가 켜져 있으므로 모든Saveable 상태를 InMemoryDB에 저장합니다");
                 SaveAllSaveableEntities();
             }
@@ -40,9 +40,9 @@ namespace Rano.SaveSystem
 
         private void OnApplicationPause(bool pause)
         {
-            Log.Info($"OnApplicationPause({pause})");
             if (pause == true && AutoSaveOnPause)
             {
+                Log.Info($"OnApplicationPause({pause})");
                 Log.Info("AutoSaveOnPause가 켜져 있으므로 모든Saveable 상태를 InMemoryDB에 저장합니다");
                 SaveAllSaveableEntities();
             }
@@ -50,9 +50,9 @@ namespace Rano.SaveSystem
 
         private void OnApplicationFocus(bool focus)
         {
-            Log.Info($"OnApplicationFocus({focus})");
             if (focus == false && AutoSaveOnFocusOut)
             {
+                Log.Info($"OnApplicationFocus({focus})");
                 Log.Info("OnApplicationFocus가 켜져 있으므로 모든Saveable 상태를 InMemoryDB에 저장합니다");
                 SaveAllSaveableEntities();
             }

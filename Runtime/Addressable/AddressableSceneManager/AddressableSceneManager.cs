@@ -20,43 +20,36 @@ namespace Rano.Addressable
 {
     public sealed class AddressableSceneManager : MonoSingleton<AddressableSceneManager>
     {
-        public enum Status
-        {
-            None,
-            Initialized,
-        }
-        public Status status {get; private set;}
-        Dictionary<Address, SceneInstance> _scenes;
+        Dictionary<object, SceneInstance> _scenes;
 
         protected override void Awake()
         {
             base.Awake();
-            status = Status.None;
-            _scenes = new Dictionary<Address, SceneInstance>();
+            _scenes = new Dictionary<object, SceneInstance>();
         }
 
         /// <summary>
         /// 씬을 교체함. 로드된 모든 씬들은 언로드된다.
         /// </summary>
-        public AsyncOperationHandle<SceneInstance> ChangeSceneAsync(Address address)
+        public AsyncOperationHandle<SceneInstance> ChangeSceneAsync(object key)
         {
-            if (_scenes.ContainsKey(address))
+            if (_scenes.ContainsKey(key))
             {
-                throw new AddressableSceneManagerException($"씬 교체 실패: {address}는 이미 로드되어 있음");
+                throw new AddressableSceneManagerException($"씬 교체 실패: {key}는 이미 로드되어 있음");
             }
 
             AsyncOperationHandle<SceneInstance> handle;
-            handle = Addressables.LoadSceneAsync(address.value, LoadSceneMode.Single, true); // activateOnLoad:true
+            handle = Addressables.LoadSceneAsync(key, LoadSceneMode.Single, activateOnLoad:true);
             handle.Completed += (handle) => {
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
-                    Log.Info($"씬 교체됨: {address}");
+                    Log.Info($"씬 교체됨: {key}");
                     _scenes.Clear(); // 등재 씬 전부 삭제.
-                    _scenes.Add(address, handle.Result); // 새 씬 등재
+                    _scenes.Add(key, handle.Result); // 새 씬 등재
                 }
                 else
                 {
-                    throw new AddressableSceneManagerException($"씬 교체 실패: {address}");
+                    throw new AddressableSceneManagerException($"씬 교체 실패: {key}");
                 }
             };
             return handle;
@@ -65,24 +58,24 @@ namespace Rano.Addressable
         /// <summary>
         /// 씬을 추가함. 기존에 열린 씬들은 닫히지 않는다.
         /// </summary>
-        public AsyncOperationHandle<SceneInstance> AddSceneAsync(Address address)
+        public AsyncOperationHandle<SceneInstance> AddSceneAsync(object key)
         {
-            if (_scenes.ContainsKey(address))
+            if (_scenes.ContainsKey(key))
             {
-                throw new AddressableSceneManagerException($"씬 추가 실패: {address}는 이미 로드되어 있음");
+                throw new AddressableSceneManagerException($"씬 추가 실패: {key}는 이미 로드되어 있음");
             }
 
             AsyncOperationHandle<SceneInstance> handle;
-            handle = Addressables.LoadSceneAsync(address.value, LoadSceneMode.Additive, activateOnLoad:true);
+            handle = Addressables.LoadSceneAsync(key, LoadSceneMode.Additive, activateOnLoad:true);
             handle.Completed += (handle) => {
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
-                    Log.Info($"씬 추가됨: {address}");
-                    _scenes.Add(address, handle.Result); // SceneInstance 등재
+                    Log.Info($"씬 추가됨: {key}");
+                    _scenes.Add(key, handle.Result); // SceneInstance 등재
                 }
                 else
                 {
-                    throw new AddressableSceneManagerException($"씬 추가 실패: {address}");
+                    throw new AddressableSceneManagerException($"씬 추가 실패: {key}");
                 }
             };
             return handle;
@@ -92,25 +85,25 @@ namespace Rano.Addressable
         /// 씬을 제거한다. 기존에 열린 씬들은 건들지 않는다.
         /// autoReleaseHandle이 false면 Complete되어도 handle이 제거되지 않고 살아남게 된다.
         /// </summary>
-        public AsyncOperationHandle<SceneInstance> RemoveSceneAsync(Address address, bool autoReleaseHandle=true)
+        public AsyncOperationHandle<SceneInstance> RemoveSceneAsync(object key, bool autoReleaseHandle=true)
         {
-            if (_scenes.ContainsKey(address) == false)
+            if (_scenes.ContainsKey(key) == false)
             {
-                throw new AddressableSceneManagerException($"씬 제거 실패: {address}가 로드되어있지 않음");
+                throw new AddressableSceneManagerException($"씬 제거 실패: {key}가 로드되어있지 않음");
             }
 
             AsyncOperationHandle<SceneInstance> handle;
-            SceneInstance sceneInstance = _scenes[address];
+            SceneInstance sceneInstance = _scenes[key];
             handle = Addressables.UnloadSceneAsync(sceneInstance, autoReleaseHandle);
             handle.Completed += (handle) => {
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
-                    Log.Info($"씬 제거: {address}");
-                    _scenes.Remove(address);
+                    Log.Info($"씬 제거: {key}");
+                    _scenes.Remove(key);
                 }
                 else
                 {
-                    throw new AddressableSceneManagerException($"씬 제거 실패: {address}");
+                    throw new AddressableSceneManagerException($"씬 제거 실패: {key}");
                 }
             };
             return handle;
@@ -122,16 +115,16 @@ namespace Rano.Addressable
         /// <remarks>
         /// Instantiate된 개체가 지정되는 씬 활성화를 말한다.
         /// </remarks>
-        public void ActivateScene(Address address)
+        public void ActivateScene(object key)
         {
-            if (_scenes.ContainsKey(address) == false)
+            if (_scenes.ContainsKey(key) == false)
             {
-                throw new AddressableSceneManagerException($"씬 활성화 실패: {address}가 로드 되어있지 않음");
+                throw new AddressableSceneManagerException($"씬 활성화 실패: {key}가 로드 되어있지 않음");
             }
             else
             {
-                Log.Info($"현재 활성화 씬으로 지정: {address}");
-                UnityEngine.SceneManagement.SceneManager.SetActiveScene(_scenes[address].Scene);
+                Log.Info($"현재 활성화 씬으로 지정: {key}");
+                UnityEngine.SceneManagement.SceneManager.SetActiveScene(_scenes[key].Scene);
                 // _scenes[address].ActivateAsync(); // 로드 후 활성화
             }
         }

@@ -56,7 +56,8 @@ namespace Rano.PoolSystem
             string assetName = reference.Asset.name;
             if (_pools.ContainsKey(assetName))
             {
-                throw new Exception($"오브젝트 풀이 이미 존재함 ({assetName})");
+                Log.Info($"오브젝트 풀이 이미 존재함 ({assetName})");
+                return;
             }
 
             // 풀을 생성
@@ -64,6 +65,17 @@ namespace Rano.PoolSystem
             pool.Initialize(reference, capacity);
             pool.PoolTransform.parent = _rootTransform;
             _pools.Add(assetName, pool);
+        }
+
+        public void ReleaseAllPools()
+        {
+            Log.Info("모든 풀 삭제");
+            foreach (var kv in _pools)
+            {
+                AddressablePool pool = kv.Value;
+                pool.Release();
+            }
+            _pools.Clear();
         }
 
         public void ReleasePool(string assetName)
@@ -79,16 +91,6 @@ namespace Rano.PoolSystem
         public void ReleasePool(AssetReferenceGameObject reference)
         {
             ReleasePool(reference.Asset.name);
-        }
-
-        public void Clear()
-        {
-            foreach (var kv in _pools)
-            {
-                AddressablePool pool = kv.Value;
-                pool.Release();
-            }
-            _pools.Clear();
         }
 
         public AddressablePool GetPool(string assetName)

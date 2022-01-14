@@ -4,7 +4,6 @@
 // Written by Taewoo Lee <oiehot@gmail.com>
 
 using System;
-using Rano;
 
 namespace Rano.Addressable
 {

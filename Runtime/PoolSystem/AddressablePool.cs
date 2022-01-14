@@ -20,14 +20,15 @@ namespace Rano.PoolSystem
         private Stack<GameObject> _stack;
         public string AssetName { get; private set; }
         public AssetReferenceGameObject Reference { get; private set;}
-        public Transform PoolTransform {get; private set; }
+        public GameObject PoolGameObject { get; private set; }
+        public Transform PoolTransform { get; private set; }
 
         public AddressablePool()
         {
             _stack = new Stack<GameObject>();
         }
 
-        private void ExtendCapacity(int size)
+        public void ExtendCapacity(int size)
         {
             int newCapacity = Capacity + size;
             Log.Info($"풀({AssetName}) 확장 ({Capacity} => {newCapacity})");
@@ -54,10 +55,10 @@ namespace Rano.PoolSystem
 
             // 풀 트랜스폼을 만들고 Capacity에 따라 인스턴스 생성.
             Log.Info($"풀({AssetName}) 생성 시작 (x{capacity})");
-            PoolTransform = new GameObject().transform;
+            PoolGameObject = new GameObject();
+            PoolTransform = PoolGameObject.transform;
             PoolTransform.name = $"{AssetName}_Pool";
             ExtendCapacity(capacity);
-            Log.Info($"풀({AssetName}) 생성 완료");
         }
 
         /// <summary>
@@ -66,31 +67,32 @@ namespace Rano.PoolSystem
         /// </summary>
         public void Release() // TODO: IDispose, Dipose?
         {
+            Log.Info($"풀({AssetName}) 삭제중");
             while (_stack.Count > 0)
             {
                 var gameObject = _stack.Pop();
-                Addressables.ReleaseInstance(gameObject);
+                if (gameObject != null)
+                {
+                    Addressables.ReleaseInstance(gameObject);
+                }
+                else
+                {
+                    // 스택에서 Pop되기 전에 이미 게임오브젝트가 지워졌음.
+                }
             }
-            GameObject.Destroy(PoolTransform.gameObject);
+
+            if (PoolGameObject != null)
+            {
+                GameObject.Destroy(PoolGameObject);
+            }
+            else
+            {
+                // 이 메소드를 호출하기 전에 풀게임오브젝트가 이미 지워졌음.
+            }
             AssetName = null;
             PoolTransform = null;
             Reference = null;
         }
-
-#if false
-        /// <summary>
-        /// AssetRefernceGameObject를 사용해서 게임오브젝트를 생성한다.
-        /// </summary>
-        private GameObject Instantiate()
-        {
-            var handle = Addressables.InstantiateAsync(Reference);
-            var gameObject = handle.WaitForCompletion();
-            gameObject = handle.Result;
-            gameObject.name = AssetName;
-            gameObject.SetActive(false);
-            return gameObject;
-        }
-#endif
 
         /// <summary>
         /// 게임오브젝트를 재사용할 풀 스택에 넣는다.
@@ -116,6 +118,7 @@ namespace Rano.PoolSystem
             if (_stack.Count > 0)
             {
                 gameObject = _stack.Pop();
+                if (gameObject == null) throw new Exception("스택에서 Pop되기 전에 게임오브젝트가 삭제되었음");
             }
             else
             {
@@ -123,6 +126,7 @@ namespace Rano.PoolSystem
                 {
                     ExtendCapacity(Capacity); // Capacity 두 배로.
                     gameObject = _stack.Pop();
+                    if (gameObject == null) throw new Exception("스택에서 Pop되기 전에 게임오브젝트가 삭제되었음");
                 }
                 else
                 {
