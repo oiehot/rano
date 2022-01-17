@@ -149,20 +149,5 @@ namespace Rano.SaveSystem
             Log.Info($"{_id}:");
             Debug.Log(ToJsonString());
         }
-
-        //public byte[] CaptureToBinary()
-        //{
-        //    byte[] bytes = null;
-        //    bytes = Rano.Encoding.Binary.ConvertObjectToBinary(
-        //        CaptureToDict()
-        //    );
-        //    return bytes;
-        //}
-
-        //public void RestoreFromBinary(byte[] bytes)
-        //{
-        //    object obj = Rano.Encoding.Binary.ConvertBinaryToObject(bytes);
-        //    RestoreFromDict(obj);
-        //}
     }
 }
