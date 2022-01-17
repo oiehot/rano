@@ -36,7 +36,7 @@ namespace Rano.Network
                 // TODO: Wait for done
                 while (!asyncOperation.isDone)
                 {
-                    await Task.Delay(100);
+                    await Task.Yield();
                 }
 
                 UnityWebRequest.Result requestResult;
