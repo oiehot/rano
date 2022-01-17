@@ -55,6 +55,16 @@ namespace Rano
             }
         }
 
+#if UNITY_EDITOR && UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ReloadDomain()
+        {
+            Log.Info($"For UnityReloadDomain, Reset Instance");
+            _isAppQuitting = false;
+            _instance = null;
+        }
+#endif
+
         protected virtual void Awake()
         {
             if (_instance && _instance != this)
