@@ -10,34 +10,43 @@ using UnityEngine;
 
 namespace Rano.PlatformServices.Admob
 {
+    public enum AdLoadStatus
+    {
+        None,
+        Loading,
+        Loaded
+    }
+
     /// <summary>
     /// 이벤트 핸들러는 Admob 스레드에서 실행되므로 핸들러 안에서는 유니티 엔진 라이브러리를 사용해서는 안된다.
     /// 우리는 이 문제를 핸들러에서는 플래그를 세우고 메인스레드에서 작동되는 Update에서 사용자 이벤트 함수를 호출하는 식으로 해결했다.
     /// 다음 글을 참고할것: https://ads-developers.googleblog.com/2016/04/handling-android-ad-events-in-unity.html
     /// </summary>
     [RequireComponent(typeof(CanvasSorter))]
-    public class RewardedAdBase : MonoBehaviour
+    public sealed class RewardedAdBase : MonoBehaviour
     {
-        /// <summary>
-        /// 총 광고 로드 횟수.
-        /// </summary>
-        protected int _adLoadCount = 0;
+        private readonly object _lockObject = new object();
 
-        /// <summary>
-        /// 광고 객체.
-        /// </summary>
-        protected RewardedAd _ad;
-
-        /// <summary>
-        /// 광고 출력시 게임UI SortingOrder를 일괄적으로 변경하기 위해 이 컴포넌트가 필요함.
-        /// </summary>
+        /* Link */
+        private RewardedAd _ad;
         private CanvasSorter _canvasSorter;
 
-        /// <summary>
-        /// 광고 유닛Id.
-        /// </summary>
-        protected string _adUnitId;
+        /* Loading Status */
+        public AdLoadStatus LoadStatus
+        {
+            get
+            {
+                if (_ad == null) return AdLoadStatus.None;
+                else if (IsLoading) return AdLoadStatus.Loading;
+                else if (IsLoaded) return AdLoadStatus.Loaded;
+                else throw new Exception("광고로드 상태를 알 수 없음");
+            }
+        }
+        public bool IsLoading => (_ad != null && _ad.IsLoaded() == false);
+        public bool IsLoaded => (_ad != null && _ad.IsLoaded() == true);
+        private int _adLoadCount = 0;
 
+        /* For RewardedAd */
         private bool _adLoadedFlag = false;
         private bool _adOpeningFlag = false;
         private bool _adRewardFlag = false;
@@ -47,31 +56,30 @@ namespace Rano.PlatformServices.Admob
         private int _adRewardAmount;
         private string _adRewardUnit;
 
-        /// <summary>
-        /// 광고 이름.
-        /// </summary>
-        [SerializeField] protected string _adName;
+        [Header("Ad Unit Ids")]
+        [SerializeField] private string _adName;
+        [SerializeField] private string _androidAdUnitId = "";
+        [SerializeField] private string _iosAdUnitId = "";
+        private string _adUnitId;
 
-        /// <summary>
-        /// 안드로이드용 광고유닛Id.
-        /// </summary>
-        [SerializeField] protected string _androidAdUnitId = "";
+        [Header("Settings")]
+        [SerializeField] private bool _autoLoadOnAwake = true;
+        [SerializeField] private bool _autoReload = true;
 
-        /// <summary>
-        /// iOS용 광고유닛Id.
-        /// </summary>
-        [SerializeField] protected string _iosAdUnitId = "";
+        /* Callbacks */
+        public Action OnAdLoading { get; set; }
+        public Action OnAdLoaded { get; set; }
+        public Action OnAdOpening { get; set; }
+        public Action OnAdClosed { get; set; }
+        public Action<int, string> OnAdReward { get; set; }
+        public Action OnAdFailedToLoad { get; set; }
+        public Action OnAdFailedToShow { get; set; }
 
-        protected virtual void Awake()
+        void Awake()
         {
             _canvasSorter = this.GetRequiredComponent<CanvasSorter>();
-        }
-
-        protected virtual void Start()
-        {
 
 #if UNITY_ANDROID
-
             if (_androidAdUnitId != "")
             {
                 _adUnitId = _androidAdUnitId;
@@ -85,6 +93,7 @@ namespace Rano.PlatformServices.Admob
                 throw new Exception($"{_adName} - 안드로이드 광고Id가 없음.");
 #endif
             }
+
 
 #elif UNITY_IOS
             if (_iosAdUnitId != "")
@@ -102,6 +111,7 @@ namespace Rano.PlatformServices.Admob
             }
 #else
 
+
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
             Log.Info($"{_adName} - 기타플랫폼 테스트광고Id 사용.");
             _adUnitId = "ca-app-pub-3940256099942544/5224354917"; // Android 테스트광고
@@ -110,17 +120,26 @@ namespace Rano.PlatformServices.Admob
 #endif
 
 #endif
+
+            if (_autoLoadOnAwake == true)
+            {
+                Log.Info($"{_adName} - AutoLoadOnAwake 플래그가 켜져있어 자동으로 광고를 로드합니다.");
+                LoadAd();
+            }
         }
 
         /// <<summary>
         /// Admob스레드에서 호출된 콜백에서 켜진 플래그를 체크하여 매칭되는 함수를 메인스레드에서 실행한다.
         /// </summary>
-        protected virtual void Update()
+        // TODO: 에드몹스레드에서 실행되는 콜백에서 UniTask 등을 이용하여 유니티스레드에서 자동으로 메서드를 실행하도록 수정.
+        // TODO: 업데이트에서 반복적으로 플래그를 체크할 필요는 없음.
+        void Update()
         {
             if (_adLoadedFlag)
             {
                 _adLoadedFlag = false;
-                OnAdLoaded();
+                Log.Info($"{_adName} - 광고 로드 완료");
+                OnAdLoaded?.Invoke();
             }
 
             if (_adOpeningFlag)
@@ -132,22 +151,30 @@ namespace Rano.PlatformServices.Admob
                 // 이런 문제점을 해결하기 위해서 미래 등록해둔 게임UI 캔버스들의 SortingOrder를
                 // 일괄적으로 아래로 내려줘서 전면광고가 가장 위에 그려질 수 있도록 수정한다.
                 _canvasSorter.MoveSortingOrder(-10);
-                OnAdOpening();
+                Log.Info($"{_adName} - 광고 시작");
+                OnAdOpening?.Invoke();
             }
 
             if (_adClosedFlag)
             {
                 _adClosedFlag = false;
+                Log.Info($"{_adName} - 광고 닫힘");
                 // 수정했던 모든 캔버스SortingOrder를 원래 위치로 돌려놓는다.
                 _canvasSorter.ResetSortingOrder();
-                OnAdClosed();
+                OnAdClosed?.Invoke();
                 _ad = null;
+                if (_autoReload == true)
+                {
+                    Log.Info($"{_adName} - AutoReload 플래그가 켜져있어 광고가 닫힘과 동시에 새 광고를 로드합니다.");
+                    LoadAd();
+                }
             }
 
             if (_adRewardFlag)
             {
                 _adRewardFlag = false;
-                OnAdReward(_adRewardAmount, _adRewardUnit);
+                Log.Info($"{_adName} - 광고 보상받음 ({_adRewardAmount} {_adRewardUnit})");
+                OnAdReward?.Invoke(_adRewardAmount, _adRewardUnit);
                 _adRewardAmount = 0;
                 _adRewardUnit = null;
             }
@@ -155,25 +182,32 @@ namespace Rano.PlatformServices.Admob
             if (_adFailedToLoadFlag)
             {
                 _adFailedToLoadFlag = false;
-                OnAdFailedToLoad();
+                Log.Warning($"{_adName} - 광고 로드 실패");
+                OnAdFailedToLoad?.Invoke();
             }
 
             if (_adFailedToShowFlag)
             {
                 _adFailedToShowFlag = false;
-                OnAdFailedToShow();
+                Log.Warning($"{_adName} - 광고 출력 실패");
+                OnAdFailedToShow?.Invoke();
             }
         }
 
         /// <summary>광고 로드가 완료될 때 실행된다.</summary>
-        protected virtual void HandleAdLoaded(object sender, EventArgs args)
+        /// <remarks>에드몹 스레드에서 실행된다.</remarks>
+        private void HandleAdLoaded(object sender, EventArgs args)
         {
-            _adLoadedFlag = true;
-            _adLoadCount++;
+            lock (_lockObject)
+            {
+                _adLoadCount++;
+                _adLoadedFlag = true;
+            }
         }
 
         /// <summary>광고 로드에 실패할 때 실행된다.</summary>
-        protected virtual void HandleAdFailedToLoad(object sender, AdFailedToLoadEventArgs args)
+        /// /// <remarks>에드몹 스레드에서 실행된다.</remarks>
+        private void HandleAdFailedToLoad(object sender, AdFailedToLoadEventArgs args)
         {
             _adFailedToLoadFlag = true;
         }
@@ -182,13 +216,15 @@ namespace Rano.PlatformServices.Admob
         /// 광고가 표시될 때 기기 화면을 덮는다.
         /// 이때 필요한 경우 오디오 출력 또는 게임 루프를 일시중지하는 것이 좋다.
         /// </summary>
-        protected virtual void HandleAdOpening(object sender, EventArgs args)
+        /// <remarks>에드몹 스레드에서 실행된다.</remarks>
+        private void HandleAdOpening(object sender, EventArgs args)
         {
             _adOpeningFlag = true;
         }
 
         /// <summary>광고 표시에 실패할 때 실행된다.</summary>
-        protected virtual void HandleAdFailedToShow(object sender, AdErrorEventArgs args)
+        /// <remarks>에드몹 스레드에서 실행된다.</remarks>
+        private void HandleAdFailedToShow(object sender, AdErrorEventArgs args)
         {
             _adFailedToShowFlag = true;
         }
@@ -197,7 +233,8 @@ namespace Rano.PlatformServices.Admob
         /// 사용자가 닫기 아이콘을 탭하거나 뒤로 버튼을 사용하여 광고를 닫을 때 실행된다.
         /// 보상을 받기 전에 콜백된다. 앱에서 오디오 출력 또는 게임 루프를 일시중지했을 때 이 메소드로 재개하면 편리하다.
         /// </summary>
-        protected virtual void HandleAdClosed(object sender, EventArgs args)
+        /// <remarks>에드몹 스레드에서 실행된다.</remarks>
+        private void HandleAdClosed(object sender, EventArgs args)
         {
             _adClosedFlag = true;
         }
@@ -205,7 +242,8 @@ namespace Rano.PlatformServices.Admob
         /// <summary>
         /// 보상형 광고를 완수했을 때 호출된다.
         /// </summary>
-        protected virtual void HandleUserEarnedReward(object sender, Reward reward)
+        /// <remarks>에드몹 스레드에서 실행된다.</remarks>
+        private void HandleUserEarnedReward(object sender, Reward reward)
         {
             int rewardAmount = 0;
             string rewardUnit = reward.Type;
@@ -219,9 +257,13 @@ namespace Rano.PlatformServices.Admob
             {
                 throw new Exception($"{_adName} - 보상 개수가 1미만일 수가 없음.");
             }
-            _adRewardAmount = rewardAmount;
-            _adRewardUnit = rewardUnit;
-            _adRewardFlag = true;
+
+            lock (_lockObject)
+            {
+                _adRewardAmount = rewardAmount;
+                _adRewardUnit = rewardUnit;
+                _adRewardFlag = true;
+            }
         }
 
         /// <summary>
@@ -230,12 +272,20 @@ namespace Rano.PlatformServices.Admob
         /// </summary>
         public void LoadAd()
         {
-            Log.Info($"{_adName} - 광고 로드.");
-            if (IsAdLoaded())
+            if (LoadStatus == AdLoadStatus.Loading)
             {
-                Log.Info($"{_adName} - 광고가 이미 로드되어 있어서 새로 만들지 않음.");
+
+                Log.Info($"{_adName} - 광고가 로딩중이므로 새로 로드하지 않습니다.");
                 return;
             }
+
+            if (_ad != null && _ad.IsLoaded() == true)
+            {
+                Log.Info($"{_adName} - 광고가 이미 로드되어 있어서 새로 로드하지 않습니다.");
+                return;
+            }
+
+            Log.Info($"{_adName} - 광고 로드 시작");
 
             // RewardedAd는 일회용 객체다.
             // 보상형 광고가 표시된 후에는 이 객체를 사용해 다른 광고를 로드할 수 없다.
@@ -248,24 +298,10 @@ namespace Rano.PlatformServices.Admob
             _ad.OnUserEarnedReward += HandleUserEarnedReward;
             _ad.OnAdClosed += HandleAdClosed;
 
+            OnAdLoading?.Invoke();
+
             AdRequest request = new AdRequest.Builder().Build();
             _ad.LoadAd(request);
-        }
-
-        /// <summary>
-        /// 광고 로드여부를 리턴한다.
-        /// </summary>
-        /// <returns>광고 로드 여부</returns>
-        public bool IsAdLoaded()
-        {
-            if (_ad != null)
-            {
-                return _ad.IsLoaded();
-            }
-            else
-            {
-                return false;
-            }
         }
 
         /// <summary>
@@ -285,80 +321,31 @@ namespace Rano.PlatformServices.Admob
             }
         }
 
-        /// <summary>
-        /// 광고를 로드하고 완료되면 바로 출력한다.
-        /// </summary>
-        public void LoadAndShowAd()
-        {
-            StartCoroutine(nameof(CoLoadAndShowAd));
-        }
+        ///// <summary>
+        ///// 광고를 로드하고 완료되면 바로 출력한다.
+        ///// </summary>
+        //public void LoadAndShowAd()
+        //{
+        //    StartCoroutine(nameof(CoLoadAndShowAd));
+        //}
 
-        /// <summary>
-        /// 광고를 로드하고 완료되면 바로 출력하는 코루틴.
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerator CoLoadAndShowAd()
-        {
-            LoadAd();
+        //private IEnumerator CoLoadAd()
+        //{
+        //    LoadAd();
+        //    while (!_ad.IsLoaded())
+        //    {
+        //        yield return YieldCache.WaitForSeconds(0.2f);
+        //    }
+        //}
 
-            // 로딩이 완료될때 까지 대기.
-            while (!_ad.IsLoaded())
-            {
-                yield return YieldCache.WaitForSeconds(0.2f);
-            }
-
-            ShowAd();
-        }
-
-        /// <summary>
-        /// 광고가 로드될 때 호출됨.
-        /// </summary>
-        protected virtual void OnAdLoaded()
-        {
-            Log.Info($"{_adName} - 광고 로드됨.");
-        }
-
-        /// <summary>
-        /// 광고가 출력되기 시작할 때 호출됨.
-        /// </summary>
-        protected virtual void OnAdOpening()
-        {
-            Log.Info($"{_adName} - 광고 시작.");
-        }
-
-
-        /// <summary>
-        /// 광고가 닫혔을 때 호출됨. 광고중간에 닫아서 보상을 받지않더라도 호출된다.
-        /// OnAdReward보다 먼저 호출된다.
-        /// </summary>
-        protected virtual void OnAdClosed()
-        {
-            Log.Info($"{_adName} - 광고 닫힘.");
-        }
-
-        /// <summary>
-        /// 광고를 전부보고 보상받을 때 호출된다.
-        /// </summary>
-        /// <param name="rewardAmount"></param>
-        protected virtual void OnAdReward(int amount, string unit)
-        {
-            Log.Info($"{_adName} - 광고 보상받음. ({amount} {unit})");
-        }
-
-        /// <summary>
-        /// 광고 로드실패시 호출된다.
-        /// </summary>
-        protected virtual void OnAdFailedToLoad()
-        {
-            Log.Warning($"{_adName} - 광고 로드실패.");
-        }
-
-        /// <summary>
-        /// 광고 출력실패시 호출된다.
-        /// </summary>
-        protected virtual void OnAdFailedToShow()
-        {
-            Log.Warning($"{_adName} - 광고 출력실패.");
-        }
+        ///// <summary>
+        ///// 광고를 로드하고 완료되면 바로 출력하는 코루틴.
+        ///// </summary>
+        ///// <returns></returns>
+        //private IEnumerator CoLoadAndShowAd()
+        //{
+        //    yield return CoLoadAd();
+        //    ShowAd();
+        //}
     }
 }
