@@ -81,7 +81,7 @@ namespace Rano.SaveSystem
                 Log.Info($"{TemporaryJsonSavePath} 저장중...");
                 var jsonString = Rano.Encoding.Json.ConvertObjectToString(_dict); // TODO: Save using FileStream
                 Rano.IO.LocalFile.WriteString(TemporaryJsonSavePath, jsonString);
-                #endif
+#endif
 
             }
             catch (Exception e)
@@ -92,9 +92,9 @@ namespace Rano.SaveSystem
             }
             // 임시로 저장한 파일을 정식파일로 승격.
             Rano.IO.LocalFile.Move(TemporarySavePath, SavePath, true);
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             Rano.IO.LocalFile.Move(TemporaryJsonSavePath, JsonSavePath, true);
-            #endif
+#endif
 
             Log.Info($"{SavePath} 저장완료.");
         }
