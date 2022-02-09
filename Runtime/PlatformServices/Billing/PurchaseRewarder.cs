@@ -26,9 +26,9 @@ namespace Rano.PlatformServices.Billing
             _activated = true;
             if (PurchaseManager.Instance != null)
             {
-                PurchaseManager.Instance.onPurchaseComplete += OnPurchaseComplete;
-                PurchaseManager.Instance.onPurchaseFailed += OnPurchaseFailed;
-                PurchaseManager.Instance.onRestorePurchase += OnRestorePurchase;
+                PurchaseManager.Instance.OnPurchaseComplete += HandlePurchaseComplete;
+                PurchaseManager.Instance.OnPurchaseFailed += HandlePurchaseFailed;
+                PurchaseManager.Instance.OnRestorePurchase += HandleRestorePurchase;
             }
         }
 
@@ -37,25 +37,24 @@ namespace Rano.PlatformServices.Billing
             _activated = false;
             if (PurchaseManager.Instance != null)
             {
-                PurchaseManager.Instance.onPurchaseComplete -= OnPurchaseComplete;
-                PurchaseManager.Instance.onPurchaseFailed -= OnPurchaseFailed;
-                PurchaseManager.Instance.onRestorePurchase -= OnRestorePurchase;
+                PurchaseManager.Instance.OnPurchaseComplete -= HandlePurchaseComplete;
+                PurchaseManager.Instance.OnPurchaseFailed -= HandlePurchaseFailed;
+                PurchaseManager.Instance.OnRestorePurchase -= HandleRestorePurchase;
             }
         }
 
-        protected virtual void OnPurchaseComplete(string productId)
+        protected virtual void HandlePurchaseComplete(string productId)
         {
             Reward(productId);
         }
 
-        protected virtual void OnPurchaseFailed(string productId, string errorMessage)
+        protected virtual void HandlePurchaseFailed(string productId, string errorMessage)
         {
-            // Pass   
         }
 
-        protected virtual void OnRestorePurchase(string productId)
+        protected virtual void HandleRestorePurchase(string productId)
         {
-            Log.Info($"구매하셨던 상품을 복구합니다. ({productId})");
+            Log.Info($"구매했던 상품을 복구합니다. ({productId})");
             Reward(productId);
         }
 

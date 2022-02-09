@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections;
+using UnityEngine;
 using UnityEngine.Events;
 using VoxelBusters.CoreLibrary;
 using VoxelBusters.EssentialKit;
@@ -12,19 +13,12 @@ using Rano;
 
 namespace Rano.PlatformServices.Gaming
 {
-    public sealed class GameServiceManager : MonoSingleton<GameServiceManager>
+    public sealed class AuthManager : MonoSingleton<AuthManager>
     {
         public bool IsFeatureAvailable => GameServices.IsAvailable();
         private bool _lastResult = false;
         public bool IsAuthWorking { get; private set; }
-        public bool IsAvailable
-        {
-            get
-            {
-                if (IsFeatureAvailable && GameServices.IsAuthenticated) return true;
-                else return false;
-            }
-        }
+        public bool IsAuthenticated => GameServices.IsAuthenticated;
 
         public ILocalPlayer LocalPlayer
         {
@@ -37,16 +31,16 @@ namespace Rano.PlatformServices.Gaming
         protected override void OnEnable()
         {
             base.OnEnable();
-            GameServices.OnAuthStatusChange += OnAuthStatusChange;
+            GameServices.OnAuthStatusChange += HandleAuthStatusChange;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            GameServices.OnAuthStatusChange -= OnAuthStatusChange;
+            GameServices.OnAuthStatusChange -= HandleAuthStatusChange;
         }
 
-        private void OnAuthStatusChange(GameServicesAuthStatusChangeResult result, Error error)
+        private void HandleAuthStatusChange(GameServicesAuthStatusChangeResult result, Error error)
         {
             if (error == null)
             {
@@ -100,6 +94,12 @@ namespace Rano.PlatformServices.Gaming
                 yield return null;
             }
             onResult?.Invoke(_lastResult);
+        }
+
+        public void Signout()
+        {
+            Log.Info("게임서비스 로그아웃 요청.");
+            GameServices.Signout();
         }
     }
 }

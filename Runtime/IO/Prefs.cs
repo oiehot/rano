@@ -32,17 +32,6 @@ namespace Rano.IO
                 Rano.IO.Prefs.SetBool(Key, value);
             }
         }
-
-        // 구조체인 경우 getter, setter 삭제하고 이 메소드를 사용.
-        //public void SetValue(bool value)
-        //{
-        //    Rano.IO.Prefs.SetBool(Key, value);
-        //}
-
-        //public bool GetValue()
-        //{
-        //    return Rano.IO.Prefs.GetBool(Key, DefaultValue);
-        //}
     }
 
     public static class Prefs

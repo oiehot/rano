@@ -22,13 +22,6 @@ namespace Rano.PlatformServices.Billing
 
     public sealed class PurchaseManager : MonoSingleton<PurchaseManager>
     {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-        /// <summary>
-        /// 이 값이 켜져있으면 시작시 로컬구매목록을 삭제한다. 시뮬레이터가 클라우드의 값이 사라지는 것은 아니다.
-        /// </summary>
-        public PrefsBool ClearPurchaseHistoryOnStart { get; private set; } =
-            new PrefsBool($"{typeof(PurchaseManager).ToString()}.ClearPurchaseHistoryOnStart", false);
-#endif
         public bool IsFeatureAvailable => BillingServices.IsAvailable();
         public bool IsAvailable
         {
@@ -44,9 +37,11 @@ namespace Rano.PlatformServices.Billing
         /// PlatformId가 아닌 Settings에 적혀진 ProductId를 키로 사용한다.
         /// </summary>
         private Dictionary<string, IBillingProduct> _products;
-        public Action<string> onPurchaseComplete;
-        public Action<string, string> onPurchaseFailed;
-        public Action<string> onRestorePurchase;
+
+        public Action<string> OnPurchaseComplete { get; set; }
+        public Action<string, string> OnPurchaseFailed { get; set; }
+        public Action<string> OnRestorePurchase { get; set; }
+        public Action<int> OnRestoreAllPurchasesComplete { get; set; }
 
         protected override void Awake()
         {
@@ -54,12 +49,6 @@ namespace Rano.PlatformServices.Billing
             _products = new Dictionary<string, IBillingProduct>();
             if (BillingServices.IsAvailable())
             {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-                if (ClearPurchaseHistoryOnStart.Value == true)
-                {
-                    ClearPurchaseHistory();
-                }
-#endif
                 BillingServices.InitializeStore();
             }
             else
@@ -71,20 +60,20 @@ namespace Rano.PlatformServices.Billing
         protected override void OnEnable()
         {
             base.OnEnable();
-            BillingServices.OnInitializeStoreComplete += OnInitializeStoreComplete;
-            BillingServices.OnTransactionStateChange += OnTransactionStateChange;
-            BillingServices.OnRestorePurchasesComplete += OnRestorePurchasesComplete;
+            BillingServices.OnInitializeStoreComplete += HandleInitializeStoreComplete;
+            BillingServices.OnTransactionStateChange += HandleTransactionStateChange;
+            BillingServices.OnRestorePurchasesComplete += HandleRestoreAllPurchasesComplete;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            BillingServices.OnInitializeStoreComplete -= OnInitializeStoreComplete;
-            BillingServices.OnTransactionStateChange -= OnTransactionStateChange;
-            BillingServices.OnRestorePurchasesComplete -= OnRestorePurchasesComplete;
+            BillingServices.OnInitializeStoreComplete -= HandleInitializeStoreComplete;
+            BillingServices.OnTransactionStateChange -= HandleTransactionStateChange;
+            BillingServices.OnRestorePurchasesComplete -= HandleRestoreAllPurchasesComplete;
         }
 
-        private void OnInitializeStoreComplete(BillingServicesInitializeStoreResult result, Error error)
+        private void HandleInitializeStoreComplete(BillingServicesInitializeStoreResult result, Error error)
         {
             if (error == null)
             {
@@ -119,7 +108,7 @@ namespace Rano.PlatformServices.Billing
         /// 상품구매를 요청한뒤 결과가 리턴되었을 때 호출된다.
         /// </summary>
         /// <param name="result">결과</param>
-        private void OnTransactionStateChange(BillingServicesTransactionStateChangeResult result)
+        private void HandleTransactionStateChange(BillingServicesTransactionStateChangeResult result)
         {
             IBillingTransaction[] transactions = result.Transactions;
             for (int i = 0; i < transactions.Length; i++)
@@ -131,8 +120,8 @@ namespace Rano.PlatformServices.Billing
                         // TODO: 영수증 검증절차.
                         if (transaction.ReceiptVerificationState == BillingReceiptVerificationState.Success)
                         {
-                            Log.Important($"상품구매 성공. ({transaction.Payment.ProductId})");
-                            onPurchaseComplete?.Invoke(transaction.Payment.ProductId);
+                            Log.Info($"상품구매 성공. ({transaction.Payment.ProductId})");
+                            OnPurchaseComplete?.Invoke(transaction.Payment.ProductId);
                         }
                         else
                         {
@@ -142,7 +131,7 @@ namespace Rano.PlatformServices.Billing
 
                     case BillingTransactionState.Failed:
                         Log.Info($"상품구매 실패. ({transaction.Error.Description})");
-                        onPurchaseFailed?.Invoke(transaction.Payment.ProductId, transaction.Error.Description);
+                        OnPurchaseFailed?.Invoke(transaction.Payment.ProductId, transaction.Error.Description);
                         break;
                 }
             }
@@ -153,19 +142,19 @@ namespace Rano.PlatformServices.Billing
         /// </summary>
         /// <param name="result">결과</param>
         /// <param name="error">에러</param>
-        private void OnRestorePurchasesComplete(BillingServicesRestorePurchasesResult result, Error error)
+        private void HandleRestoreAllPurchasesComplete(BillingServicesRestorePurchasesResult result, Error error)
         {
             if (error == null)
             {
                 IBillingTransaction[] transactions = result.Transactions;
-                Log.Info("구매복구 요청이 완료되었습니다.");
                 Log.Info($"구매복구 할 상품은 총 {transactions.Length} 개 입니다:");
                 for (int i = 0; i < transactions.Length; i++)
                 {
                     IBillingTransaction transaction = transactions[i];
                     Log.Info($"[{i}]: {transaction.Payment.ProductId}");
-                    onRestorePurchase?.Invoke(transaction.Payment.ProductId);
+                    OnRestorePurchase?.Invoke(transaction.Payment.ProductId);
                 }
+                OnRestoreAllPurchasesComplete?.Invoke(transactions.Length);
             }
             else
             {
@@ -207,6 +196,7 @@ namespace Rano.PlatformServices.Billing
             }
         }
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
         /// <summary>
         /// 구매목록을 삭제한다. 클라우드 혹은 시뮬레이터에 남아있는 구매목록이 삭제되는 것은 아니다.
         /// </summary>
@@ -215,15 +205,23 @@ namespace Rano.PlatformServices.Billing
             Log.Info("구매목록 삭제.");
             BillingServices.ClearPurchaseHistory();
         }
+#endif
 
         /// <summary>
-        /// 구매복구를 요청한다.
+        /// 모든 구매항목의 복구를 요청한다.
         /// </summary>
-        [ContextMenu("Restore Purchases")]
-        public void RestorePurchases()
+        public void RestoreAllPurchases()
         {
-            Log.Info("구매복구 요청.");
+            Log.Info("모든 구매항목의 복구를 요청.");
             BillingServices.RestorePurchases();
+        }
+
+        /// <summary>
+        /// 특정 항목의 복구를 요청.
+        /// </summary>
+        public void RestorePurchase(string productId)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
