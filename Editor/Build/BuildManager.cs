@@ -103,7 +103,7 @@ namespace RanoEditor.Build
         [MenuItem("Build/Build Android AppBundle", false, 202)]
         public static void BuildAndroidAppBundle()
         {
-            var builder = new AndroidBuilderAAB(IsDevelopmentBuild);
+            var builder = new AndroidBuilderAAB(IsDevelopmentBuild, IsAutoRun);
             builder.Build();
         }
 

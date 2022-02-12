@@ -42,9 +42,13 @@ namespace RanoEditor.Build
 
     public class AndroidBuilderAAB : AndroidBuilder
     {
-        public AndroidBuilderAAB(bool developmentBuild) : base(developmentBuild)
+        public AndroidBuilderAAB(bool developmentBuild, bool autoRun) : base(developmentBuild)
         {
             EditorUserBuildSettings.buildAppBundle = true;
+            if (autoRun)
+            {
+                _options.options |= BuildOptions.AutoRunPlayer;
+            }
         }
 
         protected override string GetOutputExtension()
