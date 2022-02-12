@@ -16,7 +16,6 @@ namespace Rano.PlatformServices.Gaming
     public sealed class AchievementManager : MonoSingleton<AchievementManager>
     {
         public bool IsFeatureAvailable => GameServices.IsAvailable() && GameServices.IsAuthenticated;
-        public Action OnShowFailed { get; set; }
 
         [ContextMenu("Show Achievements UI")]
         public void ShowAchievementsUI()
@@ -29,20 +28,13 @@ namespace Rano.PlatformServices.Gaming
 
             GameServices.ShowAchievements((GameServicesViewResult result, Error error) =>
             {
-                if (error != null)
-                {
-                    Log.Warning($"업적창 출력 실패 ({error.ToString()})");
-                    OnShowFailed?.Invoke();
-                    return;
-                }
-
                 switch (result.ResultCode)
                 {
                     case GameServicesViewResultCode.Done:
                         Log.Info("업적창이 성공적으로 닫힘");
                         break;
                     case GameServicesViewResultCode.Unknown:
-                        Log.Warning("업적창 닫힘상태를 알 수 없음");
+                        Log.Info("업적창 닫힘상태를 알 수 없음");
                         break;
                 }
             });
@@ -59,7 +51,7 @@ namespace Rano.PlatformServices.Gaming
             {
                 if (error == null)
                 {
-                    Log.Info($"업적 진척도 업데이트 (Id:{achievementId}, 완료율:{percentCompleted}%)");
+                    Log.Info($"업적 진척도 업데이트 성공(Id:{achievementId}, 완료율:{percentCompleted}%)");
                 }
                 else
                 {

@@ -16,7 +16,24 @@ namespace Rano.PlatformServices.Gaming
     public sealed class LeaderboardManager : MonoSingleton<LeaderboardManager>
     {
         public bool IsFeatureAvailable => GameServices.IsAvailable() && GameServices.IsAuthenticated;
-        public Action OnShowFailed { get; set; }
+
+        /// <summary>
+        /// 리더보드에 점수를 업데이트한다.
+        /// </summary>
+        public void ReportScore(string leaderboardId, long score)
+        {
+            GameServices.ReportScore(leaderboardId, score, (Error error) =>
+            {
+                if (error == null)
+                {
+                    Log.Info($"리더보드({leaderboardId})에 점수({score}) 업데이트 성공");
+                }
+                else
+                {
+                    Log.Warning($"리더보드({leaderboardId})에 점수 업데이트 실패 ({error.Description})");
+                }
+            });
+        }
 
         /// <summary>
         /// 전체시간대의 모든 리더보드 출력
@@ -32,28 +49,15 @@ namespace Rano.PlatformServices.Gaming
         /// </summary>
         public void ShowLeaderboards(TimeScope timeScope)
         {
-            if (IsFeatureAvailable == false)
-            {
-                Log.Warning($"게임서비스를 사용할 수 없기 때문에 리더보드창을 띄울 수 없음");
-                return;
-            }
-
             GameServices.ShowLeaderboards(timeScope.ToVoxelBusterEnum(), (GameServicesViewResult result, Error error) =>
             {
-                if (error != null)
-                {
-                    Log.Warning($"리더보드 출력 실패 ({error.ToString()})");
-                    OnShowFailed?.Invoke();
-                    return;
-                }
-
                 switch (result.ResultCode)
                 {
                     case GameServicesViewResultCode.Done:
                         Log.Info("리더보드가 성공적으로 닫힘");
                         break;
                     case GameServicesViewResultCode.Unknown:
-                        Log.Warning("리더보드의 닫힘상태를 알 수 없음");
+                        Log.Info("리더보드의 닫힘상태를 알 수 없음");
                         break;
                 }
             });
@@ -64,30 +68,41 @@ namespace Rano.PlatformServices.Gaming
         /// </summary>
         public void ShowLeaderboard(string leaderboardId, TimeScope timeScope = TimeScope.AllTime)
         {
-            if (IsFeatureAvailable == false)
-            {
-                Log.Warning($"게임서비스를 사용할 수 없기 때문에 리더보드창을 띄울 수 없음");
-                return;
-            }
             GameServices.ShowLeaderboard(leaderboardId, timeScope.ToVoxelBusterEnum(), (GameServicesViewResult result, Error error) =>
             {
-                if (error != null)
-                {
-                    Log.Warning($"리더보드 출력 실패 ({error.ToString()})");
-                    OnShowFailed?.Invoke();
-                    return;
-                }
-
                 switch (result.ResultCode)
                 {
                     case GameServicesViewResultCode.Done:
                         Log.Info("리더보드가 성공적으로 닫힘");
                         break;
                     case GameServicesViewResultCode.Unknown:
-                        Log.Warning("리더보드의 닫힘상태를 알 수 없음");
+                        Log.Info("리더보드의 닫힘상태를 알 수 없음");
                         break;
                 }
             });
         }
+
+#if UNITY_EDITOR
+        [ContextMenu("Print Leaderboards")]
+        public void PrintLeaderboards()
+        {
+            GameServices.LoadLeaderboards((GameServicesLoadLeaderboardsResult result, Error error) => {
+                if (error == null)
+                {
+                    ILeaderboard[] items = result.Leaderboards;
+                    Log.Info($"전체 리더보드 수: {items.Length}");
+                    for (int i = 0; i < items.Length; i++)
+                    {
+                        ILeaderboard item = items[i];
+                        Log.Info($"[{i}] {item}");
+                    }
+                }
+                else
+                {
+                    Log.Warning($"리더보드 로드 실패 ({error.Description})");
+                }
+            });
+        }
+#endif
     }
 }
