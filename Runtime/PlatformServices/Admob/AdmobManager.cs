@@ -17,36 +17,57 @@ namespace Rano.PlatformServices.Admob
     /// </summary>
     public sealed class AdmobManager : MonoSingleton<AdmobManager>
     {
-        private string _testDeviceId
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            = "60170BB4E800B2E49C50C2E22050016E";
-#else
-            = null;
-#endif
-
-        void Start()
+        protected override void Awake()
         {
-            Log.Info($"에드몹 초기화 요청.");
-            if (_testDeviceId != null)
-            {
-                Log.Info($"테스트 디바이스 지정 ({_testDeviceId})");
-                List<string> testDevices = new List<string>();
-                testDevices.Add(_testDeviceId);
-                RequestConfiguration requestConfiguration = new RequestConfiguration
-                    .Builder()
-                    .SetTestDeviceIds(testDevices)
-                    .build();
-                MobileAds.SetRequestConfiguration(requestConfiguration);
-            }
-            else
-            {
-#if DEVELOPMENT_BUILD
-                Log.Warning("테스트 디바이스 Id가 지정되어있지 않음");
+            base.Awake();
+            Log.Info($"Admob Initalize Requested");
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            SetTestDevices();
 #endif
-            }
-
             MobileAds.Initialize(OnInitComplete);
         }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        /// <summary>
+        /// 프로그래머틱 방식으로 테스트장치 설정.
+        /// </summary>
+        /// <remarks>
+        /// Development 빌드로 앱을 실행하면 나오는 로그에서 장치Id를 얻고 여기에 기재하도록 한다.
+        /// 이 데이터는 릴리즈 빌드에 포함되어선 절대 안된다.
+        ///
+        /// 안드로이드 로그의 예)
+        /// I / Ads: Use
+        /// RequestConfiguration.Builder
+        /// .setTestDeviceIds(Arrays.asList("33BE2250B43518CCDA7DE426D04EE231"))
+        /// to get test ads on this device.
+        ///
+        /// iOS 로그의 예)
+        /// <Google> To get test ads on this device, set:
+        /// GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers =
+        /// @[ @"2077ef9a63d2b398840261c8221a0c9b" ];
+        /// 
+        /// https://developers.google.com/admob/unity/test-ads?hl=ko#add_your_test_device_programmatically
+        /// </remarks>
+        private void SetTestDevices()
+        {
+            // TIP: 여기에 테스트 디바이스 Id 를 추가할것.
+            List<string> items = new List<string>{
+                "60170BB4E800B2E49C50C2E22050016E",
+                "26DB568E05A345E163257223FB462AB5"
+            };
+
+            Log.Info($"Set TestDevices:");
+            foreach (var item in items)
+            {
+                Log.Info($"  {item}");
+            }
+            RequestConfiguration requestConfiguration = new RequestConfiguration
+                .Builder()
+                .SetTestDeviceIds(items)
+                .build();
+            MobileAds.SetRequestConfiguration(requestConfiguration);
+        }
+#endif
 
         /// <summary>
         /// 초기화 완료시 호출됨.
@@ -54,7 +75,7 @@ namespace Rano.PlatformServices.Admob
         /// <param name="status"></param>
         private void OnInitComplete(InitializationStatus status)
         {
-            Log.Info($"에드몹 초기화 완료.");
+            Log.Info($"Admob Initialize Completed");
         }
     }
 }

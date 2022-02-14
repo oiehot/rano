@@ -79,46 +79,45 @@ namespace Rano.PlatformServices.Admob
         {
             _canvasSorter = this.GetRequiredComponent<CanvasSorter>();
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !DEVELOPMENT_BUILD && !UNITY_EDITOR
             if (_androidAdUnitId != "")
             {
                 _adUnitId = _androidAdUnitId;
             }
             else
             {
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
-                Log.Info($"{_adName} - 안드로이드 테스트광고Id 사용.");
-                _adUnitId = "ca-app-pub-3940256099942544/5224354917"; // Android 테스트광고
-#else
                 throw new Exception($"{_adName} - 안드로이드 광고Id가 없음.");
-#endif
             }
+#endif
 
+#if UNITY_ANDROID && (DEVELOPMENT_BUILD || UNITY_EDITOR)
+            Log.Info($"{_adName} - 안드로이드 테스트광고Id 사용.");
+            _adUnitId = "ca-app-pub-3940256099942544/5224354917"; // Android 테스트광고
+#endif
 
-#elif UNITY_IOS
+#if UNITY_IOS && !DEVELOPMENT_BUILD && !UNITY_EDITOR
             if (_iosAdUnitId != "")
             {
                 _adUnitId = _iosAdUnitId;
             }
             else
             {
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
+                throw new Exception($"{_adName} - iOS 광고Id가 없음.");
+            }
+#endif
+
+#if UNITY_IOS && (DEVELOPMENT_BUILD || UNITY_EDITOR)
                 Log.Info($"{_adName} - iOS 테스트광고Id 사용.");
                 _adUnitId = "ca-app-pub-3940256099942544/1712485313"; // iOS 테스트광고
-#else
-                throw new Exception($"{_adName} - iOS 광고Id가 없음.");
 #endif
-            }
-#else
 
-
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
-            Log.Info($"{_adName} - 기타플랫폼 테스트광고Id 사용.");
-            _adUnitId = "ca-app-pub-3940256099942544/5224354917"; // Android 테스트광고
-#else
+#if !UNITY_ANDROID && !UNITY_IOS && !DEVELOPMENT_BUILD && !UNITY_EDITOR
             throw new Exception($"{_adName} - 기타 플랫폼용 광고Id가 없음.");
 #endif
 
+#if !UNITY_ANDROID && !UNITY_IOS && (DEVELOPMENT_BUILD || UNITY_EDITOR)
+            Log.Info($"{_adName} - 기타플랫폼 테스트광고Id 사용.");
+            _adUnitId = "ca-app-pub-3940256099942544/5224354917"; // Android 테스트광고           
 #endif
 
             if (_autoLoadOnAwake == true)
@@ -320,32 +319,5 @@ namespace Rano.PlatformServices.Admob
                 HandleAdFailedToShow(null, null);
             }
         }
-
-        ///// <summary>
-        ///// 광고를 로드하고 완료되면 바로 출력한다.
-        ///// </summary>
-        //public void LoadAndShowAd()
-        //{
-        //    StartCoroutine(nameof(CoLoadAndShowAd));
-        //}
-
-        //private IEnumerator CoLoadAd()
-        //{
-        //    LoadAd();
-        //    while (!_ad.IsLoaded())
-        //    {
-        //        yield return YieldCache.WaitForSeconds(0.2f);
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 광고를 로드하고 완료되면 바로 출력하는 코루틴.
-        ///// </summary>
-        ///// <returns></returns>
-        //private IEnumerator CoLoadAndShowAd()
-        //{
-        //    yield return CoLoadAd();
-        //    ShowAd();
-        //}
     }
 }
