@@ -19,13 +19,11 @@ namespace Rano.SaveSystem
 
         void Awake()
         {
-            //Log.Info("Awake");
             if (_autoLoadOnAwake == true) RestoreFromMemory();
         }
 
         void OnDestroy()
         {
-            //Log.Info("OnDestroy");
             if (_autoSaveOnDestroy && InMemoryDatabase.Instance != null)
             {
                 Log.Info("OnDestroy => AutoSave");

@@ -14,7 +14,7 @@ namespace Rano.SaveSystem
 {
     public sealed class SaveableManager : MonoSingleton<SaveableManager>
     {
-        private InMemoryDatabase _db;
+        private InMemoryDatabase _storage;
         public bool IncludeInactive { get; set; } = true;
         public bool AutoSaveOnPause { get; set; } = false;
         public bool AutoSaveOnFocusOut { get; set; } = false;
@@ -24,7 +24,7 @@ namespace Rano.SaveSystem
         protected override void Awake()
         {
             base.Awake();
-            _db = InMemoryDatabase.Instance;
+            _storage = InMemoryDatabase.Instance;
         }
 
         protected override void OnApplicationQuit()
@@ -62,7 +62,7 @@ namespace Rano.SaveSystem
         {
             OnSave?.Invoke();
             CaptureAllSaveableEntities();
-            _db.Save();
+            _storage.Save();
         }
 
         private void CaptureAllSaveableEntities()
@@ -73,7 +73,7 @@ namespace Rano.SaveSystem
                 string id = saveable.Id;
                 Log.Info($"{id} 게임오브젝트 상태저장");
                 var gameObjectState = saveable.CaptureState();
-                _db.SetDictionary(id, gameObjectState);
+                _storage.SetDictionary(id, gameObjectState);
             }
         }
     }

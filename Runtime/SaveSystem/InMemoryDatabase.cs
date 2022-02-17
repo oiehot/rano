@@ -19,12 +19,12 @@ namespace Rano.SaveSystem
         public string SavePath { get; private set; }
         public string TemporarySavePath { get; private set; }
 
-        #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
         public string JsonSavePath => $"{SavePath}.json";
         public string TemporaryJsonSavePath => $"{JsonSavePath}.tmp";
         public PrefsBool ResetOnStart { get; private set; } =
             new PrefsBool($"{typeof(InMemoryDatabase).ToString()}.ResetOnStart");
-        #endif
+#endif
 
         public InMemoryDatabase()
         {
@@ -34,7 +34,7 @@ namespace Rano.SaveSystem
             SavePath = $"{Application.persistentDataPath}/save";
             TemporarySavePath = $"{SavePath}.tmp";
 
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (ResetOnStart.Value == true)
             {
                 Log.Warning($"{ResetOnStart.Key}가 켜져있어 로드하지 않고 시작합니다.");
@@ -43,16 +43,10 @@ namespace Rano.SaveSystem
             {
                 Load();
             }
-            #else
+#else
             Load();
-            #endif
+#endif
         }
-
-        //~InMemoryDatabase()
-        //{
-        //    Log.Sys($"{typeof(InMemoryDatabase).ToString()}: Finalize", caller: false);
-        //    Save();
-        //}
 
         private void UpdateLastModifiedDate()
         {
