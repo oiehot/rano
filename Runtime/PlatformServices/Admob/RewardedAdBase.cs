@@ -58,8 +58,10 @@ namespace Rano.PlatformServices.Admob
 
         [Header("Ad Unit Ids")]
         [SerializeField] private string _adName;
+#pragma warning disable CS0414
         [SerializeField] private string _androidAdUnitId = "";
         [SerializeField] private string _iosAdUnitId = "";
+#pragma warning restore CS0414
         private string _adUnitId;
 
         [Header("Settings")]
