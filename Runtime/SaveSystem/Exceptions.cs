@@ -23,4 +23,26 @@ namespace Rano.SaveSystem
         {
         }
     }
+
+    public class GameObjectDataNotFoundException : Exception
+    {
+        public string SaveableEntityId { get; private set; }
+
+        public GameObjectDataNotFoundException(string saveableEntityId)
+        {
+            SaveableEntityId = saveableEntityId;
+        }
+    }
+
+    public class ComponentDataNotFoundException : Exception
+    {
+        public string SaveableEntityId { get; private set; }
+        public string SaveableComponentName { get; private set; }
+
+        public ComponentDataNotFoundException(string saveableEntityId, string saveableComponentName)
+        {
+            SaveableEntityId = saveableEntityId;
+            SaveableComponentName = saveableComponentName;
+        }
+    }
 }

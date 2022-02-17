@@ -13,20 +13,30 @@ namespace Rano.SaveSystem
     public class SaveableEntity : MonoBehaviour
     {
         [SerializeField] private string _id = string.Empty;
-        [SerializeField] private bool _autoLoadOnAwake = false;
+        [SerializeField] private bool _autoLoad = false;
         [SerializeField] private bool _autoSaveOnDestroy = false;
         public string Id => _id;
 
         void Awake()
         {
-            if (_autoLoadOnAwake == true) RestoreFromMemory();
+            if (_autoLoad == true)
+            {
+                try
+                {
+                    RestoreFromMemory();
+                }
+                catch
+                {
+                    Log.Info($"저장된 데이터가 없거나 복구중에 예외가 발생하여 초기값으로 설정합니다. ({_id})");
+                    DefaultState();
+                }
+            }
         }
 
         void OnDestroy()
         {
             if (_autoSaveOnDestroy && InMemoryDatabase.Instance != null)
             {
-                Log.Info("OnDestroy => AutoSave");
                 CaptureToMemory();
             }
         }
@@ -51,7 +61,6 @@ namespace Rano.SaveSystem
 
         public void ClearState()
         {
-            Log.Info($"빈상태로 설정 ({_id})");
             foreach (var saveableComponent in GetComponents<ISaveLoadable>())
             {
                 saveableComponent.ClearState();
@@ -60,7 +69,6 @@ namespace Rano.SaveSystem
 
         public void DefaultState()
         {
-            Log.Info($"기본상태로 설정 ({_id})");
             foreach (var saveableComponent in GetComponents<ISaveLoadable>())
             {
                 saveableComponent.DefaultState();
@@ -85,38 +93,17 @@ namespace Rano.SaveSystem
             {
                 // TODO: 두 개 이상의 동일컴포넌트가 있는 예외상황 대처.
                 string saveableComponentName = saveableComponent.GetType().ToString();
-                if (componentStates.TryGetValue(saveableComponentName, out object componentState) == false) continue;
-
-                try
+                if (componentStates.TryGetValue(saveableComponentName, out object componentState) == false)
                 {
-                    saveableComponent.ValidateState(componentState);
+                    throw new ComponentDataNotFoundException(_id, saveableComponentName);
                 }
-                catch (Exception e)
-                {
-                    Debug.Log(e.ToString());
-                    Log.Warning($"저장된 데이터가 정상이 아닙니다. 기본상태로 설정합니다 ({saveableComponentName})");
-                    saveableComponent.DefaultState();
-                    continue;
-                }
-
-                try
-                {
-                    saveableComponent.RestoreState(componentState);
-                }
-                catch (Exception e)
-                {
-                    Debug.Log(e.ToString());
-                    Log.Warning($"컴포넌트 상태복구에 실패. 기본상태로 설정합니다 ({saveableComponentName})");
-                    saveableComponent.DefaultState();
-                }
-
-                // Done
+                saveableComponent.ValidateState(componentState);
+                saveableComponent.RestoreState(componentState);
             }
         }
 
         public void CaptureToMemory()
         {
-            Log.Info($"상태저장 {_id} (InMemoryDatabase)");
             var dict = CaptureState();
             InMemoryDatabase.Instance.SetDictionary(_id, dict);
         }
@@ -125,13 +112,11 @@ namespace Rano.SaveSystem
         {
             if (InMemoryDatabase.Instance.HasKey(_id) == true)
             {
-                Log.Info($"상태복구 {_id} (InMemoryDatabase)");
                 RestoreState(InMemoryDatabase.Instance.GetDictionary(_id));
             }
             else
             {
-                Log.Info($"저장데이터 없음 ({_id})");
-                DefaultState();
+                throw new GameObjectDataNotFoundException(_id);
             }
         }
 
