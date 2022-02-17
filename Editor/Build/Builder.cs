@@ -8,9 +8,6 @@ using UnityEditor;
 using UnityEngine;
 using UnityEditor.Build.Reporting;
 using Rano;
-using Rano.App;
-using System.Reflection;
-using UnityEditor.AddressableAssets;
 
 namespace RanoEditor.Build
 {
@@ -71,10 +68,11 @@ namespace RanoEditor.Build
             // 빌드 아웃풋 경로 설정 (파일 경로)
             _options.locationPathName = GetOutputPath();
 
-
             // TODO: 어드레서블 빌드
             Log.Important($"Building Addressable Assets...");
+            PreprocessAddressableBuild();
             UnityEditor.AddressableAssets.Settings.AddressableAssetSettings.BuildPlayerContent();
+            PostprocessAddressableBuild();
 
             // 빌드 시작 전 로그
             string buildVersionStr = VersionManager.GetCurrentVersion().ToString();
@@ -105,6 +103,20 @@ namespace RanoEditor.Build
             }
 
             return report;
+        }
+
+        private void PreprocessAddressableBuild()
+        {
+            InterfaceHelper.CallAllInterfacesMethod(
+                typeof(IPreprocessAddressableBuild),
+                nameof(IPreprocessAddressableBuild.OnPreprocessAddressableBuild));
+        }
+
+        private void PostprocessAddressableBuild()
+        {
+            InterfaceHelper.CallAllInterfacesMethod(
+                typeof(IPostprocessAddressableBuild),
+                nameof(IPostprocessAddressableBuild.OnPostprocessAddressableBuild));
         }
     }
 }
