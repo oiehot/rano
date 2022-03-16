@@ -12,6 +12,7 @@ namespace Rano
     /// <summary>
     /// 코루틴의 성능을 높이도록 자주 사용하는 Wait* 를 캐싱해두는 클래스.
     /// </summary>
+    // TODO: Rename YieldCache to CoroutineYieldCache
     public static class YieldCache
     {
         #region WaitFor

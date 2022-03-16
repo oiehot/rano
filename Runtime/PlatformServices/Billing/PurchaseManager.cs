@@ -22,7 +22,21 @@ namespace Rano.PlatformServices.Billing
 
     public sealed class PurchaseManager : MonoSingleton<PurchaseManager>
     {
-        public bool IsFeatureAvailable => BillingServices.IsAvailable();
+        public bool IsFeatureAvailable
+        {
+            get
+            {
+                try
+                {
+                    return BillingServices.IsAvailable();
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
         public bool IsAvailable
         {
             get
@@ -49,7 +63,14 @@ namespace Rano.PlatformServices.Billing
             _products = new Dictionary<string, IBillingProduct>();
             if (BillingServices.IsAvailable())
             {
-                BillingServices.InitializeStore();
+                try
+                {
+                    BillingServices.InitializeStore();
+                }
+                catch
+                {
+                    Log.Warning($"스토어 초기화에 실패했습니다.");
+                }
             }
             else
             {
@@ -78,7 +99,7 @@ namespace Rano.PlatformServices.Billing
             if (error == null)
             {
                 IBillingProduct[] products = result.Products;
-                Log.Info("인앱상품 결제서비스 초기화 완료.");
+                Log.Info("인앱상품 결제서비스 초기화 완료.");
                 Log.Info($"총 {products.Length} 개의 상품이 있습니다:");
                 for (int i = 0; i < products.Length; i++)
                 {
