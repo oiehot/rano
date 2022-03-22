@@ -141,6 +141,15 @@ namespace Rano.Encoding.Csv
                             finalValue = float.Parse(value, NUMBER_STYLE);
                             break;
 
+                        case "hexcolor":
+                            UnityEngine.Color color;
+                            if (!UnityEngine.ColorUtility.TryParseHtmlString(value, out color))
+                            {
+                                throw new Exception($"컬러값의 파싱에 실패 ({value})");
+                            }
+                            finalValue = color;
+                            break;
+
                         case "str":
                         case "string":
                             finalValue = value;
