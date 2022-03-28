@@ -13,7 +13,7 @@ namespace Rano
     public static class BoundsExtensions
     {
         /// <summary>
-        /// ÁÖ¾îÁø Bounds °ª°ú ÇÕÄ£ Bounds·Î ¾÷µ¥ÀÌÆ® ÇÑ´Ù.
+        /// ì£¼ì–´ì§„ Bounds ê°’ê³¼ í•©ì¹œ Boundsë¡œ ì—…ë°ì´íŠ¸ í•œë‹¤.
         /// </summary>
         public static void Combine(this ref Bounds bounds, Bounds item)
         {
@@ -21,7 +21,7 @@ namespace Rano
         }
 
         /// <summary>
-        /// ÁÖ¾îÁø Bounds °ªµé°ú ÇÕÄ£ Bounds·Î ¾÷µ¥ÀÌÆ® ÇÑ´Ù.
+        /// ì£¼ì–´ì§„ Bounds ê°’ë“¤ê³¼ í•©ì¹œ Boundsë¡œ ì—…ë°ì´íŠ¸ í•œë‹¤.
         /// </summary>
         public static void Combine(this ref Bounds bounds, IEnumerable<Bounds> items)
         {
@@ -29,6 +29,22 @@ namespace Rano
             {
                 bounds.Encapsulate(item);
             }
+        }
+        
+        /// <summary>
+        /// ì¤‘ì•™ì ì„ ê¸°ì¤€ìœ¼ë¡œ ìŠ¤ì¼€ì¼ì„ ë³€ê²½í•œë‹¤.
+        /// </summary>
+        public static void Multiply(this ref Bounds bounds, float scale)
+        {
+            bounds.extents *= scale;
+        }
+
+        /// <summary>
+        /// Width/Height ë¹„ë¡€ë¥¼ ì–»ëŠ”ë‹¤.
+        /// </summary>
+        public static float GetAspect(this Bounds bounds)
+        {
+            return bounds.size.x / bounds.size.y;
         }
     }
 }
