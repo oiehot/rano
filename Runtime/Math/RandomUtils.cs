@@ -12,6 +12,16 @@ namespace Rano
     /// </summary>
     public static class RandomUtils
     {
+        public static int GetRandomInt(int minInclusive, int maxExclusive)
+        {
+            return UnityEngine.Random.Range(minInclusive, maxExclusive);
+        }
+        
+        public static float GetRandomFloat(float minInclusive, float maxInclusive)
+        {
+            return UnityEngine.Random.Range(minInclusive, maxInclusive);
+        }
+        
         /// <summary>
         /// 랜덤한 참/거짓 값을 돌려준다.
         /// </summary>
