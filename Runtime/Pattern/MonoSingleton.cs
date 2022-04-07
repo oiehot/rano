@@ -70,7 +70,7 @@ namespace Rano
             if (_instance && _instance != this)
             {
                 Log.Error($"{typeof(T)} 가 이미 존재합니다!");
-                Destroy(gameObject);
+                // Destroy(gameObject);
                 return;
             }
             Log.Sys($"{typeof(T).ToString()}: Awake", caller: false);
