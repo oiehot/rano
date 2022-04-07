@@ -13,6 +13,7 @@ namespace RanoEditor.Build
 {
     public static class BuildManager
     {
+        private const int PRIORITY = 200;
         public const string DevelopmentBuildName = "Build/Development Build";
         public const string AddressableBuildName = "Build/Adressable Build";
         public const string AutoRunBuildName = "Build/Auto Run";
@@ -44,7 +45,7 @@ namespace RanoEditor.Build
             return true;
         }
         /// <summary>자동 빌드 버젼 증가 체크</summary>
-        [MenuItem(DevelopmentBuildName, false, 100)]
+        [MenuItem(DevelopmentBuildName, false, PRIORITY+1)]
         private static void SetDevelopmentBuild()
         {
             IsDevelopmentBuild = !IsDevelopmentBuild;
@@ -64,7 +65,7 @@ namespace RanoEditor.Build
         }
 
         /// <summary>자동 빌드 버젼 증가 체크</summary>
-        [MenuItem(AddressableBuildName, false, 101)]
+        [MenuItem(AddressableBuildName, false, PRIORITY+2)]
         private static void SetAddressableBuild()
         {
             IsAdressableBuild = !IsAdressableBuild;
@@ -83,7 +84,7 @@ namespace RanoEditor.Build
             return true;
         }
 
-        [MenuItem(AutoRunBuildName, false, 102)]
+        [MenuItem(AutoRunBuildName, false, PRIORITY+3)]
         private static void SetAutoRun()
         {
             IsAutoRun = !IsAutoRun;
@@ -93,21 +94,21 @@ namespace RanoEditor.Build
 
         #endregion
 
-        [MenuItem("Build/Build Android APK", false, 201)]
+        [MenuItem("Build/Build Android APK", false, PRIORITY+21)]
         public static void BuildAndroidAPK()
         {
             var builder = new AndroidBuilderAPK(IsDevelopmentBuild, IsAutoRun);
             builder.Build();
         }
 
-        [MenuItem("Build/Build Android AppBundle", false, 202)]
+        [MenuItem("Build/Build Android AppBundle", false, PRIORITY+22)]
         public static void BuildAndroidAppBundle()
         {
             var builder = new AndroidBuilderAAB(IsDevelopmentBuild, IsAutoRun);
             builder.Build();
         }
 
-        [MenuItem("Build/Open Build Folder", false, 300)]
+        [MenuItem("Build/Open Build Folder", false, PRIORITY+33)]
         public static void OpenBuildFolder()
         {
             Log.Info($"Open Build Folder: {BuildPath}");

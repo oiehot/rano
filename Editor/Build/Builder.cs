@@ -57,6 +57,18 @@ namespace RanoEditor.Build
         public virtual BuildReport Build()
         {
             BuildReport report;
+            
+            // // 모든 BuildScene중 Missing레퍼런스를 찾는다.
+            // if (MissingReferenceFinder.FindMissingReferencesInBuildScenes() == false)
+            // {
+            //     
+            // }
+            //
+            // // 에셋중 Missing레퍼런스를 찾는다.
+            // if (MissingReferenceFinder.FindMissingReferencesInAssets() == false)
+            // {
+            //     
+            // }
 
             // 빌드 아웃풋 디렉토리가 없으면 생성한다.
             DirectoryInfo buildDirectory = new DirectoryInfo(GetOutputDirectory());

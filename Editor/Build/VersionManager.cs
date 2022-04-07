@@ -20,7 +20,8 @@ namespace RanoEditor.Build
     [InitializeOnLoad]
     public class VersionManager : IPostprocessBuildWithReport
     {
-        private const string _autoIncreaseMenuName = "Build/Auto Increase Build Version";
+        private const int PRIORITY = 100;
+        private const string AUTO_INCREASE_MENU_NAME = "Build/Auto Increase Build Version";
         public static bool IsAutoIncrease { get; private set; } = true;
         public static Version LastVersion { get; private set; }
         public static Version CurrentVersion { get; private set; }
@@ -39,7 +40,7 @@ namespace RanoEditor.Build
         static VersionManager()
         {
             // 환경세팅에 자동 빌드 버젼 증가여부 저장
-            IsAutoIncrease = EditorPrefs.GetBool(_autoIncreaseMenuName, true);
+            IsAutoIncrease = EditorPrefs.GetBool(AUTO_INCREASE_MENU_NAME, true);
             CurrentVersion = GetCurrentVersion(); 
             LastVersion = CurrentVersion;
         }
@@ -47,10 +48,10 @@ namespace RanoEditor.Build
         /// <todo>
         /// 자동 빌드 버젼 증가 속성에 따라 메뉴 활성화 여부 결정
         /// </todo>
-        [MenuItem(_autoIncreaseMenuName, true)]
+        [MenuItem(AUTO_INCREASE_MENU_NAME, true, PRIORITY+1)]
         private static bool SetAutoIncreaseValidate()
         {
-            Menu.SetChecked(_autoIncreaseMenuName, IsAutoIncrease);
+            Menu.SetChecked(AUTO_INCREASE_MENU_NAME, IsAutoIncrease);
             return true;
         }
 
@@ -82,21 +83,21 @@ namespace RanoEditor.Build
         /// <summary>
         /// 자동 빌드 버젼 증가 체크
         /// </summary>
-        [MenuItem(_autoIncreaseMenuName, false, 1)]
+        [MenuItem(AUTO_INCREASE_MENU_NAME, false, PRIORITY+1)]
         private static void SetAutoIncrease()
         {
             IsAutoIncrease = !IsAutoIncrease;
-            EditorPrefs.SetBool(_autoIncreaseMenuName, IsAutoIncrease);
+            EditorPrefs.SetBool(AUTO_INCREASE_MENU_NAME, IsAutoIncrease);
             Log.Info($"Auto Increase Build Version: {IsAutoIncrease}");
         }
 
-        [MenuItem("Build/Check Current Version", false, 2)]
+        [MenuItem("Build/Check Current Version", false, PRIORITY+2)]
         private static void CheckCurrentVersion()
         {
             Log.Info($"Build v{CurrentVersionString}");
         }
 
-        [MenuItem("Build/Edit Version", false, 3)]
+        [MenuItem("Build/Edit Version", false, PRIORITY+3)]
         static void OpenEditVersionWindow()
         {
             VersionEditor window = EditorWindow.CreateInstance<VersionEditor>();
