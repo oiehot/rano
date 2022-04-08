@@ -1,4 +1,6 @@
-﻿// Copyright (C) OIEHOT - All Rights Reserved
+﻿#if false
+
+// Copyright (C) OIEHOT - All Rights Reserved
 // Unauthorized copying of this file, via any medium is strictly prohibited
 // Proprietary and confidential
 // Written by Taewoo Lee <oiehot@gmail.com>
@@ -17,10 +19,9 @@ namespace RanoEditor.Build
 	/// </summary>
 	public class SpriteAtlasChecker : IPreprocessBuildWithReport
 	{
-		public int callbackOrder => 0;
-
+		public int callbackOrder => 0;	
 		public void OnPreprocessBuild(BuildReport report)
-        {
+		{
 	        var assets = AssetDatabase.GetAllAssetPaths().Where(path => path.StartsWith("Assets/")).ToArray();
 	        var items = assets.Select(a => AssetDatabase.LoadAssetAtPath(a, typeof(SpriteAtlas)) as SpriteAtlas)
 		        .Where(item => item != null).ToArray();
@@ -35,3 +36,4 @@ namespace RanoEditor.Build
         }
 	}
 }
+#endif
