@@ -11,98 +11,92 @@ namespace Rano
     {
         // Position
 
-        public static void SetY(this RectTransform rect, float y)
+        public static void SetY(this RectTransform rectTransform, float y)
         {
-            float x = rect.anchoredPosition.x;
-            rect.anchoredPosition = new Vector2(x, y);
+            float x = rectTransform.anchoredPosition.x;
+            rectTransform.anchoredPosition = new Vector2(x, y);
         }
 
-        public static void MoveY(this RectTransform rect, float offsetY)
+        public static void MoveY(this RectTransform rectTransform, float offsetY)
         {
-            float x = rect.anchoredPosition.x;
-            float y = rect.anchoredPosition.y;
-            rect.anchoredPosition = new Vector2(x, y + offsetY);
+            float x = rectTransform.anchoredPosition.x;
+            float y = rectTransform.anchoredPosition.y;
+            rectTransform.anchoredPosition = new Vector2(x, y + offsetY);
         }
 
         // Width, Height
 
-        /// <summary>
-        /// RectTransform�� ���� ��´�. Awake�� Start�� �ٷ� ����ϸ� �������� ���� �ȳ��� �� �ִ�.
-        /// </summary>
-        public static float GetWidth(this RectTransform rect)
+        public static float GetWidth(this RectTransform rectTransform)
         {
             //return rect.sizeDelta.x;
-            return rect.rect.width;
+            return rectTransform.rect.width;
         }
 
-        /// <summary>
-        /// RectTransform�� ���̸� ��´�. Awake�� Start�� �ٷ� ����ϸ� �������� ���� �ȳ��� �� �ִ�.
-        /// </summary>
-        public static float GetHeight(this RectTransform rect)
+        public static float GetHeight(this RectTransform rectTransform)
         {
             //return rect.sizeDelta.y;
-            return rect.rect.height;
+            return rectTransform.rect.height;
         }
 
-        public static void SetWidth(this RectTransform rect, float width)
+        public static void SetWidth(this RectTransform rectTransform, float width)
         {
-            rect.sizeDelta = new Vector2(width, rect.sizeDelta.y);
+            rectTransform.sizeDelta = new Vector2(width, rectTransform.sizeDelta.y);
         }
         
-        public static void SetHeight(this RectTransform rect, float height)
+        public static void SetHeight(this RectTransform rectTransform, float height)
         {
-            rect.sizeDelta = new Vector2(rect.sizeDelta.x, height);
+            rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, height);
         }
         
-        public static void SetSize(this RectTransform rect, float width, float height)
+        public static void SetSize(this RectTransform rectTransform, float width, float height)
         {
-            rect.sizeDelta = new Vector2(width, height);
+            rectTransform.sizeDelta = new Vector2(width, height);
         }
 
         // Left, Right, Top, Bottom
 
-        public static float GetLeft(this RectTransform rect)
+        public static float GetLeft(this RectTransform rectTransform)
         {
-            return rect.offsetMin.x;
+            return rectTransform.offsetMin.x;
         }
 
-        public static float GetRight(this RectTransform rect)
+        public static float GetRight(this RectTransform rectTransform)
         {
-            return rect.offsetMax.x;
+            return rectTransform.offsetMax.x;
         }
 
-        public static void SetLeft(this RectTransform rect, float left)
+        public static void SetLeft(this RectTransform rectTransform, float left)
         {
-            rect.offsetMin = new Vector2(left, rect.offsetMin.y);
+            rectTransform.offsetMin = new Vector2(left, rectTransform.offsetMin.y);
         }
             
-        public static void SetRight(this RectTransform rect, float right)
+        public static void SetRight(this RectTransform rectTransform, float right)
         {
-            rect.offsetMax = new Vector2(-right, rect.offsetMax.y);
+            rectTransform.offsetMax = new Vector2(-right, rectTransform.offsetMax.y);
         }
     
-        public static void SetTop(this RectTransform rect, float top)
+        public static void SetTop(this RectTransform rectTransform, float top)
         {
-            rect.offsetMax = new Vector2(rect.offsetMax.x, -top);
+            rectTransform.offsetMax = new Vector2(rectTransform.offsetMax.x, -top);
         }
     
-        public static void SetBottom(this RectTransform rect, float bottom)
+        public static void SetBottom(this RectTransform rectTransform, float bottom)
         {
-            rect.offsetMin = new Vector2(rect.offsetMin.x, bottom);
+            rectTransform.offsetMin = new Vector2(rectTransform.offsetMin.x, bottom);
         }
 
         //  Padding
 
-        public static void SetPadding(this RectTransform rect, float horizontal, float vertical)
+        public static void SetPadding(this RectTransform rectTransform, float horizontal, float vertical)
         {
-            rect.offsetMax = new Vector2(-horizontal, -vertical);
-            rect.offsetMin = new Vector2(horizontal, vertical);
+            rectTransform.offsetMax = new Vector2(-horizontal, -vertical);
+            rectTransform.offsetMin = new Vector2(horizontal, vertical);
         }
 
-        public static void SetPadding(this RectTransform rect, float left, float top, float right, float bottom)
+        public static void SetPadding(this RectTransform rectTransform, float left, float top, float right, float bottom)
         {
-            rect.offsetMax = new Vector2(-right, -top);
-            rect.offsetMin = new Vector2(left, bottom);
+            rectTransform.offsetMax = new Vector2(-right, -top);
+            rectTransform.offsetMin = new Vector2(left, bottom);
         }
     }
 }
