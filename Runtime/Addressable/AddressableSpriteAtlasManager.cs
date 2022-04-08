@@ -56,6 +56,15 @@ namespace Rano.Addressable
             SpriteAtlasManager.atlasRegistered -= HandleAtlasRegistered;
         }
 
+        /// <summary>
+        /// SpriteAtlasManager의 아틀라스 요청 콜백에 의해 호출된다.
+        /// 요청이 들어오면 로드된 SpriteAtlas가 있는지 찾고 있으면 콜백을 통해 응답, 전달한다.
+        /// </summary>
+        /// <remarks>
+        /// 요청은 SpriteAtlas에셋의 이름을 사용한다. 어드레서블 키 값이 아님에 주의할것.
+        /// </remarks>
+        /// <param name="name">SpriteAtlasManager가 요청할 때 사용하는 에셋의 이름. 어드레서블 키 값이 아니다.</param>
+        /// <param name="callback">SpriteAtlasManager에 응답할 떄 사용. 얻은 SpriteAtlas를 매개변수로 담아 콜백하여 전달한다.</param>
         private void HandleRequestAtlas(string name, System.Action<SpriteAtlas> callback)
         {
             SpriteAtlas spriteAtlas;
