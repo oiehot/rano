@@ -5,89 +5,85 @@
 
 using System;
 using System.Collections;
+using System.Diagnostics.Eventing.Reader;
+using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 using UnityEngine.Events;
 using Rano;
 
 namespace Rano.Network
 {
+    public enum NetworkState
+    {
+        Unknown = -1,
+        Disconnected = 0,
+        Connected = 1
+    }
+    
     public sealed class NetworkManager : MonoSingleton<NetworkManager>
     {
-        public bool isConnected { get; private set; }
+        private NetworkState _state;
 
         [Header("Ping")]
         public string pingAddress = "8.8.8.8";
         public float pingWaitTime = 0.5f;
-        public float pingNextTime = 5.0f;
+        public float pingNextTime = 3.0f;
 
-        [Header("Events")]
+        [Header("Event Callbacks")]
         public Action onConnected;
         public Action onDisconnected;
 
-        protected override void Awake()
-        {
-            base.Awake();
-            isConnected = false;
-        }
+        /// <summary>네트워크 연결상태를 리턴한다.</summary>
+        /// <example>
+        /// networkManager.Status == NetworkStatus.Connected;
+        /// </example>
+        public NetworkState State => _state;
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            StartCoroutine(nameof(CoUpdate));
+            StartCoroutine(nameof(UpdateCoroutine));
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            StopCoroutine(nameof(CoUpdate));
+            StopCoroutine(nameof(UpdateCoroutine));
         }
-
-        IEnumerator CoUpdate()
+        
+        private IEnumerator UpdateCoroutine()
         {
             Ping ping;
-
+            _state = NetworkState.Unknown;
+            
             while (true)
             {
-                // 핑 발사
                 ping = new Ping(pingAddress);
+                yield return YieldCache.WaitForSeconds(pingWaitTime);
 
-                // 핑 대기
-                yield return new WaitForSeconds(pingWaitTime);
-
-                if (ping.isDone)
+                if (ping.isDone && ping.time >= 0)
                 {
-                    if (ping.time >=0)
+                    /* Ping recevied,  Set to Connected */
+                    if (_state == NetworkState.Unknown || _state == NetworkState.Disconnected)
                     {
-                        // OFF > ON
-                        if (isConnected == false)
-                        {
-                            onConnected?.Invoke();
-                            isConnected = true;
-                        }
-                    }
-                    else
-                    {
-                        // Ping 실패 (-1 리턴)
-                        // ON >> OFF
-                        if (isConnected)
-                        {
-                            onDisconnected?.Invoke();
-                            isConnected = false;
-                        }
+                        Log.Sys("Network Connected");
+                        _state = NetworkState.Connected;
+                        onConnected?.Invoke();
                     }
                 }
                 else
                 {
-                    // Timeout 으로 인한 Ping 실패
-                    if (isConnected)
+                    /* Ping not received or timeout, Set to Disconnected */
+                    if (_state == NetworkState.Unknown || _state == NetworkState.Connected)
                     {
+                        Log.Sys("Network Disconnected");
+                        _state = NetworkState.Disconnected;
                         onDisconnected?.Invoke();
-                        isConnected = false;
                     }
                 }
 
-                // 다음 시도 기다림
-                yield return new WaitForSeconds(pingNextTime);
+                // Retry after a while
+                yield return YieldCache.WaitForSeconds(pingNextTime);
             }
         }
     }

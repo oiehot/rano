@@ -5,10 +5,8 @@
 
 using System;
 using System.Collections;
-using UnityEngine;
 using System.Threading.Tasks;
 using UnityEngine.Networking;
-using Rano;
 
 namespace Rano.Network
 {
@@ -33,14 +31,13 @@ namespace Rano.Network
             {
                 UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
 
-                // TODO: Wait for done
+                // Wait for done
                 while (!asyncOperation.isDone)
                 {
                     await Task.Yield();
                 }
 
-                UnityWebRequest.Result requestResult;
-                requestResult = request.result;
+                // var requestResult = request.result;
                 if (request.error == null)
                 {
                     Log.Info($"GET Success ({url})");
@@ -54,15 +51,14 @@ namespace Rano.Network
             }
         }
 
-        public static IEnumerator CoGetString(string url, Action<HttpRequestResult, string> onResult)
+        public static IEnumerator GetStringCoroutine(string url, Action<HttpRequestResult, string> onResult)
         {
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
                 yield return asyncOperation; // 완료될 때까지 대기
 
-                UnityWebRequest.Result requestResult;
-                requestResult = request.result;
+                var requestResult = request.result;
                 switch (requestResult)
                 {
                     case UnityWebRequest.Result.ConnectionError:
@@ -77,6 +73,8 @@ namespace Rano.Network
                         string result = downloadHandler.text;
                         onResult?.Invoke(HttpRequestResult.Success, result);
                         break;
+                    default:
+                        throw new Exception($"Unprocessable Result ({requestResult})");
                 }
             }
         }
