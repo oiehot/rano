@@ -3,7 +3,9 @@
     "rootNamespace": "",
     "references": [
         "Rano",
-        "Unity.Addressables.Editor"
+        "Unity.Addressables.Editor",
+        "VoxelBusters.CoreLibrary.NativePlugins",
+        "VoxelBusters.EssentialKit"
     ],
     "includePlatforms": [
         "Editor"
