@@ -5,7 +5,8 @@
         "Rano",
         "Unity.Addressables.Editor",
         "VoxelBusters.CoreLibrary.NativePlugins",
-        "VoxelBusters.EssentialKit"
+        "VoxelBusters.EssentialKit",
+        "GoogleMobileAds.Editor"
     ],
     "includePlatforms": [
         "Editor"
