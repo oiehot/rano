@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEditor;
 using Rano;
 
-namespace RanoEditor
+namespace RanoEditor.Inspector
 {
     /// <summary>ShowOnly 속성이 적용된 프로퍼티를 인스펙터에서 그린다.</summary>
     [CustomPropertyDrawer(typeof(ShowOnlyAttribute))]
