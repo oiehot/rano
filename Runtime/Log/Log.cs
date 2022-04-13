@@ -1,9 +1,5 @@
-// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
 using System;
+using System.IO;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -18,9 +14,9 @@ namespace Rano
     {
         private static string ToShortFilepath(string filePath)
         {
-            string[] tokens = filePath.Split('/');
-            string filenameWithExt = tokens[tokens.Length - 1];
-            return System.IO.Path.GetFileNameWithoutExtension(filenameWithExt);
+            var tokens = filePath.Split(new[] { '/', '\\' });
+            var filenameWithExt = tokens[tokens.Length - 1];
+            return Path.GetFileNameWithoutExtension(filenameWithExt);
         }
 
 #if UNITY_EDITOR
