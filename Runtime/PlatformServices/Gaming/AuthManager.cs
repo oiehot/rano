@@ -1,12 +1,6 @@
-﻿// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
-using System;
+﻿using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 using VoxelBusters.CoreLibrary;
 using VoxelBusters.EssentialKit;
 using Rano;
@@ -15,18 +9,12 @@ namespace Rano.PlatformServices.Gaming
 {
     public sealed class AuthManager : MonoSingleton<AuthManager>
     {
-        public bool IsFeatureAvailable => GameServices.IsAvailable();
         private bool _lastResult = false;
+        
+        public bool IsFeatureAvailable => GameServices.IsAvailable();
         public bool IsAuthWorking { get; private set; }
         public bool IsAuthenticated => GameServices.IsAuthenticated;
-
-        public ILocalPlayer LocalPlayer
-        {
-            get
-            {
-                return GameServices.LocalPlayer;
-            }
-        }
+        public ILocalPlayer LocalPlayer => GameServices.LocalPlayer;
 
         protected override void OnEnable()
         {
@@ -76,26 +64,29 @@ namespace Rano.PlatformServices.Gaming
                 IsAuthWorking = false;
             }
         }
+        
+        public IEnumerator AuthenticateCoroutine(Action<bool> onResult = null)
+        {
+            if (IsAuthWorking == true) yield break;
+            IsAuthWorking = true;
+            Log.Info("게임서비스 로그인 요청.");
+            GameServices.Authenticate();
+            yield return new WaitUntil(() => IsAuthWorking == true);
 
+        onResult?.Invoke(_lastResult);
+        }
+
+        /// <summary>
+        /// 게임서비스 로그인
+        /// </summary>
         public void Authenticate(Action<bool> onResult=null)
         {
             StartCoroutine(AuthenticateCoroutine(onResult));
         }
 
-        public IEnumerator AuthenticateCoroutine(Action<bool> onResult=null)
-        {
-            if (IsAuthWorking == true) yield break;
-            IsAuthWorking = true;
-
-            Log.Info("게임서비스 로그인 요청.");
-            GameServices.Authenticate();
-            while (IsAuthWorking == true)
-            {
-                yield return null;
-            }
-            onResult?.Invoke(_lastResult);
-        }
-
+        /// <summary>
+        /// 게임서비스 로그아웃
+        /// </summary>
         public void Signout()
         {
             Log.Info("게임서비스 로그아웃 요청.");

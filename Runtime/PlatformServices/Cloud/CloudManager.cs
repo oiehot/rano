@@ -1,12 +1,5 @@
-﻿// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
-using System;
+﻿using System;
 using System.Collections;
-using UnityEngine;
-using UnityEngine.Events;
 using VoxelBusters.CoreLibrary;
 using VoxelBusters.EssentialKit;
 
@@ -180,7 +173,7 @@ namespace Rano.PlatformServices.Cloud
             StartCoroutine(CoSynchronize(onResult));
         }
 
-        #region 로컬카피 편집 메소드들
+    #region 로컬카피 편집 메소드들
 
         public void SetBool(string key, bool value) => CloudServices.SetBool(key, value);
         public void SetByteArray(string key, byte[] value) => CloudServices.SetByteArray(key, value);
@@ -219,6 +212,6 @@ namespace Rano.PlatformServices.Cloud
             else return false;
         }
 
-#endregion
+    #endregion
     }
 }

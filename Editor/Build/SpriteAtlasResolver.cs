@@ -1,10 +1,6 @@
-﻿// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Rano;
 using UnityEngine.U2D;
 using UnityEditor;
 using UnityEditor.Build;
@@ -45,7 +41,7 @@ namespace RanoEditor.Build
         /// </summary>
         public void OnPreprocessBuild(BuildReport report)
         {
-            Debug.Log("모든 SpriteAtlas 에셋의 IncludeInBuild를 끕니다.");
+            Log.Info("모든 SpriteAtlas 에셋의 IncludeInBuild를 끕니다.");
             _flags.Clear();
             var assetPaths = AssetDatabase.GetAllAssetPaths().Where(path => path.StartsWith("Assets/")).ToArray();
             foreach (var assetPath in assetPaths)
@@ -67,7 +63,7 @@ namespace RanoEditor.Build
         /// </summary>
         public void OnPostprocessBuild(BuildReport report)
         {
-            Debug.Log("모든 SpriteAtlas 에셋의 IncludeInBuild를 원상복구합니다.");
+            Log.Info("모든 SpriteAtlas 에셋의 IncludeInBuild를 원상복구합니다.");
             foreach (var kv in _flags)
             {
                 var assetPath = kv.Key;

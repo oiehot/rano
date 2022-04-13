@@ -71,14 +71,14 @@ namespace Rano.Addressable
 
             if (TryGetLoadedSpriteAtlas(name, out spriteAtlas))
             {
-                Log.Info($"SpriteAtlas is requested, Sends the Loaded SpriteAtlas ({name})");
+                Log.Info($"SpriteAtlas is requested. Sends the Loaded SpriteAtlas ({name})");
                 callback(spriteAtlas);
                 return;
             }
             else
             {
                 // 이 메시지가 출력되지 않게 하려면 SpriteAtlas를 미리 로드하면 된다.
-                Log.Warning($"SpriteAtlas is requested, But SpriteAtlas is not Loaded ({name})");
+                Log.Warning($"SpriteAtlas is requested. But SpriteAtlas is not Loaded. Please insert the code to load SpriteAtlas. ({name})");
                 // _atlasRequests[name] = callback;
             }
         }

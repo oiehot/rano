@@ -22,7 +22,7 @@ namespace Rano
                 {
                     if (_instance == null)
                     {
-                        Log.Sys($"Loading SingletonScriptableObject from Resources ({typeof(T).Name})");
+                        Log.Info($"Loading SingletonScriptableObject from Resources ({typeof(T).Name})");
                         _instance = Resources.Load(typeof(T).Name) as T;
                     }
                     return _instance;
