@@ -35,7 +35,6 @@ namespace Rano.PlatformServices.Admob
         private int _adLoadCount = 0;
         
         [Header("Ad Settings")]
-        private string _adUnitId;
         [SerializeField] private AdSO _adInfo;
 
         [Header("Settings")]
@@ -49,8 +48,9 @@ namespace Rano.PlatformServices.Admob
         public Action<int, string> OnAdReward { get; set; }
         public Action OnAdFailedToLoad { get; set; }
         public Action OnAdFailedToShow { get; set; }
-        
+
         public string AdName => _adInfo.adName;
+        public string AdUnitId => _adInfo.UnitId;
         
         public AdLoadStatus LoadStatus
         {
@@ -68,48 +68,6 @@ namespace Rano.PlatformServices.Admob
         void Awake()
         {
             _canvasSorter = this.GetRequiredComponent<CanvasSorter>();
-
-#if  UNITY_ANDROID && !DEVELOPMENT_BUILD && !UNITY_EDITOR
-            if (!String.IsNullOrEmpty(_adInfo.androidUnitId))
-            {
-                _adUnitId = _adInfo.androidUnitId;
-            }
-            else
-            {
-                throw new Exception($"{AdName} - 안드로이드 광고Id가 없음.");
-            }
-#endif
-
-#if UNITY_ANDROID && (DEVELOPMENT_BUILD || UNITY_EDITOR)
-            Log.Info($"{AdName} - 안드로이드 테스트광고Id 사용.");
-            _adUnitId = "ca-app-pub-3940256099942544/5224354917"; // Android 테스트광고
-#endif
-
-#if UNITY_IOS && !DEVELOPMENT_BUILD && !UNITY_EDITOR
-            if (!String.IsNullOrEmpty(_adInfo.iosUnitId))
-            {
-                _adUnitId = _adInfo.iosUnitId;
-            }
-            else
-            {
-                throw new Exception($"{AdName} - iOS 광고Id가 없음.");
-            }
-#endif
-
-#if UNITY_IOS && (DEVELOPMENT_BUILD || UNITY_EDITOR)
-                Log.Info($"{AdName} - iOS 테스트광고Id 사용.");
-                _adUnitId = "ca-app-pub-3940256099942544/1712485313"; // iOS 테스트광고
-#endif
-
-#if !UNITY_ANDROID && !UNITY_IOS && !DEVELOPMENT_BUILD && !UNITY_EDITOR
-            throw new Exception($"{AdName} - 기타 플랫폼용 광고Id가 없음.");
-#endif
-
-#if !UNITY_ANDROID && !UNITY_IOS && (DEVELOPMENT_BUILD || UNITY_EDITOR)
-            Log.Info($"{AdName} - 기타플랫폼 테스트광고Id 사용.");
-            _adUnitId = "ca-app-pub-3940256099942544/5224354917"; // Android 테스트광고           
-#endif
-
             if (_autoLoadOnAwake == true)
             {
                 Log.Info($"{AdName} - AutoLoadOnAwake 플래그가 켜져있어 자동으로 광고를 로드합니다.");
@@ -279,7 +237,7 @@ namespace Rano.PlatformServices.Admob
             // RewardedAd는 일회용 객체다.
             // 보상형 광고가 표시된 후에는 이 객체를 사용해 다른 광고를 로드할 수 없다.
             // 다른 보상형 광고를 요청하려면 RewardedAd 객체를 만들어야 한다.
-            _ad = new RewardedAd(_adUnitId);
+            _ad = new RewardedAd(AdUnitId);
             _ad.OnAdLoaded += HandleAdLoaded;
             _ad.OnAdFailedToLoad += HandleAdFailedToLoad;
             _ad.OnAdOpening += HandleAdOpening;
