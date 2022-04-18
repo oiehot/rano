@@ -7,7 +7,7 @@ namespace Rano.PlatformServices.Admob
     {
         [Header("Admob Application Ids")]
         public string iosId;
-        public string androidId; // ex) ca-app-pub-****14***60****5~9048***80*
+        public string androidId;
         public bool delayAppMeasurement;
     }
 }
