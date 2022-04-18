@@ -34,7 +34,7 @@ namespace RanoEditor.Build
         /// </summary>
         private Dictionary<string, bool> _flags = new Dictionary<string, bool>();
         
-        public int callbackOrder => 0;		
+        public int callbackOrder => 0;
 		
         /// <summary>
         /// 빌드 전, 모든 SpriteAtlas에셋들의 IncludeInBuild를 기억한 뒤, 기본값(false)으로 설정한다.
