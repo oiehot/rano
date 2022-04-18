@@ -19,7 +19,7 @@ namespace Rano
             return Path.GetFileNameWithoutExtension(filenameWithExt);
         }
 
-#if UNITY_EDITOR
+#if (UNITY_EDITOR)
 
         public static int fontSize = 12;
 
@@ -66,7 +66,7 @@ namespace Rano
 
         public static void Sys(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            if (caller == true)
+            if (caller)
             {
                 UnityEngine.Debug.Log($"<size={fontSize}><color={systemTitleColor}>[SYS]</color> <color={systemCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={systemTextColor}>{text}</color></size>");
             }
@@ -76,26 +76,52 @@ namespace Rano
             }
         }
 
-        public static void Important(string text, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        public static void Important(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            //UnityEngine.Debug.Log($"<size={fontSize}><color={importantTitleColor}>[IMPR]</color> <color={importantCallerColor}>{Log.Caller}</color>: <color={importantTextColor}>{text}</color></size>");
-            UnityEngine.Debug.Log($"<size={fontSize}><color={importantTitleColor}>[IMPR]</color> <color={importantCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={importantTextColor}>{text}</color></size>");
+            if (caller)
+            {
+                UnityEngine.Debug.Log($"<size={fontSize}><color={importantTitleColor}>[IMPR]</color> <color={importantCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={importantTextColor}>{text}</color></size>");
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"<size={fontSize}><color={importantTitleColor}>[IMPR]</color> <color={importantTextColor}>{text}</color></size>");
+            }
+        }
+        
+        public static void Info(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        {
+            if (caller)
+            {
+                UnityEngine.Debug.Log($"<size={fontSize}><color={infoTitleColor}>[INFO]</color> <color={infoCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={infoTextColor}>{text}</color></size>");
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"<size={fontSize}><color={infoTitleColor}>[INFO]</color> <color={infoTextColor}>{text}</color></size>");                
+            }
         }
 
-        // TODO: caller
-        public static void Info(string text, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        public static void Warning(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            UnityEngine.Debug.Log($"<size={fontSize}><color={infoTitleColor}>[INFO]</color> <color={infoCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={infoTextColor}>{text}</color></size>");
+            if (caller)
+            {
+                UnityEngine.Debug.LogWarning($"<size={fontSize}><color={warningTitleColor}>[WARN]</color> <color={warningCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={warningTextColor}>{text}</color></size>");
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning($"<size={fontSize}><color={warningTitleColor}>[WARN]</color> <color={warningTextColor}>{text}</color></size>");
+            }
         }
 
-        public static void Warning(string text, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        public static void Error(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            UnityEngine.Debug.LogWarning($"<size={fontSize}><color={warningTitleColor}>[WARN]</color> <color={warningCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={warningTextColor}>{text}</color></size>");
-        }
-
-        public static void Error(string text, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        {
-            UnityEngine.Debug.LogError($"<size={fontSize}><color={errorTitleColor}>[ERR]</color> <color={errorCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={errorTextColor}>{text}</color></size>");
+            if (caller)
+            {
+                UnityEngine.Debug.LogError($"<size={fontSize}><color={errorTitleColor}>[ERR]</color> <color={errorCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={errorTextColor}>{text}</color></size>");
+            }
+            else
+            {
+                UnityEngine.Debug.LogError($"<size={fontSize}><color={errorTitleColor}>[ERR]</color> <color={errorTextColor}>{text}</color></size>");
+            }
         }
 
         public static void Exception(Exception e)
@@ -107,35 +133,32 @@ namespace Rano
 
         public static void Sys(string text, bool caller=false, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            if (caller == true)
-            {
-                UnityEngine.Debug.Log($"[SYS] {ToShortFilepath(filePath)}.{member}[{line}]: {text}");
-            }
-            else
-            {
-                UnityEngine.Debug.Log($"[SYS] {text}");
-            }
+            if (caller) UnityEngine.Debug.Log($"[SYS] {ToShortFilepath(filePath)}.{member}[{line}]: {text}");
+            else UnityEngine.Debug.Log($"[SYS]  {text}");
         }
 
-        public static void Important(string text, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        public static void Important(string text, bool caller=false, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            
-            UnityEngine.Debug.Log($"[IMPORTANT] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
+            if (caller) UnityEngine.Debug.Log($"[IMPORTANT] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
+            else UnityEngine.Debug.Log($"[IMPORTANT]  {text}");
         }
 
-        public static void Info(string text, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        public static void Info(string text, bool caller=false, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            UnityEngine.Debug.Log($"[INFO] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
+            if (caller) UnityEngine.Debug.Log($"[INFO] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
+            else UnityEngine.Debug.Log($"[INFO]  {text}");
         }
 
-        public static void Warning(string text, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        public static void Warning(string text, bool caller=false, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            UnityEngine.Debug.LogWarning($"[WARN] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
+            if (caller) UnityEngine.Debug.LogWarning($"[WARN] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
+            else UnityEngine.Debug.LogWarning($"[WARN]  {text}");
         }
 
-        public static void Error(string text, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        public static void Error(string text, bool caller=false, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            UnityEngine.Debug.LogError($"[ERR] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
+            if (caller) UnityEngine.Debug.LogError($"[ERR] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
+            else UnityEngine.Debug.LogError($"[ERR]  {text}");
         }
 
         public static void Exception(Exception e)

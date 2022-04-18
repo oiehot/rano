@@ -16,11 +16,11 @@ namespace RanoEditor.Intergrator
         [InitializeOnLoadMethod]
         public static void Intergrate()
         {
-            Log.Info($"Intergrating {nameof(AdmobSettingsSO)} to {nameof(GoogleMobileAdsSettings)}...");
+            Log.Info($"Intergrating {nameof(AdmobSettingsSO)} to {nameof(GoogleMobileAdsSettings)}...", caller:false);
             var admobSettings = AssetDatabaseHelper.GetScriptableObject<AdmobSettingsSO>();
             if (admobSettings == null)
             {
-                Log.Warning($"{typeof(AdmobSettingsSO).FullName}가 없습니다. 생성하고 설정하시기를 추천합니다. 설정통합을 생략합니다");
+                Log.Warning($"{typeof(AdmobSettingsSO).FullName}가 없습니다. 생성하고 설정하시기를 추천합니다. 설정통합을 생략합니다", caller:false);
                 return;
             }
             // WARN: GoogleMobileAdsSettings 클래스는 원래 internal class 였습니다.

@@ -95,12 +95,12 @@ namespace Rano.Network
         /// </summary>
         public async Task WaitForConnectionTestCompletedAsync()
         {
-            Log.Info("Wait for the network connection test to complete.");
+            Log.Info("Wait for the network connection test to complete.", caller:false);
             while (_state == NetworkState.Unknown)
             {
                 await Task.Delay(25);
             }
-            Log.Info("Network connection test completed.");
+            Log.Info("Network connection test completed.",caller:false);
         }
     }
 }

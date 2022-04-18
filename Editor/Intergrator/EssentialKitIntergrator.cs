@@ -23,7 +23,7 @@ namespace RanoEditor.Intergrator
             var essentialKitSettings = AssetDatabaseHelper.GetScriptableObject<EssentialKitSettings>();
             if (essentialKitSettings == null)
             {
-                Log.Info($"{typeof(EssentialKitSettings).FullName} 스크립터블 오브젝트가 없으므로 설정통합을 생략합니다.");
+                Log.Info($"{typeof(EssentialKitSettings).FullName} 스크립터블 오브젝트가 없으므로 설정통합을 생략합니다.", caller:false);
                 return;
             }
             IntergrateInAppProducts(essentialKitSettings);
@@ -35,7 +35,7 @@ namespace RanoEditor.Intergrator
         /// </summary>
         private static void IntergrateInAppProducts(EssentialKitSettings settings)
         {
-            Log.Info($"Intergrating {nameof(InAppProductSO)} to {nameof(VoxelBusters.EssentialKit)}...");
+            Log.Info($"Intergrating {nameof(InAppProductSO)} to {nameof(VoxelBusters.EssentialKit)}...", caller:false);
             var before = settings.BillingServicesSettings;
             var billingServiceSettings = new BillingServicesUnitySettings (
                 before.IsEnabled,
@@ -76,7 +76,7 @@ namespace RanoEditor.Intergrator
         /// </summary>
         private static void IntergrateAchievementsAndLeaderboards(EssentialKitSettings settings)
         {
-            Log.Info($"Intergrating {nameof(AchievementSO)} and {nameof(LeaderboardSO)} to {nameof(VoxelBusters.EssentialKit)}...");
+            Log.Info($"Intergrating {nameof(AchievementSO)} and {nameof(LeaderboardSO)} to {nameof(VoxelBusters.EssentialKit)}...", caller:false);
             var before = settings.GameServicesSettings;
             
             var androidPlatformProperties = Get_GameServices_AndroidPlatformProperties_Intergrated(settings);
@@ -121,7 +121,6 @@ namespace RanoEditor.Intergrator
                         null,
                         null
                 );
-                // Log.Info($"* {leaderboard.id} (Leaderboard)");
                 leaderboardList.Add(product);
             }
             return leaderboardList;
@@ -152,7 +151,6 @@ namespace RanoEditor.Intergrator
                     null,
                     null
                 );
-                // Debug.Log($"* {achievement.id} (Achievement)");
                 achievementList.Add(product);
             }
             return achievementList;
@@ -195,7 +193,6 @@ namespace RanoEditor.Intergrator
                     null,
                     null
                 );
-                // Log.Info($"* {iap.id} (InAppProduct)");
                 productList.Add(product);
             }
             return productList;

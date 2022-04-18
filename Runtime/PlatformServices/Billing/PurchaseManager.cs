@@ -72,6 +72,7 @@ namespace Rano.PlatformServices.Billing
             {
                 try
                 {
+                    Log.Info("PurchaseManager Initialize Requested");
                     BillingServices.InitializeStore();
                 }
                 catch

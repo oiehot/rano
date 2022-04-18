@@ -17,12 +17,12 @@ namespace Rano.PlatformServices.Gaming
         /// <summary>
         /// 업적이 보고되었을 때 호출됨.
         /// </summary>
-        public Action<string, double> onAchievementReported;
+        public Action<string, double> OnAchievementReported { get; set; }
         
         /// <summary>
         /// 업적이 달성되었을 때 호출됨.
         /// </summary>
-        public Action<string> onAchievementCompleted;
+        public Action<string> OnAchievementCompleted { get; set; }
 
         /// <summary>
         /// 게임 서비스가 켜져 있고, 로그인이 되어있는 경우 true. 
@@ -136,15 +136,15 @@ namespace Rano.PlatformServices.Gaming
         /// <param name="percent">업적 달성율 (0 ~ 100)</param>
         public void ReportAchievementPercent(string achievementId, double percentCompleted)
         {
-            UnityEngine.Debug.Assert(percentCompleted > 0 && percentCompleted <= 100, $"보고할 업적 진척도는 0초과 및 100이하여야 합니다. ({percentCompleted})");
+            UnityEngine.Debug.Assert(percentCompleted is > 0 and <= 100, $"보고할 업적 진척도는 0초과 및 100이하여야 합니다. ({percentCompleted})");
             
             GameServices.ReportAchievementProgress(achievementId, percentCompleted, (Error error) =>
             {
                 if (error == null)
                 {
                     Log.Info($"Report AchievementProgress Success (id:{achievementId}, percent:{percentCompleted}%)");
-                    onAchievementReported?.Invoke(achievementId, percentCompleted);
-                    if (percentCompleted >= 100) onAchievementCompleted?.Invoke(achievementId);
+                    OnAchievementReported?.Invoke(achievementId, percentCompleted);
+                    if (percentCompleted >= 100) OnAchievementCompleted?.Invoke(achievementId);
                     UpdateAchievementsAsync(); // 서버에 업적을 리포팅했으면 로컬상태도 업데이트 한다.                    
                 }
                 else
