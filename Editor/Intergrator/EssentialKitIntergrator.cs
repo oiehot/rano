@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Rano;
 using Rano.PlatformServices.Billing;
 using Rano.PlatformServices.Gaming;
 using RanoEditor.Helper;
@@ -17,12 +18,12 @@ namespace RanoEditor.Intergrator
     public static class EssentialKitIntergrator
     {
         [InitializeOnLoadMethod]
-        private static void Intergrate()
+        public static void Intergrate()
         {
             var essentialKitSettings = AssetDatabaseHelper.GetScriptableObject<EssentialKitSettings>();
             if (essentialKitSettings == null)
             {
-                Debug.Log($"{typeof(EssentialKitSettings).FullName} 스크립터블 오브젝트가 없으므로 설정통합을 생략합니다.");
+                Log.Info($"{typeof(EssentialKitSettings).FullName} 스크립터블 오브젝트가 없으므로 설정통합을 생략합니다.");
                 return;
             }
             IntergrateInAppProducts(essentialKitSettings);
@@ -34,7 +35,7 @@ namespace RanoEditor.Intergrator
         /// </summary>
         private static void IntergrateInAppProducts(EssentialKitSettings settings)
         {
-            Debug.Log($"Intergrating {nameof(InAppProductSO)} to {nameof(VoxelBusters.EssentialKit)}...");
+            Log.Info($"Intergrating {nameof(InAppProductSO)} to {nameof(VoxelBusters.EssentialKit)}...");
             var before = settings.BillingServicesSettings;
             var billingServiceSettings = new BillingServicesUnitySettings (
                 before.IsEnabled,
@@ -75,13 +76,13 @@ namespace RanoEditor.Intergrator
         /// </summary>
         private static void IntergrateAchievementsAndLeaderboards(EssentialKitSettings settings)
         {
-            Debug.Log($"Intergrating {nameof(AchievementSO)} and {nameof(LeaderboardSO)} to {nameof(VoxelBusters.EssentialKit)}...");
+            Log.Info($"Intergrating {nameof(AchievementSO)} and {nameof(LeaderboardSO)} to {nameof(VoxelBusters.EssentialKit)}...");
             var before = settings.GameServicesSettings;
             
             var androidPlatformProperties = Get_GameServices_AndroidPlatformProperties_Intergrated(settings);
             if (androidPlatformProperties == null)
             {
-                Debug.LogWarning($"{typeof(GpgsSettingsSO).FullName}가 없습니다. 생성하고 설정하시기를 추천합니다. 설정통합을 생략합니다");
+                Log.Warning($"{typeof(GpgsSettingsSO).FullName}가 없습니다. 생성하고 설정하시기를 추천합니다. 설정통합을 생략합니다");
                 androidPlatformProperties = before.AndroidProperties;
             }
             
@@ -105,6 +106,8 @@ namespace RanoEditor.Intergrator
             var leaderboards = AssetDatabaseHelper.GetScriptableObjects<LeaderboardSO>();
             foreach (var leaderboard in leaderboards)
             {
+                if (!leaderboard.includeInBuild) continue;
+                
                 var platformIdOverrides = new NativePlatformConstantSet(
                     leaderboard.iosId,
                     leaderboard.tvosId,
@@ -118,7 +121,7 @@ namespace RanoEditor.Intergrator
                         null,
                         null
                 );
-                // Debug.Log($"* {leaderboard.id} (Leaderboard)");
+                // Log.Info($"* {leaderboard.id} (Leaderboard)");
                 leaderboardList.Add(product);
             }
             return leaderboardList;
@@ -133,6 +136,8 @@ namespace RanoEditor.Intergrator
             var achievements = AssetDatabaseHelper.GetScriptableObjects<AchievementSO>();
             foreach (var achievement in achievements)
             {
+                if (!achievement.includeInBuild) continue;
+                
                 var platformIdOverrides = new NativePlatformConstantSet(
                     achievement.iosId,
                     achievement.tvosId,
@@ -190,7 +195,7 @@ namespace RanoEditor.Intergrator
                     null,
                     null
                 );
-                // Debug.Log($"* {iap.id} (InAppProduct)");
+                // Log.Info($"* {iap.id} (InAppProduct)");
                 productList.Add(product);
             }
             return productList;
