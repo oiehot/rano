@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Threading.Tasks;
 using VoxelBusters.CoreLibrary;
 using VoxelBusters.EssentialKit;
 
@@ -117,6 +118,11 @@ namespace Rano.PlatformServices.Cloud
                 Log.Warning("클라우드 동기화 실패.");
             }
             onSynchronizeComplete?.Invoke();
+        }
+
+        public Task SynchronizeAsync()
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>

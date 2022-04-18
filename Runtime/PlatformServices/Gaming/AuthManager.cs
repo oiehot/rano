@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 using VoxelBusters.CoreLibrary;
 using VoxelBusters.EssentialKit;
@@ -10,6 +11,9 @@ namespace Rano.PlatformServices.Gaming
     public sealed class AuthManager : MonoSingleton<AuthManager>
     {
         private bool _lastResult = false;
+        public Action onAuthCompleted;
+        public Action onAuthNotAvailable;
+        public Action onAuthFailed;
         
         public bool IsFeatureAvailable => GameServices.IsAvailable();
         public bool IsAuthWorking { get; private set; }
@@ -43,12 +47,14 @@ namespace Rano.PlatformServices.Gaming
                     Log.Info("게임서비스 로컬사용자: " + result.LocalPlayer);
                     _lastResult = true;
                     IsAuthWorking = false;
+                    onAuthCompleted?.Invoke();
                 }
                 else if (result.AuthStatus == LocalPlayerAuthStatus.NotAvailable)
                 {
                     Log.Warning("게임서비스 로컬사용자 사용불가능");
                     _lastResult = false;
                     IsAuthWorking = false;
+                    onAuthNotAvailable?.Invoke();
                 }
                 else
                 {
@@ -62,31 +68,19 @@ namespace Rano.PlatformServices.Gaming
                 Log.Warning($"게임서비스 로그인 실패 ({error})");
                 _lastResult = false;
                 IsAuthWorking = false;
+                onAuthFailed?.Invoke();
             }
         }
         
-        public IEnumerator AuthenticateCoroutine(Action<bool> onResult = null)
+        public async Task AuthenticateAsync()
         {
-            if (IsAuthWorking == true) yield break;
+            if (IsAuthWorking == true) return;
             IsAuthWorking = true;
             Log.Info("게임서비스 로그인 요청.");
             GameServices.Authenticate();
-            yield return new WaitUntil(() => IsAuthWorking == true);
-
-        onResult?.Invoke(_lastResult);
+            while (IsAuthWorking) await Task.Delay(25);
         }
 
-        /// <summary>
-        /// 게임서비스 로그인
-        /// </summary>
-        public void Authenticate(Action<bool> onResult=null)
-        {
-            StartCoroutine(AuthenticateCoroutine(onResult));
-        }
-
-        /// <summary>
-        /// 게임서비스 로그아웃
-        /// </summary>
         public void Signout()
         {
             Log.Info("게임서비스 로그아웃 요청.");

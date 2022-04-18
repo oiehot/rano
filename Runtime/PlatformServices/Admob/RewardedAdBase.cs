@@ -41,13 +41,13 @@ namespace Rano.PlatformServices.Admob
         [SerializeField] private bool _autoLoadOnAwake = true;
         [SerializeField] private bool _autoReload = true;
 
-        public Action OnAdLoading { get; set; }
-        public Action OnAdLoaded { get; set; }
-        public Action OnAdOpening { get; set; }
-        public Action OnAdClosed { get; set; }
-        public Action<int, string> OnAdReward { get; set; }
-        public Action OnAdFailedToLoad { get; set; }
-        public Action OnAdFailedToShow { get; set; }
+        public Action onAdLoading;
+        public Action onAdLoaded;
+        public Action onAdOpening;
+        public Action onAdClosed;
+        public Action<int, string> onAdReward;
+        public Action onAdFailedToLoad;
+        public Action onAdFailedToShow;
 
         public string AdName => _adInfo.adName;
         public string AdUnitId => _adInfo.UnitId;
@@ -86,7 +86,7 @@ namespace Rano.PlatformServices.Admob
             {
                 _adLoadedFlag = false;
                 Log.Info($"{AdName} - 광고 로드 완료");
-                OnAdLoaded?.Invoke();
+                onAdLoaded?.Invoke();
             }
 
             if (_adOpeningFlag)
@@ -99,7 +99,7 @@ namespace Rano.PlatformServices.Admob
                 // 일괄적으로 아래로 내려줘서 전면광고가 가장 위에 그려질 수 있도록 수정한다.
                 _canvasSorter.MoveSortingOrder(-10);
                 Log.Info($"{AdName} - 광고 시작");
-                OnAdOpening?.Invoke();
+                onAdOpening?.Invoke();
             }
 
             if (_adClosedFlag)
@@ -108,7 +108,7 @@ namespace Rano.PlatformServices.Admob
                 Log.Info($"{AdName} - 광고 닫힘");
                 // 수정했던 모든 캔버스SortingOrder를 원래 위치로 돌려놓는다.
                 _canvasSorter.ResetSortingOrder();
-                OnAdClosed?.Invoke();
+                onAdClosed?.Invoke();
                 _ad = null;
                 if (_autoReload == true)
                 {
@@ -121,7 +121,7 @@ namespace Rano.PlatformServices.Admob
             {
                 _adRewardFlag = false;
                 Log.Info($"{AdName} - 광고 보상받음 ({_adRewardAmount} {_adRewardUnit})");
-                OnAdReward?.Invoke(_adRewardAmount, _adRewardUnit);
+                onAdReward?.Invoke(_adRewardAmount, _adRewardUnit);
                 _adRewardAmount = 0;
                 _adRewardUnit = null;
             }
@@ -130,14 +130,14 @@ namespace Rano.PlatformServices.Admob
             {
                 _adFailedToLoadFlag = false;
                 Log.Warning($"{AdName} - 광고 로드 실패");
-                OnAdFailedToLoad?.Invoke();
+                onAdFailedToLoad?.Invoke();
             }
 
             if (_adFailedToShowFlag)
             {
                 _adFailedToShowFlag = false;
                 Log.Warning($"{AdName} - 광고 출력 실패");
-                OnAdFailedToShow?.Invoke();
+                onAdFailedToShow?.Invoke();
             }
         }
 
@@ -232,7 +232,12 @@ namespace Rano.PlatformServices.Admob
                 return;
             }
 
-            Log.Info($"{AdName} - 광고 로드 시작");
+            
+#if (UNITY_EDITOR || DEVELOPMENT_BUILD)
+            Log.Info($"{AdName} - 광고 로드 시작 ({AdUnitId})");
+#else
+            Log.Info($"{AdName} -  광고 로드 시작");
+#endif
 
             // RewardedAd는 일회용 객체다.
             // 보상형 광고가 표시된 후에는 이 객체를 사용해 다른 광고를 로드할 수 없다.
@@ -245,7 +250,7 @@ namespace Rano.PlatformServices.Admob
             _ad.OnUserEarnedReward += HandleUserEarnedReward;
             _ad.OnAdClosed += HandleAdClosed;
 
-            OnAdLoading?.Invoke();
+            onAdLoading?.Invoke();
 
             AdRequest request = new AdRequest.Builder().Build();
             _ad.LoadAd(request);

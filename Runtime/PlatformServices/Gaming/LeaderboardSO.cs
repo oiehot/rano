@@ -13,5 +13,8 @@ namespace Rano.PlatformServices.Gaming
         
         [Header("Informations")]
         public string title;
+        
+        [Header("Core")]
+        public bool includeInBuild;
     }
 }

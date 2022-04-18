@@ -1,14 +1,5 @@
-﻿// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
-using Rano;
-using Rano.IO;
 using VoxelBusters.CoreLibrary;
 using VoxelBusters.EssentialKit;
 
@@ -19,9 +10,20 @@ namespace Rano.PlatformServices.Billing
         Unknown,
         AlreadyPurchased
     }
-
+    
+    public enum PurchaseManagerState
+    {
+        NotInitialized,
+        Initialized
+    }
+    
     public sealed class PurchaseManager : MonoSingleton<PurchaseManager>
     {
+        private PurchaseManagerState _state = PurchaseManagerState.NotInitialized;
+        public PurchaseManagerState State => _state;
+
+        public bool IsInitialized => (_state == PurchaseManagerState.Initialized);
+        
         public bool IsFeatureAvailable
         {
             get
@@ -37,46 +39,16 @@ namespace Rano.PlatformServices.Billing
             }
         }
 
-        public bool IsAvailable
-        {
-            get
-            {
-                if (IsFeatureAvailable) return true;
-                else return false;
-            }
-        }
-
         /// <summary>
         /// PlatformId에 매칭되는 Product 객체를 담는 사전.
         /// PlatformId가 아닌 Settings에 적혀진 ProductId를 키로 사용한다.
         /// </summary>
-        private Dictionary<string, IBillingProduct> _products;
+        private Dictionary<string, IBillingProduct> _products = new Dictionary<string, IBillingProduct>();
 
         public Action<string> OnPurchaseComplete { get; set; }
         public Action<string, string> OnPurchaseFailed { get; set; }
         public Action<string> OnRestorePurchase { get; set; }
         public Action<int> OnRestoreAllPurchasesComplete { get; set; }
-
-        protected override void Awake()
-        {
-            base.Awake();
-            _products = new Dictionary<string, IBillingProduct>();
-            if (BillingServices.IsAvailable())
-            {
-                try
-                {
-                    BillingServices.InitializeStore();
-                }
-                catch
-                {
-                    Log.Warning($"스토어 초기화에 실패했습니다.");
-                }
-            }
-            else
-            {
-                Log.Warning("인앱상품 결제서비스를 사용할 수 없습니다.");
-            }
-        }
 
         protected override void OnEnable()
         {
@@ -93,6 +65,31 @@ namespace Rano.PlatformServices.Billing
             BillingServices.OnTransactionStateChange -= HandleTransactionStateChange;
             BillingServices.OnRestorePurchasesComplete -= HandleRestoreAllPurchasesComplete;
         }
+        
+        public void Initialize()
+        {
+            if (BillingServices.IsAvailable())
+            {
+                try
+                {
+                    BillingServices.InitializeStore();
+                }
+                catch
+                {
+                    Log.Warning($"IAP 스토어 초기화에 실패했습니다.");
+                    _state = PurchaseManagerState.NotInitialized;
+                    return;
+                }
+
+                _state = PurchaseManagerState.Initialized;
+            }
+            else
+            {
+                Log.Warning("IAP 결제서비스를 사용할 수 없습니다.");
+                _state = PurchaseManagerState.NotInitialized;
+            }
+        }
+
 
         private void HandleInitializeStoreComplete(BillingServicesInitializeStoreResult result, Error error)
         {
