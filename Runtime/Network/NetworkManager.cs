@@ -6,7 +6,9 @@
 using System;
 using System.Collections;
 using System.Diagnostics.Eventing.Reader;
+using System.Runtime.CompilerServices;
 using System.Runtime.Remoting.Messaging;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using Rano;
@@ -38,6 +40,7 @@ namespace Rano.Network
         /// networkManager.Status == NetworkStatus.Connected;
         /// </example>
         public NetworkState State => _state;
+        public bool IsConnected => _state == NetworkState.Connected;
 
         protected override void OnEnable()
         {
@@ -85,6 +88,19 @@ namespace Rano.Network
                 // Retry after a while
                 yield return YieldCache.WaitForSeconds(pingNextTime);
             }
+        }
+
+        /// <summary>
+        /// 최초 네트워크 테스트가 완료될 때까지 대기한다.
+        /// </summary>
+        public async Task WaitForConnectionTestCompletedAsync()
+        {
+            Log.Info("Wait for the network connection test to complete.");
+            while (_state == NetworkState.Unknown)
+            {
+                await Task.Delay(25);
+            }
+            Log.Info("Network connection test completed.");
         }
     }
 }
