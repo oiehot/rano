@@ -44,6 +44,8 @@ namespace Rano.PlatformServices.Billing
         /// PlatformId가 아닌 Settings에 적혀진 ProductId를 키로 사용한다.
         /// </summary>
         private Dictionary<string, IBillingProduct> _products = new Dictionary<string, IBillingProduct>();
+        
+        public Dictionary<string, IBillingProduct> Products => _products;
 
         public Action<string> OnPurchaseComplete { get; set; }
         public Action<string, string> OnPurchaseFailed { get; set; }
@@ -214,17 +216,20 @@ namespace Rano.PlatformServices.Billing
                 return false;
             }
         }
-
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        
         /// <summary>
         /// 구매목록을 삭제한다. 클라우드 혹은 시뮬레이터에 남아있는 구매목록이 삭제되는 것은 아니다.
         /// </summary>
         public void ClearPurchaseHistory()
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             Log.Info("구매목록 삭제.");
             BillingServices.ClearPurchaseHistory();
-        }
+#else
+            Log.Warning("릴리즈 빌드에서는 구매목록 삭제가 불가능함.");
 #endif
+        }
+
 
         /// <summary>
         /// 모든 구매항목의 복구를 요청한다.
