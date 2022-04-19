@@ -1,10 +1,6 @@
-// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
 using System;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 
 namespace Rano.PlatformServices.GoogleDocuments
 {
@@ -14,11 +10,12 @@ namespace Rano.PlatformServices.GoogleDocuments
         TSV
     }
 
+    [Serializable]
     public struct GoogleSheetId
     {
-        public string Id;
-        public string Gid;
-        public string Range;
+        [FormerlySerializedAs("Id")] public string id;
+        [FormerlySerializedAs("Gid")] public string gid;
+        [FormerlySerializedAs("Range")] public string range;
     }
 
     public static class GoogleSheet
@@ -48,7 +45,7 @@ namespace Rano.PlatformServices.GoogleDocuments
 
         public static string GetExportUrl(GoogleSheetId gsid, GoogleSheetExportFormat format)
         {
-            return GetExportUrl(gsid.Id, gsid.Gid, gsid.Range, format);
+            return GetExportUrl(gsid.id, gsid.gid, gsid.range, format);
         }
     }
 }
