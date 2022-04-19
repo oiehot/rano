@@ -1,9 +1,4 @@
-﻿// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine.Networking;
@@ -23,6 +18,30 @@ namespace Rano.Network
         {
             await Task.FromResult(0);
             throw new NotImplementedException();
+        }
+
+        public static string GetString(string url)
+        {
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
+                
+                while (!asyncOperation.isDone)
+                {
+                }
+
+                // var requestResult = request.result;
+                if (request.error == null)
+                {
+                    Log.Info($"GET Success ({url})");
+                    return request.downloadHandler.text;
+                }
+                else
+                {
+                    Log.Info($"GET Failed ({url})");
+                    throw new HttpRequestException($"{request.error} ({url})");
+                }
+            }
         }
 
         public static async Task<string> GetStringAsync(string url)
