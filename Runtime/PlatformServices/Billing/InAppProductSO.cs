@@ -12,7 +12,13 @@ namespace Rano.PlatformServices.Billing
     [CreateAssetMenu(fileName = "InAppProduct", menuName = "Rano/Platform Services/Billing/In App Product")]
     public class InAppProductSO : ScriptableObject
     {
+        [Header("Ids")]
         public string id;
+        public string iosId;
+        public string tvosId;
+        public string androidId;
+        
+        [Header("Product")]
         public string title;
         public string description;
         public InAppProductType productType;

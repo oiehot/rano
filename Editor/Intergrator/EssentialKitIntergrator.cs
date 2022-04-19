@@ -166,9 +166,9 @@ namespace RanoEditor.Intergrator
             foreach (var iap in iaps)
             {
                 var platformIdOverrides = new NativePlatformConstantSet(
-                    null,
-                    null,
-                    null
+                    iap.iosId,
+                    iap.tvosId,
+                    iap.androidId
                 );
                 BillingProductType billingProductType;
                 switch (iap.productType)
