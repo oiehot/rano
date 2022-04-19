@@ -131,31 +131,31 @@ namespace Rano
 
 #else
 
-        public static void Sys(string text, bool caller=false, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        public static void Sys(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
             if (caller) UnityEngine.Debug.Log($"[SYS] {ToShortFilepath(filePath)}.{member}[{line}]: {text}");
             else UnityEngine.Debug.Log($"[SYS]  {text}");
         }
 
-        public static void Important(string text, bool caller=false, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        public static void Important(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
             if (caller) UnityEngine.Debug.Log($"[IMPORTANT] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
             else UnityEngine.Debug.Log($"[IMPORTANT]  {text}");
         }
 
-        public static void Info(string text, bool caller=false, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        public static void Info(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
             if (caller) UnityEngine.Debug.Log($"[INFO] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
             else UnityEngine.Debug.Log($"[INFO]  {text}");
         }
 
-        public static void Warning(string text, bool caller=false, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        public static void Warning(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
             if (caller) UnityEngine.Debug.LogWarning($"[WARN] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
             else UnityEngine.Debug.LogWarning($"[WARN]  {text}");
         }
 
-        public static void Error(string text, bool caller=false, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        public static void Error(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
             if (caller) UnityEngine.Debug.LogError($"[ERR] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
             else UnityEngine.Debug.LogError($"[ERR]  {text}");
