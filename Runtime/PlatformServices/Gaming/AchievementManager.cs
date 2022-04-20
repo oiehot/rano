@@ -28,7 +28,7 @@ namespace Rano.PlatformServices.Gaming
         /// 게임 서비스가 켜져 있고, 로그인이 되어있는 경우 true. 
         /// </summary>
         public bool IsFeatureAvailable => GameServices.IsAvailable() && GameServices.IsAuthenticated;
-        
+
         /// <summary>
         /// 서버로부터 현재 업적들을 가져온다.
         /// </summary>
@@ -66,9 +66,6 @@ namespace Rano.PlatformServices.Gaming
                     _achievements[achievement.id] = achievement;
                 }
                 Log.Info($"서버에서 업적들을 가져왔습니다. (count: {_achievements.Count})");
-#if (UNITY_EDITOR || DEVELOPMENT_BUILD)
-                LogLocalAchievements();
-#endif
             }
             else
             {
@@ -118,9 +115,6 @@ namespace Rano.PlatformServices.Gaming
                     _achievementInfos[achievementInfo.id] = achievementInfo;
                 }
                 Log.Info($"서버에서 업적정보들을 가져왔습니다. (count: {_achievementInfos.Count})");
-#if (UNITY_EDITOR || DEVELOPMENT_BUILD)
-                LogLocalAchievementInfos();
-#endif
             }
             else
             {
@@ -197,10 +191,17 @@ namespace Rano.PlatformServices.Gaming
             });
         }
         
-#if (UNITY_EDITOR || DEVELOPMENT_BUILD)
-        [ContextMenu(nameof(LogLocalAchievements))]
-        private void LogLocalAchievements()
+        [ContextMenu(nameof(LogStatus))]
+        public void LogStatus()
         {
+            Log.Info("AchievementManager Status:");
+            Log.Info($"  FeatureAvailable: {IsFeatureAvailable}");
+        }
+        
+        [ContextMenu(nameof(LogLocalAchievements))]
+        public void LogLocalAchievements()
+        {
+            Log.Info("Achievements (local):");
             foreach (var item in _achievements.Values)
             {
                 Log.Info($"* {item.id} (Achievement)");
@@ -213,8 +214,9 @@ namespace Rano.PlatformServices.Gaming
         }
 
         [ContextMenu(nameof(LogLocalAchievementInfos))]
-        private void LogLocalAchievementInfos()
+        public void LogLocalAchievementInfos()
         {
+            Log.Info("AchievementInfos (local):");
             foreach (var item in _achievementInfos.Values)
             {
                 Log.Info($"* {item.id} (AchievementInfo)");
@@ -229,6 +231,5 @@ namespace Rano.PlatformServices.Gaming
                 Log.Info($"  replayable: {item.replayable}");
             }
         }
-#endif
     }
 }

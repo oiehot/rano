@@ -77,27 +77,27 @@ namespace Rano.PlatformServices.Gaming
             });
         }
 
-#if UNITY_EDITOR
-        [ContextMenu("Print Leaderboards")]
-        public void PrintLeaderboards()
+        [ContextMenu(nameof(LogStatus))]
+        public void LogStatus()
         {
+            Log.Info("LeaderboardManager Status:");
+            Log.Info($"  FeatureAvailable: {IsFeatureAvailable}");
             GameServices.LoadLeaderboards((GameServicesLoadLeaderboardsResult result, Error error) => {
                 if (error == null)
                 {
                     ILeaderboard[] items = result.Leaderboards;
-                    Log.Info($"전체 리더보드 수: {items.Length}");
+                    Log.Info($"  Total Leaderboards ({items.Length})");
                     for (int i = 0; i < items.Length; i++)
                     {
                         ILeaderboard item = items[i];
-                        Log.Info($"[{i}] {item}");
+                        Log.Info($"    [{i}] {item}");
                     }
                 }
                 else
                 {
-                    Log.Warning($"리더보드 로드 실패 ({error.Description})");
+                    Log.Warning($"Load leaderboard failed ({error.Description})");
                 }
             });
         }
-#endif
     }
 }

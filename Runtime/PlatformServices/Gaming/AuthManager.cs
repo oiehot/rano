@@ -20,6 +20,15 @@ namespace Rano.PlatformServices.Gaming
         public bool IsAuthenticated => GameServices.IsAuthenticated;
         public ILocalPlayer LocalPlayer => GameServices.LocalPlayer;
 
+        // TODO: IStatusLogable
+        public void LogStatus()
+        {
+            Log.Info("GamingServiceStatus:");
+            Log.Info($"  FeatureAvailable: {IsFeatureAvailable}");
+            Log.Info($"  AuthWorking: {IsAuthWorking}");
+            Log.Info($"  Authenticated: {IsAuthenticated}");
+        }
+
         protected override void OnEnable()
         {
             base.OnEnable();
