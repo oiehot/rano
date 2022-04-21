@@ -1,7 +1,7 @@
 ﻿using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
-namespace RanoEditor.Intergrator
+namespace RanoEditor.Intergrator.EssentialKit
 {
     /// <summary>
     /// 빌드 전에 EssentialKitIntergrator.Intergrate()를 호출한다.

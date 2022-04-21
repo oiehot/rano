@@ -5,7 +5,7 @@ using Rano.PlatformServices.Admob;
 using RanoEditor.Helper;
 using GoogleMobileAds.Editor;
 
-namespace RanoEditor.Intergrator
+namespace RanoEditor.Intergrator.Admob
 {
     /// <summary>
     /// AdmobSettingsSO를 GoogleMobileAds Settings에 통합시킨다.

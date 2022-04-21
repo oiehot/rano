@@ -1,7 +1,7 @@
 ﻿using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
-namespace RanoEditor.Intergrator
+namespace RanoEditor.Intergrator.Admob
 {   
     /// <summary>
     /// 빌드 전에 AdmobIntergrator.Intergrate()를 호출한다.
