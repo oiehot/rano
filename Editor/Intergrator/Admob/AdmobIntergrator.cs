@@ -16,7 +16,7 @@ namespace RanoEditor.Intergrator.Admob
         [InitializeOnLoadMethod]
         public static void Intergrate()
         {
-            Log.Info($"Intergrating {nameof(AdmobSettingsSO)} to {nameof(GoogleMobileAdsSettings)}...", caller:false);
+            Log.Info($"Intergrating Admob...", caller:false);
             var admobSettings = AssetDatabaseHelper.GetScriptableObject<AdmobSettingsSO>();
             if (admobSettings == null)
             {

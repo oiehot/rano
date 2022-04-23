@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if false
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Rano;
@@ -9,11 +11,10 @@ namespace Rano.PlatformServices.Billing
     {
         private bool _activated;
 
-        private Dictionary<string, Action> _rewardActions;
+        private Dictionary<string, Action> _rewardActions = new Dictionary<string, Action>();
 
         protected virtual void Awake()
         {
-            _rewardActions = new Dictionary<string, Action>();
         }
 
         protected virtual void OnEnable()
@@ -86,5 +87,4 @@ namespace Rano.PlatformServices.Billing
         }
     }
 }
-
-    
+#endif

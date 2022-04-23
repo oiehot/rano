@@ -66,7 +66,7 @@ namespace Rano.PlatformServices.Billing
         /// <summary>
         /// 구매한 상품이었는데 사라진 아이템을 발견했을 때 호출된다.
         /// </summary>
-        public Action<string> OnProductRefunded { get; set; }
+        public Action<string> OnPurchaseRefunded { get; set; }
         
         /// <summary>
         /// 구매하지 않은 상품이었는데 사라진 아이템을 발견했을 때 호출된다.
@@ -152,7 +152,7 @@ namespace Rano.PlatformServices.Billing
                     if (beforeProduct.IsPurchased && !product.IsPurchased)
                     {
                         Log.Info($"구매하신 상품이 환불되었습니다 ({productId})");
-                        OnProductRefunded?.Invoke(productId);
+                        OnPurchaseRefunded?.Invoke(productId);
                     }
                 }
             }
@@ -231,6 +231,33 @@ namespace Rano.PlatformServices.Billing
             _lastUpdatedDateTime = DateTime.Now;
         }
 
+#if (UNITY_EDITOR || DEVELOPMENT_BUILD)
+        public void VerificationTransactions()
+        {
+            Log.Info($"BillingServices.GetTransactions 시작");
+            // Fetch all pending transactions
+            var transactions = BillingServices.GetTransactions();
+            
+            Log.Info($"=> transactions (count:{transactions.Length})");
+            
+            // Process each transaction
+            foreach (var transaction in transactions)
+            {
+                string productId = transaction.Payment.ProductId;
+                
+                // TODO: Verify the receipt with your server - This is an async call usually
+                // TODO: Set the ReceiptVerificationState to Success or Failed
+                transaction.ReceiptVerificationState = BillingReceiptVerificationState.Success;
+                
+                Log.Info($"테스트로 영수증 검증 완료시킴 {productId}");
+            }
+
+            // TODO: Call Finish Transactions to clear the pending transaction queue
+            Log.Info($"BillingServices.FinishTransactions 시작");
+            BillingServices.FinishTransactions(transactions);
+        }
+#endif
+
         /// <summary>
         /// 상품구매를 요청한뒤 결과가 리턴되었을 때 호출된다.
         /// </summary>
@@ -259,6 +286,10 @@ namespace Rano.PlatformServices.Billing
                         {
                             case BillingReceiptVerificationState.Success:
                                 Log.Info($"상품구매영수증 검증이 성공함 ({productId})");
+                                // 상품이 구매되었으므로 구입여부 플래그를 켠다.
+                                // (스토어로 부터 최신 정보를 가져오지 않더라도 최신 정보를 활용할 수 있도록)
+                                _products[productId].SetPurchaseFlag(true);
+                                OnPurchaseComplete?.Invoke(transaction.Payment.ProductId);
                                 break;
                             case BillingReceiptVerificationState.NotDetermined:
                                 Log.Info($"상품구매영수증 검증이 결정되지 않았음({productId})");
@@ -270,12 +301,6 @@ namespace Rano.PlatformServices.Billing
                                 Log.Info($"상품구매영수증 검증상태를 알 수 없음 ({productId}, {transaction.ReceiptVerificationState})");
                                 break;
                         }
-
-                        // 상품이 구매되었으므로 구입여부 플래그를 켠다.
-                        // (스토어로 부터 최신 정보를 가져오지 않더라도 최신 정보를 활용할 수 있도록)
-                        _products[productId].SetPurchaseFlag(true);
-                        
-                        OnPurchaseComplete?.Invoke(transaction.Payment.ProductId);
                         break;
 
                     case BillingTransactionState.Failed:
@@ -293,9 +318,13 @@ namespace Rano.PlatformServices.Billing
                     case BillingTransactionState.Restored:
                         Log.Info($"상품 복구됨 ({transaction.Payment.ProductId})");
                         break;
+                    
                     default:
                         throw new Exception($"알수없는 상품구매 트랜잭션 상태 ({transaction.TransactionState})");
                 }
+
+                // TMP: Clear
+                BillingServices.FinishTransactions(transactions);
             }
         }
 
