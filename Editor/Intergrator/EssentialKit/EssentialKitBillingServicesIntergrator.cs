@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if USE_ESSENTIAL_KIT_BILLING_SERVICES
+
+using System;
 using System.Collections.Generic;
 using Rano;
 using Rano.PlatformServices.Billing;
@@ -99,3 +101,4 @@ namespace RanoEditor.Intergrator.EssentialKit
         }
     }
 }
+#endif

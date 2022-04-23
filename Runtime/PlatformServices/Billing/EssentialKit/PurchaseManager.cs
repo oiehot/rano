@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if USE_ESSENTIAL_KIT_BILLING_SERVICES
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +8,7 @@ using UnityEngine;
 using VoxelBusters.CoreLibrary;
 using VoxelBusters.EssentialKit;
 
-namespace Rano.PlatformServices.Billing
+namespace Rano.PlatformServices.Billing.EssentialKit
 {
     
     public enum PurchaseManagerState
@@ -540,3 +542,5 @@ namespace Rano.PlatformServices.Billing
         }
     }
 }
+
+#endif

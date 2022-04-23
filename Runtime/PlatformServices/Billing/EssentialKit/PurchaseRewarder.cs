@@ -1,11 +1,11 @@
-﻿#if false
+﻿#if USE_ESSENTIAL_KIT_BILLING_SERVICES && false
 
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Rano;
 
-namespace Rano.PlatformServices.Billing
+namespace Rano.PlatformServices.Billing.EssentialKit
 {
     public abstract class PurchaseRewarder : MonoBehaviour
     {

@@ -21,7 +21,11 @@ namespace RanoEditor.Intergrator.EssentialKit
         public static void Intergrate()
         {
             Log.Info($"Intergrating EssentialKit...", caller: false);
+            
+            #if USE_ESSENTIAL_KIT_BILLING_SERVICES
             EssentialKitBillingServicesIntergrator.Intergrate();
+            #endif
+            
             EssentialKitGameServicesIntergrator.Intergrate();
         }
 
