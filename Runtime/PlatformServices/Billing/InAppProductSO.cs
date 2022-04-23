@@ -1,26 +1,32 @@
 ﻿using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Rano.PlatformServices.Billing
 {
     public enum InAppProductType
     {
         Consumable,
-        NonConsumable
+        NonConsumable,
+        Subscription
     }
     
     [CreateAssetMenu(fileName = "InAppProduct", menuName = "Rano/Platform Services/Billing/In App Product")]
     public class InAppProductSO : ScriptableObject
     {
         [Header("Ids")]
-        public string id;
-        public string iosId;
-        public string tvosId;
-        public string androidId;
+        [SerializeField] [FormerlySerializedAs("id")] private string _id;
+        [SerializeField] [FormerlySerializedAs("iosId")] private string _iosId;
+        [SerializeField] [FormerlySerializedAs("androidId")] private string _androidId;
         
         [Header("Product")]
-        public string title;
-        public string description;
-        public InAppProductType productType;
+        [SerializeField] [FormerlySerializedAs("title")] private string _title;
+        [SerializeField] [FormerlySerializedAs("description")] private string _description;
+        [SerializeField] [FormerlySerializedAs("productType")] private InAppProductType type;
+
+        public string Id => _id;
+        public string IosId => _iosId;
+        public string AndroidId => _androidId;
+        public InAppProductType Type => type;
     }
 }

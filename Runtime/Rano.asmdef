@@ -4,9 +4,10 @@
     "references": [
         "GoogleMobileAds",
         "GooglePlayGames",
-        "UnityEngine.Purchasing",
         "Unity.Addressables",
         "Unity.ResourceManager",
+        "UnityEngine.Purchasing",
+        "UnityEngine.Purchasing.Stores",
         "DOTween.Modules",
         "VoxelBusters.CoreLibrary",
         "VoxelBusters.EssentialKit"

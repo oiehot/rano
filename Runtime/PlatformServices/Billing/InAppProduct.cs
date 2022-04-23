@@ -3,71 +3,49 @@ using VoxelBusters.EssentialKit;
 
 namespace Rano.PlatformServices.Billing
 {
-    public class InAppProduct : IBillingProduct
-#if (UNITY_EDITOR || DEVELOPMENT_BUILD)
-        ,ICloneable
-#endif
+    public class InAppProduct
     {
-        private string _id;
-        private string _platformId;
-        private string _localizedTitle;
-        private string _localizedDescription;
-        private string _price;
-        private string _localizedPrice;
-        private string _priceCurrencyCode;
-        private object _tag;
-        public bool _purchased;
-
-        public string Id => _id;
-        public string PlatformId => _platformId;
-        public string LocalizedTitle => _localizedTitle;
-        public string LocalizedDescription => _localizedDescription;
-        public string Price => _price;
-        public string LocalizedPrice => _localizedPrice;
-        public string PriceCurrencyCode => _priceCurrencyCode;
-        public object Tag => _tag;
-
-        public bool IsPurchased => _purchased;
+        public bool enabled;
         
-        public InAppProduct(
-            string id,
-            string platformId,
-            string localizedTitle,
-            string localizedDescription,
-            string localizedPrice,
-            string price,            
-            string priceCurrencyCode,
-            bool purchased,
-            object tag
-            )
-        {
-            _id = id;
-            _platformId = platformId;
-            _localizedTitle = localizedTitle;
-            _localizedDescription = localizedDescription;
-            _price = price;
-            _localizedPrice = localizedPrice;
-            _priceCurrencyCode = priceCurrencyCode;
-            _purchased = purchased;
-            _tag = tag;
-        }
-        public void SetPurchaseFlag(bool value)
-        {
-            _purchased = value;
-        }
+        public string id;
+        public string storeSpecificId;
+        public InAppProductType type;
+        
+        public string localizedTitle;
+        public string localizedDescription;
+        public string localizedPriceString;
+        public decimal localizedPrice;
+        public string isoCurrencyCode;
 
+        public string receipt;
+        public bool hasReceipt;
+        public bool availableToPurchase;
+        public string transactionId;
+
+        public bool IsPurchased => throw new NotImplementedException();
+
+        public void LogStatus()
+        {
+            Log.Info($"* {ToString()}");
+            
+            Log.Info($"  id: {id}");
+            Log.Info($"  enabled: {enabled}");
+            Log.Info($"  type: {type}");
+            Log.Info($"  storeSpecificId: {storeSpecificId}");
+            Log.Info($"  localizedTitle: {localizedTitle}");
+            Log.Info($"  localizedDescription: {localizedDescription}");
+            Log.Info($"  localizedPriceString: {localizedPriceString}");
+            Log.Info($"  localizedPrice: {localizedPrice}");
+            Log.Info($"  isoCurrencyCode: {isoCurrencyCode}");
+            Log.Info($"  receipt: {receipt}");
+            Log.Info($"  hasReceipt: {hasReceipt}");
+            Log.Info($"  availableToPurchase: {availableToPurchase}");
+            Log.Info($"  transactionID: {transactionId}");
+        }
+        
         public override string ToString()
         {
-            return $"{_id}";
+            return $"{id}({nameof(InAppProduct)}";
         }
-        
-#if (UNITY_EDITOR || DEVELOPMENT_BUILD)
-        public object Clone()
-        {
-            return new InAppProduct(_id, _platformId, _localizedTitle,
-                _localizedDescription, _localizedPrice, _price,
-                _priceCurrencyCode, _purchased, _tag);
-        }
-#endif
     }
 }
