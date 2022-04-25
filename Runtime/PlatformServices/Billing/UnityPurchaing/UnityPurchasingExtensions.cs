@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.Purchasing;
 
 namespace Rano.PlatformServices.Billing
@@ -56,7 +53,6 @@ namespace Rano.PlatformServices.Billing
         public static void LogStatus(this Product product)
         {
             Log.Info($"* {product.definition.id}({nameof(Product)})");
-            
             Log.Info($"  id: {product.definition.id}");
             Log.Info($"  enabled: {product.definition.enabled}");
             Log.Info($"  type: {product.definition.type}");

@@ -1,9 +1,4 @@
-﻿// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
@@ -57,7 +52,7 @@ namespace Rano.SaveSystem
                 SaveAllSaveableEntities();
             }
         }
-
+        
         public void SaveAllSaveableEntities()
         {
             OnSave?.Invoke();
@@ -75,6 +70,16 @@ namespace Rano.SaveSystem
                 var gameObjectState = saveable.CaptureState();
                 _storage.SetDictionary(id, gameObjectState);
             }
+        }
+
+        [ContextMenu(nameof(LogStatus))]
+        public void LogStatus()
+        {
+            Log.Info($"{nameof(SaveableManager)}");
+            Log.Info($"  IncludeInactive: {IncludeInactive}");
+            Log.Info($"  AutoSaveOnPause: {AutoSaveOnPause}");
+            Log.Info($"  AutoSaveOnFocusOut: {AutoSaveOnFocusOut}");
+            Log.Info($"  AutoSaveOnExit: {AutoSaveOnExit}");
         }
     }
 }

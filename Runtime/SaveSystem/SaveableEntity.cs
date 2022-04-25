@@ -19,15 +19,18 @@ namespace Rano.SaveSystem
 
         void Awake()
         {
-            if (_autoLoad == true)
+            if (_autoLoad)
             {
                 try
                 {
                     RestoreFromMemory();
                 }
-                catch
+                catch (Exception e)
                 {
-                    Log.Info($"저장된 데이터가 없거나 복구중에 예외가 발생하여 초기값으로 설정합니다. ({_id})");
+                    Log.Info($"저장된 데이터가 없거나 복구중에 예외가 발생하여 초기값으로 설정합니다. ({_id})");
+#if (UNITY_EDITOR || DEVELOPMENT_BUILD)
+                    Debug.LogWarning(e);
+#endif
                     DefaultState();
                 }
             }
@@ -35,7 +38,7 @@ namespace Rano.SaveSystem
 
         void OnDestroy()
         {
-            if (_autoSaveOnDestroy && InMemoryDatabase.Instance != null)
+            if (_autoSaveOnDestroy)
             {
                 CaptureToMemory();
             }

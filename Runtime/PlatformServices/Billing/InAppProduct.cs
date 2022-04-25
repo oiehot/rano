@@ -1,8 +1,16 @@
 ﻿using System;
-using VoxelBusters.EssentialKit;
 
 namespace Rano.PlatformServices.Billing
 {
+    public enum PurchaseState
+    {
+        Unknown,
+        Validating,
+        NotPurchased,
+        Purchased
+    }
+    
+    [Serializable]
     public class InAppProduct
     {
         public bool enabled;
@@ -22,12 +30,13 @@ namespace Rano.PlatformServices.Billing
         public bool availableToPurchase;
         public string transactionId;
 
-        public bool IsPurchased => throw new NotImplementedException();
+        public PurchaseState purchaseState;
+
+        [field:NonSerialized] public bool IsPurchased => purchaseState == PurchaseState.Purchased;
 
         public void LogStatus()
         {
-            Log.Info($"* {ToString()}");
-            
+            Log.Info($"* {id}({nameof(InAppProduct)})");
             Log.Info($"  id: {id}");
             Log.Info($"  enabled: {enabled}");
             Log.Info($"  type: {type}");
@@ -41,11 +50,13 @@ namespace Rano.PlatformServices.Billing
             Log.Info($"  hasReceipt: {hasReceipt}");
             Log.Info($"  availableToPurchase: {availableToPurchase}");
             Log.Info($"  transactionID: {transactionId}");
+            Log.Info($"  purchased: {IsPurchased}");
+            Log.Info($"  purchaseState: {purchaseState}");
         }
         
         public override string ToString()
         {
-            return $"{id}({nameof(InAppProduct)}";
+            return $"{id}({nameof(InAppProduct)})";
         }
     }
 }

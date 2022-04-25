@@ -26,6 +26,21 @@ namespace Rano.SaveSystem
             new PrefsBool($"{typeof(InMemoryDatabase).ToString()}.ResetOnStart");
 #endif
 
+        public void LogStatus()
+        {
+            Log.Info($"{nameof(InMemoryDatabase)}");
+            Log.Info($"  LastModifiedDate Key: {LastModifiedDateField}");
+            Log.Info($"  LastModifiedDate: {_dict[LastModifiedDateField]}");
+            Log.Info($"  SavePath: {SavePath}");
+            Log.Info($"  TemporarySavePath: {TemporarySavePath}");
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Log.Info($"  JsonSavePath: {JsonSavePath}");
+            Log.Info($"  TemporaryJsonSavePath: {TemporaryJsonSavePath}");
+            Log.Info($"  ResetOnStart Prefs Key: {ResetOnStart.Key}");
+            Log.Info($"  ResetOnStart: {ResetOnStart.Value}");
+#endif
+        }
+
         public InMemoryDatabase()
         {
             Log.Sys($"{typeof(InMemoryDatabase).ToString()}: Construction", caller: false);

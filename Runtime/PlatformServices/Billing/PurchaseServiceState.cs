@@ -7,6 +7,7 @@
         InitializeFailed,
         Updating,
         UpdateFailed,
+        Validating,
         Available,
     }
 }

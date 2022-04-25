@@ -8,6 +8,9 @@
         "Unity.ResourceManager",
         "UnityEngine.Purchasing",
         "UnityEngine.Purchasing.Stores",
+        "UnityEngine.Purchasing.Security",
+        "UnityEngine.Purchasing.SecurityCore",
+        "UnityEngine.Purchasing.SecurityStub",
         "DOTween.Modules",
         "VoxelBusters.CoreLibrary",
         "VoxelBusters.EssentialKit"
