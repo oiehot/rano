@@ -2,23 +2,15 @@
 
 namespace Rano.PlatformServices.Billing
 {
-    public enum PurchaseState
-    {
-        Unknown,
-        Validating,
-        NotPurchased,
-        Purchased
-    }
-    
     [Serializable]
-    public class InAppProduct
+    public class InAppProduct : ICloneable
     {
         public bool enabled;
-        
+
         public string id;
         public string storeSpecificId;
         public InAppProductType type;
-        
+
         public string localizedTitle;
         public string localizedDescription;
         public string localizedPriceString;
@@ -30,9 +22,9 @@ namespace Rano.PlatformServices.Billing
         public bool availableToPurchase;
         public string transactionId;
 
-        public PurchaseState purchaseState;
-
-        [field:NonSerialized] public bool IsPurchased => purchaseState == PurchaseState.Purchased;
+        public int purchaseCount;
+        public bool validated;
+        public DateTime lastValidateDateTime;
 
         public void LogStatus()
         {
@@ -50,10 +42,16 @@ namespace Rano.PlatformServices.Billing
             Log.Info($"  hasReceipt: {hasReceipt}");
             Log.Info($"  availableToPurchase: {availableToPurchase}");
             Log.Info($"  transactionID: {transactionId}");
-            Log.Info($"  purchased: {IsPurchased}");
-            Log.Info($"  purchaseState: {purchaseState}");
+            Log.Info($"  purchaseCount: {purchaseCount}");
+            Log.Info($"  validated: {validated}");
+            Log.Info($"  lastValidateDateTime: {lastValidateDateTime}");
         }
-        
+
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
+
         public override string ToString()
         {
             return $"{id}({nameof(InAppProduct)})";

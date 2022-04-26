@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Rano;
 
-namespace Rano
+namespace Rano.Patterns
 {
     public class Fsm<T> where T : struct, IComparable, IConvertible, IFormattable
     {

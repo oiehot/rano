@@ -5,8 +5,6 @@
         NotInitialized,
         Initializing,
         InitializeFailed,
-        Updating,
-        UpdateFailed,
         Available,
     }
 }

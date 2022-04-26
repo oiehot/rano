@@ -17,7 +17,7 @@ namespace Rano.PlatformServices.Billing
             return result;
         }
         
-        public static InAppProductType ConvertToInAppProduct(this ProductType productType)
+        public static InAppProductType ConvertToInAppProductType(this ProductType productType)
         {
             InAppProductType result = productType switch
             {
@@ -35,7 +35,7 @@ namespace Rano.PlatformServices.Billing
             
             result.id = product.definition.id;
             result.enabled = product.definition.enabled;
-            result.type = product.definition.type.ConvertToInAppProduct();
+            result.type = product.definition.type.ConvertToInAppProductType();
             result.storeSpecificId = product.definition.storeSpecificId;
             result.localizedTitle = product.metadata.localizedTitle;
             result.localizedDescription = product.metadata.localizedDescription;
@@ -46,7 +46,7 @@ namespace Rano.PlatformServices.Billing
             result.hasReceipt = product.hasReceipt;
             result.availableToPurchase = product.availableToPurchase;
             result.transactionId = product.transactionID;
-            
+
             return result;
         }
 

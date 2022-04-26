@@ -95,7 +95,7 @@ namespace Rano.SaveSystem
             }
             catch (Exception e)
             {
-                Debug.Log(e);
+                Debug.LogWarning(e);
                 Log.Warning($"{TemporarySavePath} 저장실패");
                 return;
             }
