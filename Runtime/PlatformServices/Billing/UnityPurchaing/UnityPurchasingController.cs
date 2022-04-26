@@ -148,15 +148,17 @@ namespace Rano.PlatformServices.Billing
         /// <summary>
         /// 컨트롤러에 저장된 상품목록을 PurchaseManager로 싱크한다.
         /// </summary>
-        private void SyncProductToPurchaseManager()
+        private async void SendProductsAsync()
         {
+            _state = PurchaseServiceState.Updating;
             Dictionary<string, InAppProduct> inAppProducts = new();
             foreach (Product product in _controller.products.all)
             {
                 InAppProduct inAppProduct = product.ConvertToInAppProduct();
                 inAppProducts[inAppProduct.id] = inAppProduct;
             }
-            _purchaseManager.SetProductsAsync(inAppProducts);
+            await _purchaseManager.SetProductsAsync(inAppProducts);
+            _state = PurchaseServiceState.Available;
         }
         
         #endregion
@@ -168,9 +170,8 @@ namespace Rano.PlatformServices.Billing
             UnityEngine.Debug.Assert(controller != null && extensions != null);
             _controller = controller;
             _extensions = extensions;
-            _state = PurchaseServiceState.Available;
-            SyncProductToPurchaseManager();
             Log.Info($"구매서비스 초기화됨.");
+            SendProductsAsync();
         }
         
         public void OnInitializeFailed(InitializationFailureReason error)
@@ -342,9 +343,7 @@ namespace Rano.PlatformServices.Billing
         
         private void OnUpdateSuccess()
         {
-            Log.Info("상태 업데이트에 성공했습니다.");
-            SyncProductToPurchaseManager();
-            _state = PurchaseServiceState.Available;
+            SendProductsAsync();
         }
 
         private void OnUpdateFailed(InitializationFailureReason reason)

@@ -29,7 +29,7 @@ namespace Rano.SaveSystem
             {
                 Log.Info("OnApplicationQuit");
                 Log.Info("AutoSaveOnExit가 켜져 있으므로 모든Saveable 상태를 InMemoryDB에 저장합니다");
-                SaveAllSaveableEntities();
+                Save();
             }
         }
 
@@ -39,7 +39,7 @@ namespace Rano.SaveSystem
             {
                 Log.Info($"OnApplicationPause({pause})");
                 Log.Info("AutoSaveOnPause가 켜져 있으므로 모든Saveable 상태를 InMemoryDB에 저장합니다");
-                SaveAllSaveableEntities();
+                Save();
             }
         }
 
@@ -49,18 +49,18 @@ namespace Rano.SaveSystem
             {
                 Log.Info($"OnApplicationFocus({focus})");
                 Log.Info("OnApplicationFocus가 켜져 있으므로 모든Saveable 상태를 InMemoryDB에 저장합니다");
-                SaveAllSaveableEntities();
+                Save();
             }
         }
         
-        public void SaveAllSaveableEntities()
+        public void Save()
         {
             OnSave?.Invoke();
-            CaptureAllSaveableEntities();
+            Capture();
             _storage.Save();
         }
 
-        private void CaptureAllSaveableEntities()
+        private void Capture()
         {
             foreach (var saveable in GameObject.FindObjectsOfType<SaveableEntity>(IncludeInactive))
             {

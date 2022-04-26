@@ -1,15 +1,10 @@
-﻿// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
-using System;
+﻿using System;
 using UnityEngine;
 using Rano;
 
 namespace Rano
 {
-    public abstract class SingletonScriptableObject<T> : ScriptableObject where T : ScriptableObject
+    public abstract class ResourcesSingletonScriptableObject<T> : ScriptableObject where T : ScriptableObject
     {
         private static T _instance;
         private static readonly object Lock = new object();
@@ -22,7 +17,7 @@ namespace Rano
                 {
                     if (_instance == null)
                     {
-                        Log.Info($"Loading SingletonScriptableObject from Resources ({typeof(T).Name})");
+                        Log.Info($"Loading from Resources ({typeof(T).Name})");
                         _instance = Resources.Load(typeof(T).Name) as T;
                     }
                     return _instance;

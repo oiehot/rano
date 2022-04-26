@@ -153,7 +153,7 @@ namespace Rano.PlatformServices.Billing
             return false;
         }
         
-        public async void SetProductsAsync(Dictionary<string, InAppProduct> products)
+        public async Task SetProductsAsync(Dictionary<string, InAppProduct> products)
         {
             // 상품들의 영수증들을 검증하고 구매상태를 갱신한다.
             await ValidatePurchaseStatesAsync(products);

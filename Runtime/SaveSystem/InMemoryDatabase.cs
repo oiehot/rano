@@ -15,7 +15,7 @@ namespace Rano.SaveSystem
     public sealed class InMemoryDatabase : Singleton<InMemoryDatabase>
     {
         private Dictionary<string, object> _dict;
-        public string LastModifiedDateField => $"{typeof(InMemoryDatabase).ToString()}.LastModifiedDate";
+        public string LastModifiedDateKey => $"{typeof(InMemoryDatabase).ToString()}.LastModifiedDate";
         public string SavePath { get; private set; }
         public string TemporarySavePath { get; private set; }
 
@@ -29,14 +29,14 @@ namespace Rano.SaveSystem
         public void LogStatus()
         {
             Log.Info($"{nameof(InMemoryDatabase)}");
-            Log.Info($"  LastModifiedDate Key: {LastModifiedDateField}");
-            Log.Info($"  LastModifiedDate: {_dict[LastModifiedDateField]}");
+            Log.Info($"  LastModifiedDate Key: {LastModifiedDateKey}");
+            Log.Info($"  LastModifiedDate: {_dict[LastModifiedDateKey]}");
             Log.Info($"  SavePath: {SavePath}");
             Log.Info($"  TemporarySavePath: {TemporarySavePath}");
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             Log.Info($"  JsonSavePath: {JsonSavePath}");
             Log.Info($"  TemporaryJsonSavePath: {TemporaryJsonSavePath}");
-            Log.Info($"  ResetOnStart Prefs Key: {ResetOnStart.Key}");
+            Log.Info($"  ResetOnStart Key: {ResetOnStart.Key}");
             Log.Info($"  ResetOnStart: {ResetOnStart.Value}");
 #endif
         }
@@ -65,7 +65,7 @@ namespace Rano.SaveSystem
 
         private void UpdateLastModifiedDate()
         {
-            _dict[LastModifiedDateField] = DateTime.Now.ToString();
+            _dict[LastModifiedDateKey] = DateTime.Now.ToString();
         }
 
         private void Clear()
