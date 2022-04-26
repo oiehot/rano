@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEditor.Build.Reporting;
 using Rano;
 using RanoEditor.Helper;
+using UnityEditor.AddressableAssets.Build;
+using UnityEditor.Build;
 
 namespace RanoEditor.Build
 {
@@ -76,10 +78,14 @@ namespace RanoEditor.Build
             // 빌드 아웃풋 경로 설정 (파일 경로)
             _options.locationPathName = GetOutputPath();
 
-            // TODO: 어드레서블 빌드
+            // 어드레서블 빌드
             Log.Important($"Building Addressable Assets...");
             PreprocessAddressableBuild();
-            UnityEditor.AddressableAssets.Settings.AddressableAssetSettings.BuildPlayerContent();
+            UnityEditor.AddressableAssets.Settings.AddressableAssetSettings.BuildPlayerContent(out var addressablesPlayerBuildResult);
+            if (string.IsNullOrEmpty(addressablesPlayerBuildResult.Error) == false)
+            {
+                throw new BuildFailedException($"어드러세블 빌드에 실패했습니다 ({addressablesPlayerBuildResult.Error})");
+            }
             PostprocessAddressableBuild();
 
             // 빌드 시작 전 로그
