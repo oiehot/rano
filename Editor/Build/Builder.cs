@@ -81,10 +81,10 @@ namespace RanoEditor.Build
             // 어드레서블 빌드
             Log.Important($"Building Addressable Assets...");
             PreprocessAddressableBuild();
-            UnityEditor.AddressableAssets.Settings.AddressableAssetSettings.BuildPlayerContent(out var addressablesPlayerBuildResult);
-            if (string.IsNullOrEmpty(addressablesPlayerBuildResult.Error) == false)
+            UnityEditor.AddressableAssets.Settings.AddressableAssetSettings.BuildPlayerContent(out var addrBuildResult);
+            if (string.IsNullOrEmpty(addrBuildResult.Error) == false)
             {
-                throw new BuildFailedException($"어드러세블 빌드에 실패했습니다 ({addressablesPlayerBuildResult.Error})");
+                throw new BuildFailedException($"어드러세블 빌드에 실패했습니다 ({addrBuildResult.Error})");
             }
             PostprocessAddressableBuild();
 

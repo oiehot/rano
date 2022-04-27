@@ -60,6 +60,8 @@ namespace Rano.PlatformServices.Billing
 
         public async Task<ValidatePurchaseResult> ValidateAsync(string rawReceipt)
         {
+            await Task.Yield();
+            
             IPurchaseReceipt[] validateReceipts;
             try
             {

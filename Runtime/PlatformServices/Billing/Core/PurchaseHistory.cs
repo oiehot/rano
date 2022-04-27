@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web.WebPages;
+using Rano.EventSystem;
 using UnityEngine;
 using Rano.SaveSystem;
 
@@ -11,37 +13,55 @@ namespace Rano.PlatformServices.Billing
         public Dictionary<string, InAppProduct> products;
     }
     
-    public sealed class PurchaseHistory : MonoBehaviour, ISaveLoadable
+    public sealed class PurchaseHistory : MonoBehaviour, IPurchaseHistory, ISaveLoadable
     {
-        private PurchaseManager _purchaseManager;
+        private IPurchaseManager _purchaseManager;
         private Dictionary<string, InAppProduct> _products = new();
+        
+        public Action OnInitialized { get; set; }
+        public Action OnUpdated { get; set; }
+        
         public Dictionary<string, InAppProduct> Products => _products;
 
         private void Awake()
         {
-            _purchaseManager = this.GetRequiredComponent<PurchaseManager>();
+            _purchaseManager = this.GetRequiredComponent<IPurchaseManager>();
         }
+        
         private void OnEnable()
         {
-            _purchaseManager.OnInitialized += HandleInitialized;
-            _purchaseManager.OnValidatePurchaseSuccess += HandleValidatePurchaseSuccess;
-            _purchaseManager.OnValidatePurchaseFailed += HandleValidatePurchaseFailed;
+            _purchaseManager.onInitialized += HandleInitialized;
+            _purchaseManager.onUpdateSuccess += HandleUpdated;
+            _purchaseManager.onValidatePurchaseSuccess += HandleValidatePurchaseSuccess;
+            _purchaseManager.onValidatePurchaseFailed += HandleValidatePurchaseFailed;
         }
 
         private void OnDisable()
         {
-            _purchaseManager.OnInitialized -= HandleInitialized;
-            _purchaseManager.OnValidatePurchaseSuccess -= HandleValidatePurchaseSuccess;
-            _purchaseManager.OnValidatePurchaseFailed -= HandleValidatePurchaseFailed;
+            _purchaseManager.onInitialized -= HandleInitialized;
+            _purchaseManager.onUpdateSuccess -= HandleUpdated;
+            _purchaseManager.onValidatePurchaseSuccess -= HandleValidatePurchaseSuccess;
+            _purchaseManager.onValidatePurchaseFailed -= HandleValidatePurchaseFailed;
         }
 
         private void HandleInitialized(InAppProduct[] products)
         {
-            Log.Info($"상품목록을 PurchaseHistory로 가져옵니다 (src:{products.Length}, current:{_products.Count})");
+            Log.Info($"PurchaseManager가 초기화되어 상품목록을 PurchaseHistory로 가져옵니다 (src:{products.Length}, current:{_products.Count})");
             foreach (var product in products)
             {
-                AddProduct(product);
+                UpdateProduct(product);
             }
+            OnInitialized?.Invoke();
+        }
+
+        private void HandleUpdated(InAppProduct[] products)
+        {
+            Log.Info($"PurchaseManager가 업데이트되어 상품목록을 PurchaseHistory로 가져옵니다 (src:{products.Length}, current:{_products.Count})");
+            foreach (var product in products)
+            {
+                UpdateProduct(product);
+            }
+            OnUpdated?.Invoke();
         }
 
         private void HandleValidatePurchaseSuccess(InAppProduct newProduct)
@@ -77,15 +97,21 @@ namespace Rano.PlatformServices.Billing
             }
         }
 
-        private void AddProduct(InAppProduct product)
+        private void UpdateProduct(InAppProduct product)
         {
-            // 주의: 에디터에서는 이미 있으면 업데이트 하지 않는다. 로컬데이터가 우선시 되기 때문이다.
-            #if (UNITY_EDITOR)
+            #if UNITY_EDITOR
                 if (_products.ContainsKey(product.id) == false)
                 {
+                    Log.Info($"PurchaseHistory 상품정보 업데이트됨 ({product.id}, *신규)");
                     _products[product.id] = product;
                 }
+                else
+                {
+                    // 주의: 에디터에서는 이미 있으면 업데이트 하지 않는다. 로컬데이터가 우선시 되기 때문이다.
+                    Log.Info($"PurchaseHistory 상품정보 업데이트 생략됨 ({product.id}, reason:로컬데이터 우선)");
+                }
             #else
+                Log.Info($"PurchaseHistory 상품정보 업데이트됨 ({product.id})");
                 _products[product.id] = product;
             #endif   
         }
@@ -94,7 +120,7 @@ namespace Rano.PlatformServices.Billing
         {
             if (_products.TryGetValue(productId, out var product))
             {
-                Log.Info($"PurchaseHistory에 저장된 상품의 검증상태를 업데이트합니다 (productId:{productId}, validate:{value})");
+                // Log.Info($"PurchaseHistory에 저장된 상품의 검증상태를 업데이트합니다 (productId:{productId}, validate:{value})");
                 product.validated = value;
                 product.lastValidateDateTime = DateTime.Now;
             }
@@ -137,7 +163,32 @@ namespace Rano.PlatformServices.Billing
         [ContextMenu("Log Status")]
         public void LogStatus()
         {
-            Log.Info($"Products in {nameof(PurchaseHistory)} ({_products.Count})");
+            Log.Info($"{nameof(PurchaseHistory)} Status:");
+            Log.Info($"  products:");
+            foreach (var kv in _products)
+            {
+                string productId = kv.Key;
+                InAppProduct product = kv.Value;
+                int receiptLen = String.IsNullOrEmpty(product.receipt) ? 0 : product.receipt.Length; 
+                Log.Info($"    - {productId} (type:{product.type}, hasReceipt:{product.hasReceipt}, receiptLen:{receiptLen}, validated:{product.validated}, purchased:{IsPurchased(product.id)}, purchaseCount:{product.purchaseCount})");
+            }
+        }
+
+        public void LogProduct(string productId)
+        {
+            if (_products.TryGetValue(productId, out var product))
+            {
+                product.LogStatus();
+            }
+            else
+            {
+                Log.Warning($"상품을 찾을 수 없습니다 ({productId})");
+            }
+        }
+
+        public void LogProducts()
+        {
+            Log.Info($"{nameof(PurchaseHistory)} Products: ({_products.Count})");
             foreach (var kv in _products)
             {
                 InAppProduct product = kv.Value;

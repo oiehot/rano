@@ -10,7 +10,7 @@ namespace Rano.PlatformServices.Gaming
 {
     public sealed class AuthManager : MonoSingleton<AuthManager>
     {
-        private bool _lastResult = false;
+        // private bool _lastResult = false;
         public Action onAuthCompleted;
         public Action onAuthNotAvailable;
         public Action onAuthFailed;
@@ -54,14 +54,14 @@ namespace Rano.PlatformServices.Gaming
                 else if (result.AuthStatus == LocalPlayerAuthStatus.Authenticated)
                 {
                     Log.Info("게임서비스 로컬사용자: " + result.LocalPlayer);
-                    _lastResult = true;
+                    // _lastResult = true;
                     IsAuthWorking = false;
                     onAuthCompleted?.Invoke();
                 }
                 else if (result.AuthStatus == LocalPlayerAuthStatus.NotAvailable)
                 {
                     Log.Warning("게임서비스 로컬사용자 사용불가능");
-                    _lastResult = false;
+                    // _lastResult = false;
                     IsAuthWorking = false;
                     onAuthNotAvailable?.Invoke();
                 }
@@ -75,7 +75,7 @@ namespace Rano.PlatformServices.Gaming
             else
             {
                 Log.Warning($"게임서비스 로그인 실패 ({error})");
-                _lastResult = false;
+                // _lastResult = false;
                 IsAuthWorking = false;
                 onAuthFailed?.Invoke();
             }

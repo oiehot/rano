@@ -1,21 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using Rano.SaveSystem;
 
 namespace Rano.PlatformServices.Billing
 {
-    public class PurchaseHistoryValidator : MonoBehaviour
+    public class PurchaseHistoryValidator : MonoBehaviour, IPurchaseHistoryValidator 
     {
-        private PurchaseManager _purchaseManager;
-        private PurchaseHistory _purchaseHistory;
+        private IPurchaseHistory _purchaseHistory;
         private IReceiptValidator _receiptValidator;
+        
+        public Action OnValidated { get; set; }
         
         private void Awake()
         {
-            _purchaseManager = this.GetRequiredComponent<PurchaseManager>();
-            _purchaseHistory = this.GetRequiredComponent<PurchaseHistory>();
+            _purchaseHistory = this.GetRequiredComponent<IPurchaseHistory>();
             #if (!UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE_OSX))
                 _receiptValidator = this.GetRequiredComponent<LocalReceiptValidator>();
             #else
@@ -23,20 +21,31 @@ namespace Rano.PlatformServices.Billing
             #endif
         }
 
-        [ContextMenu(nameof(Validate))]
-        public void Validate()
+        private void OnEnable()
         {
+            _purchaseHistory.OnInitialized += HandleHistoryInitialized;
+            _purchaseHistory.OnUpdated += HandleHistoryUpdated;
+        }
+
+        private void OnDisable()
+        {
+            _purchaseHistory.OnInitialized -= HandleHistoryInitialized;
+            _purchaseHistory.OnUpdated -= HandleHistoryUpdated;
+        }
+        
+        private void HandleHistoryInitialized()
+        {
+            Log.Info("PurchaseHistory가 초기화되었으나 따로 영수증을 검증하진 않습니다.");
+        }
+
+        private void HandleHistoryUpdated()
+        {
+            Log.Info("PurchaseHistory가 업데이트 되었으므로(초기화 아님) 영수증을 검증합니다.");
             ValidateAsync().ConfigureAwait(false);
         }
         
         public async Task ValidateAsync()
         {
-            if (_purchaseManager.IsAvailable == false)
-            {
-                Log.Warning($"영수증 검증을 할 수 있는 상태가 아닙니다 (state: {_purchaseManager.State})");
-                return;
-            }
-                
             var products = _purchaseHistory.Products;
             Log.Info($"PurchaseHistory에 저장된 상품들의 영수증을 검증합니다... ({products.Count})");
             
@@ -72,6 +81,7 @@ namespace Rano.PlatformServices.Billing
                         break;
                 }
             }
+            OnValidated?.Invoke();
         }
     }
 }
