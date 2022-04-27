@@ -14,7 +14,7 @@ namespace Rano
         /// </summary>
         /// <typeparam name="T">컴포넌트 타입</typeparam>
         /// <returns>컴포넌트 존재 유무</returns>
-        public static bool HasComponent<T>(this Component component) where T : Component
+        public static bool HasComponent<T>(this Component component) // where T : Component
         {
             return component.GetComponent<T>() != null;
         }
@@ -24,7 +24,7 @@ namespace Rano
         /// </summary>
         /// <typeparam name="T">컴포넌트 타입</typeparam>
         /// <returns>찾은 컴포넌트</returns>
-        public static T GetRequiredComponent<T>(this Component component) where T : Component
+        public static T GetRequiredComponent<T>(this Component component) // where T : Component
         {
             if (component.TryGetComponent<T>(out var neighborComponent))
             {
