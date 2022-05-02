@@ -17,7 +17,7 @@ namespace Rano.PlatformServices.Admob
     /// 다음 글을 참고할것: https://ads-developers.googleblog.com/2016/04/handling-android-ad-events-in-unity.html
     /// </summary>
     [RequireComponent(typeof(CanvasSorter))]
-    public sealed class RewardedAdBase : MonoBehaviour
+    public sealed class RewardedAdBase : MonoBehaviour, IAd
     {
         private readonly object _lockObject = new object();
 
