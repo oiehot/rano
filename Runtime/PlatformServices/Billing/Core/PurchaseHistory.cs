@@ -126,7 +126,7 @@ namespace Rano.PlatformServices.Billing
             }
             else
             {
-                Log.Warning($"상품이 없어서 검증여부를 설정할 수 없음 ({productId})");
+                throw new NotFoundProductException(productId);
             }
         }
 
@@ -136,7 +136,7 @@ namespace Rano.PlatformServices.Billing
             {
                 if (product.type == InAppProductType.Subscription)
                 {
-                    throw new Exception($"구독형 상품에 대한 구매여부를 알아낼 수 없습니다");
+                    throw new NotImplementedException($"구독형 상품에 대한 구매여부를 알아낼 수 없습니다");
                 }
 
                 if (product.type == InAppProductType.NonConsumable && product.validated)
@@ -148,8 +148,7 @@ namespace Rano.PlatformServices.Billing
             }
             else
             {
-                Log.Warning($"상품이 없어서 구매여부를 얻을 수 없음 ({productId})");
-                return false;
+                throw new NotFoundProductException(productId);
             }
         }
 
