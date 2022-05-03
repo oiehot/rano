@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using Rano;
-using Rano.PlatformServices.Admob;
+using Rano.PlatformServices.Ad.Admob;
 using RanoEditor.Helper;
 using GoogleMobileAds.Editor;
 

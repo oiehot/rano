@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Rano.PlatformServices.Admob
+namespace Rano.PlatformServices.Ad
 {
     [CreateAssetMenu(fileName = "AdmobAd", menuName = "Rano/Platform Services/Admob/Admob Ad")]
     public class AdSO : ScriptableObject

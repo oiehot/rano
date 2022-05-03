@@ -1,9 +1,4 @@
-﻿// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,12 +17,12 @@ namespace Rano
         /// <summary>
         /// 정렬 대상 캔버스들.
         /// </summary>
-        public List<Canvas> canvases { get { return _canvases; } }
+        public List<Canvas> Canvases { get { return _canvases; } }
 
         /// <summary>
         /// 캔버스들의 기본 SortingOrder 값들.
         /// </summary>
-        public Dictionary<Canvas, int> originalSortingOrders { get { return _originalSortingOrders; } }
+        public Dictionary<Canvas, int> OriginalSortingOrders { get { return _originalSortingOrders; } }
 
         void Awake()
         {

@@ -1,4 +1,4 @@
-﻿namespace Rano.PlatformServices.Admob
+﻿namespace Rano.PlatformServices.Ad
 {
     public enum AdVendor
     {
@@ -17,5 +17,16 @@
         RewardedInterstitial,
         NativeAdvanced,
         NativeAdvancedMovie
+    }
+    
+    public enum AdState
+    {
+        None,
+        NotLoaded,
+        Loading,
+        Available,
+        Opening,
+        Closed,
+        Unknown
     }
 }
