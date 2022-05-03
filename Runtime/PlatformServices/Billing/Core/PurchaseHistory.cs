@@ -130,21 +130,24 @@ namespace Rano.PlatformServices.Billing
             }
         }
 
+        public bool IsPurchased(InAppProduct product)
+        {
+            if (product.type == InAppProductType.NonConsumable && product.validated)
+            {
+                return true;
+            }
+            if (product.type == InAppProductType.Subscription)
+            {
+                throw new NotImplementedException($"구독형 상품에 대한 구매여부를 알아낼 수 없습니다");
+            }
+            return false;
+        }
+
         public bool IsPurchased(string productId)
         {
             if (_products.TryGetValue(productId, out var product))
             {
-                if (product.type == InAppProductType.Subscription)
-                {
-                    throw new NotImplementedException($"구독형 상품에 대한 구매여부를 알아낼 수 없습니다");
-                }
-
-                if (product.type == InAppProductType.NonConsumable && product.validated)
-                {
-                    return true;
-                }
-                
-                return false;
+                return IsPurchased(product);
             }
             else
             {
