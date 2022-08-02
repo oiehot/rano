@@ -1,9 +1,4 @@
-﻿// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -23,6 +18,7 @@ namespace Rano.SaveSystem
             {
                 try
                 {
+                    Log.Info($"Restore from Memory ({_id})");
                     RestoreFromMemory();
                 }
                 catch (Exception e)
@@ -40,6 +36,7 @@ namespace Rano.SaveSystem
         {
             if (_autoSaveOnDestroy)
             {
+                Log.Info($"Capture and Save to Memory ({_id})");
                 CaptureToMemory();
             }
         }
@@ -62,6 +59,7 @@ namespace Rano.SaveSystem
             _id = id;
         }
 
+        [ContextMenu("Set to ClearState")]
         public void ClearState()
         {
             foreach (var saveableComponent in GetComponents<ISaveLoadable>())
@@ -70,6 +68,7 @@ namespace Rano.SaveSystem
             }
         }
 
+        [ContextMenu("Set to DefaultState")]
         public void DefaultState()
         {
             foreach (var saveableComponent in GetComponents<ISaveLoadable>())
@@ -105,12 +104,14 @@ namespace Rano.SaveSystem
             }
         }
 
+        [ContextMenu("Save")]
         public void CaptureToMemory()
         {
             var dict = CaptureState();
             InMemoryDatabase.Instance.SetDictionary(_id, dict);
         }
 
+        [ContextMenu("Load")]
         public void RestoreFromMemory()
         {
             if (InMemoryDatabase.Instance.HasKey(_id) == true)

@@ -1,9 +1,4 @@
-﻿// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
@@ -12,7 +7,7 @@ using Rano.IO;
 
 namespace Rano.SaveSystem
 {
-    public sealed class InMemoryDatabase : Singleton<InMemoryDatabase>
+    public sealed class InMemoryDatabase : Singleton<InMemoryDatabase>, IDisposable
     {
         private Dictionary<string, object> _dict;
         public string LastModifiedDateKey => $"{typeof(InMemoryDatabase).ToString()}.LastModifiedDate";
@@ -62,7 +57,7 @@ namespace Rano.SaveSystem
             Load();
 #endif
         }
-
+        
         private void UpdateLastModifiedDate()
         {
             _dict[LastModifiedDateKey] = DateTime.Now.ToString();

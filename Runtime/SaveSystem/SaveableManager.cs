@@ -13,7 +13,7 @@ namespace Rano.SaveSystem
         public bool IncludeInactive { get; set; } = true;
         public bool AutoSaveOnPause { get; set; } = false;
         public bool AutoSaveOnFocusOut { get; set; } = false;
-        public bool AutoSaveOnExit { get; set; } = false;
+        public bool AutoSaveOnExit { get; set; } = true;
         public Action OnSave { get; set; }
 
         protected override void Awake()
