@@ -1,15 +1,32 @@
 ﻿using System;
 using UnityEngine;
 using VoxelBusters.EssentialKit;
+using Rano.SaveSystem;
 
 namespace Rano.PlatformServices.Social
 {
-    /// <summary>
-    /// 리뷰요청 창을 연다.
-    /// </summary>
-    public class ReviewController : MonoBehaviour, IRateMyAppController
+    [Serializable]
+    public struct SReviewManagerData
     {
-        private bool _askReviewRequested;
+        public int askReviewCount;
+        public int openReviewCount;
+        public DateTime lastAskReviewDateTime;
+        public DateTime lastOpenReviewDateTime;
+    }
+    
+    /// <summary>
+    /// 정책준수하에 리뷰요청 다이얼로그을 띄우거나 리뷰 페이지를 열어준다.
+    /// </summary>
+    public class ReviewManager : MonoBehaviour, IRateMyAppController, ISaveLoadable
+    {
+        private bool _askReviewRequested = false;
+        private int _askReviewCount = 0;
+        private int _openReviewCount = 0;
+        private DateTime _lastAskReviewDateTime;
+        private DateTime _lastOpenReviewDateTime;
+        
+        // iOS 정책상 1년에 3회까지만 리뷰요청을 할 수 있으므로 122일 단위시간을 사용 (1년의 1/3)
+        private TimeSpan _askReviewTimeSpan = new TimeSpan(days: 122, hours: 0, minutes: 0, seconds: 0);
         
         // TODO: 유니티 국제화 패키지를 사용하여 텍스트의 국제화가 필요함.
         [SerializeField] private string _title = "Rate My App";
@@ -17,13 +34,29 @@ namespace Rano.PlatformServices.Social
         [SerializeField] private string _okButtonLabel = "OK";
         [SerializeField] private string _cancelButtonLabel = "Cancel";
         [SerializeField] private string _remindLaterButtonLabel = "Remind Me Later";
-        
         [SerializeField] private bool _useRemindMeLater = true;
 
         public Action OnClickOk { get; set; }
         public Action OnClickCancel { get; set; }
         public Action OnClickRemindLater { get; set; }        
         public Action OnClosePopup { get; set; }
+
+        public bool HasReviewOpened => (_openReviewCount > 0);
+        public bool HasReviewAsked => (_askReviewCount > 0);
+        
+        /// <summary>
+        /// 정책준수하에 AskReview 다이얼로그를 출력할 수 있는지 여부.
+        /// </summary>
+        public bool CanAskReview {
+            get
+            {
+                if ((_lastAskReviewDateTime + _askReviewTimeSpan) <= DateTime.Now)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
 
         void Awake()
         {
@@ -74,6 +107,9 @@ namespace Rano.PlatformServices.Social
         private void HandleOnClickOk()
         {
             Log.Info("Review request accepted");
+            _openReviewCount++;
+            _lastOpenReviewDateTime = DateTime.Now;    
+            // VoxelBusters.EssentialKit.RateMyApp 에 의해서 자동적으로 열린다.
         }
         
         private void HandleOnCancel()
@@ -94,10 +130,14 @@ namespace Rano.PlatformServices.Social
 
         /// <summary>
         /// 리뷰를 할지 여부를 사용자에게 묻는다.
+        /// CanAskReview를 통해 정책을 준수하는지 여부를 먼저 확인하고 실행하길 바람.
         /// </summary>
         [ContextMenu("Ask Review")]
         public void AskReview()
         {
+            Log.Info("Opens the review request dialog");
+            _askReviewCount++;
+            _lastAskReviewDateTime = DateTime.Now;
             _askReviewRequested = true;
         }
 
@@ -107,8 +147,64 @@ namespace Rano.PlatformServices.Social
         [ContextMenu("Show Review")]
         public void ShowReview()
         {
+            _openReviewCount++;
+            _lastOpenReviewDateTime = DateTime.Now;
             VoxelBusters.EssentialKit.Utilities.RequestStoreReview();
         }
+        
+        #region Implementation of ISaveLoadable
+
+        public void ClearState()
+        {
+            _askReviewCount = 0;
+            _openReviewCount = 0;
+            _lastAskReviewDateTime = DateTime.MinValue;
+            _lastOpenReviewDateTime = DateTime.MinValue;
+        }
+        
+        public void DefaultState()
+        {
+            _askReviewCount = 0;
+            _openReviewCount = 0;
+            _lastAskReviewDateTime = DateTime.MinValue;
+            _lastOpenReviewDateTime = DateTime.MinValue;
+        }
+        
+        public object CaptureState()
+        {
+            SReviewManagerData state = new SReviewManagerData
+            {
+                askReviewCount = _askReviewCount,
+                openReviewCount = _openReviewCount,
+                lastAskReviewDateTime = _lastAskReviewDateTime,
+                lastOpenReviewDateTime = _lastOpenReviewDateTime
+            };
+            return state;
+        }
+        
+        public void ValidateState(object state)
+        {
+            SReviewManagerData data = (SReviewManagerData) state;
+            if (data.askReviewCount < 0)
+            {
+                throw new StateValidateException("askReviewCount가 0이하일 수는 없음");
+            }            
+            if (data.openReviewCount < 0)
+            {
+                throw new StateValidateException("openReviewCount가 0이하일 수는 없음");
+            }
+        }
+        
+        public void RestoreState(object state)
+        {
+            var data = (SReviewManagerData) state;
+            _askReviewCount = data.askReviewCount;
+            _openReviewCount = data.openReviewCount;
+            _lastAskReviewDateTime = data.lastAskReviewDateTime;
+            _lastOpenReviewDateTime = data.lastOpenReviewDateTime;
+        }
+        
+        #endregion
         
         #region Implementation of IRateMyAppController
         
