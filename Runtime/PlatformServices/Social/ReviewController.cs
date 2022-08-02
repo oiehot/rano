@@ -92,10 +92,22 @@ namespace Rano.PlatformServices.Social
             _askReviewRequested = false;
         }
 
+        /// <summary>
+        /// 리뷰를 할지 여부를 사용자에게 묻는다.
+        /// </summary>
         [ContextMenu("Ask Review")]
         public void AskReview()
         {
             _askReviewRequested = true;
+        }
+
+        /// <summary>
+        /// 리뷰창을 바로 띄운다.
+        /// </summary>
+        [ContextMenu("Show Review")]
+        public void ShowReview()
+        {
+            VoxelBusters.EssentialKit.Utilities.RequestStoreReview();
         }
         
         #region Implementation of IRateMyAppController
@@ -135,6 +147,7 @@ namespace Rano.PlatformServices.Social
         /// <returns>평가 창을 지금 띄울것인지 여부</returns>
         public bool CanShowRateMyApp()
         {
+            // VoxelBusters.EssentialKit.RateMyApp.AskForReviewNow();
             return _askReviewRequested;
         }
         
