@@ -7,7 +7,7 @@ using Rano.IO;
 
 namespace Rano.SaveSystem
 {
-    public sealed class InMemoryDatabase : Singleton<InMemoryDatabase>, IDisposable
+    public sealed class InMemoryDatabase : Singleton<InMemoryDatabase>
     {
         private Dictionary<string, object> _dict;
         public string LastModifiedDateKey => $"{typeof(InMemoryDatabase).ToString()}.LastModifiedDate";
