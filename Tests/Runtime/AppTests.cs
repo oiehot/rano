@@ -17,7 +17,7 @@ namespace Rano.Tests
         [Test]
         public void VersionStruct_Test()
         {
-            Version v = new Version("1.2.3");
+            SVersion v = new SVersion("1.2.3");
             Assert.AreEqual(v.major, 1);
             Assert.AreEqual(v.minor, 2);
             Assert.AreEqual(v.build, 3);
@@ -26,18 +26,18 @@ namespace Rano.Tests
             Assert.AreEqual(v.fullVersion, "1.2.3 (12003)");
             Assert.AreEqual(v.GetHashCode(), 12003);
 
-            Assert.IsTrue(v == new Version("1.2.3"));
-            Assert.IsTrue(v != new Version("1.2.4"));
+            Assert.IsTrue(v == new SVersion("1.2.3"));
+            Assert.IsTrue(v != new SVersion("1.2.4"));
 
-            Assert.IsTrue(v >= new Version("1.2.3"));
-            Assert.IsTrue(v >= new Version("1.2.0"));
-            Assert.IsTrue(v > new Version("1.2.0"));
+            Assert.IsTrue(v >= new SVersion("1.2.3"));
+            Assert.IsTrue(v >= new SVersion("1.2.0"));
+            Assert.IsTrue(v > new SVersion("1.2.0"));
 
-            Assert.IsTrue(v <= new Version("1.2.3"));
-            Assert.IsTrue(v <= new Version("1.2.5"));
-            Assert.IsTrue(v < new Version("1.2.5"));
+            Assert.IsTrue(v <= new SVersion("1.2.3"));
+            Assert.IsTrue(v <= new SVersion("1.2.5"));
+            Assert.IsTrue(v < new SVersion("1.2.5"));
 
-            Version v2 = new Version(1,2,3);
+            SVersion v2 = new SVersion(1,2,3);
             Assert.AreEqual(v2.ToString(), "1.2.3");
         }
     }

@@ -19,7 +19,7 @@ namespace RanoEditor.Build
             this.version = version;
         }
 
-        public void SetVersion(Version version)
+        public void SetVersion(SVersion version)
         {
             this.version = version.ToString();
         }
@@ -33,7 +33,7 @@ namespace RanoEditor.Build
             GUILayout.Space(60);
             EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button("Update")) {
-                    Version v = new Version(version);
+                    SVersion v = new SVersion(version);
                     VersionManager.ApplyVersion(v);
                     Close();
                 }

@@ -1,15 +1,9 @@
-// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
 using UnityEngine;
-using Rano;
 
 namespace Rano.App
 {
     [System.Serializable]
-    public struct Version
+    public struct SVersion
     {
         public int major;
         public int minor;
@@ -35,7 +29,7 @@ namespace Rano.App
             }
         }
 
-        public Version(int majorVer, int minorVer, int buildVer)
+        public SVersion(int majorVer, int minorVer, int buildVer)
         {
             if (majorVer < 0) majorVer = 0;
             if (minorVer < 0) minorVer = 0;
@@ -45,7 +39,9 @@ namespace Rano.App
             build = buildVer;
         }
 
-        public Version(string versionString)
+        public static SVersion Min => new SVersion(0, 0, 0);
+        
+        public SVersion(string versionString)
         {
             string[] tokens;
             tokens = versionString.Split('.');
@@ -106,7 +102,7 @@ namespace Rano.App
 
         public override bool Equals(object o)
         {
-            Version v = (Version)o;
+            SVersion v = (SVersion)o;
             if (buildVersionCode == v.buildVersionCode) return true;
             else return false;
         }
@@ -116,34 +112,34 @@ namespace Rano.App
             return buildVersionCode;
         }
 
-        public static bool operator == (Version a, Version b) {
+        public static bool operator == (SVersion a, SVersion b) {
             if (a.buildVersionCode == b.buildVersionCode) return true;
-            else return false;
+            return false;
         }
 
-        public static bool operator != (Version a, Version b) {
+        public static bool operator != (SVersion a, SVersion b) {
             if (a.buildVersionCode != b.buildVersionCode) return true;
-            else return false;
+            return false;
         }
 
-        public static bool operator >= (Version a, Version b) {
+        public static bool operator >= (SVersion a, SVersion b) {
             if (a.buildVersionCode >= b.buildVersionCode) return true;
-            else return false;
+            return false;
         }
 
-        public static bool operator <= (Version a, Version b) {
+        public static bool operator <= (SVersion a, SVersion b) {
             if (a.buildVersionCode <= b.buildVersionCode) return true;
-            else return false;
+            return false;
         }
 
-        public static bool operator > (Version a, Version b) {
+        public static bool operator > (SVersion a, SVersion b) {
             if (a.buildVersionCode > b.buildVersionCode) return true;
-            else return false;
+            return false;
         }
 
-        public static bool operator < (Version a, Version b) {
+        public static bool operator < (SVersion a, SVersion b) {
             if (a.buildVersionCode < b.buildVersionCode) return true;
-            else return false;
+            return false;
         }
     }
 }

@@ -18,13 +18,13 @@ namespace RanoEditor.Build
         private const int PRIORITY = 100;
         private const string AUTO_INCREASE_MENU_NAME = "Build/Auto Increase Build Version";
         public static bool IsAutoIncrease { get; private set; } = true;
-        public static Version LastVersion { get; private set; }
-        public static Version CurrentVersion { get; private set; }
+        public static SVersion LastVersion { get; private set; }
+        public static SVersion CurrentVersion { get; private set; }
         public static string CurrentVersionString
         {
             get
             {
-                Version version = GetCurrentVersion();
+                SVersion version = GetCurrentVersion();
                 if (BuildManager.IsDevelopmentBuild)
                     return $"{version.ToString()}_dev";
                 else
@@ -50,12 +50,12 @@ namespace RanoEditor.Build
             return true;
         }
 
-        public static Version GetCurrentVersion()
+        public static SVersion GetCurrentVersion()
         {
-            return new Version(PlayerSettings.bundleVersion);
+            return new SVersion(PlayerSettings.bundleVersion);
         }
 
-        public static void ApplyVersion(Version version)
+        public static void ApplyVersion(SVersion version)
         {
             LastVersion = GetCurrentVersion();
             CurrentVersion = version;
@@ -67,7 +67,7 @@ namespace RanoEditor.Build
 
         private static void IncreaseVersion(int majorInc, int minorInc, int buildInc)
         {
-            Version version;
+            SVersion version;
             version = GetCurrentVersion();
             version.major += majorInc;
             version.minor += minorInc;
