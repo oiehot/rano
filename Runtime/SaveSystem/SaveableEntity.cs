@@ -19,7 +19,7 @@ namespace Rano.SaveSystem
                 try
                 {
                     Log.Info($"Restore from Memory ({_id})");
-                    RestoreFromMemory();
+                    RestoreFromDatabase();
                 }
                 catch (Exception e)
                 {
@@ -37,7 +37,7 @@ namespace Rano.SaveSystem
             if (_autoSaveOnDestroy)
             {
                 Log.Info($"Capture and Save to Memory ({_id})");
-                CaptureToMemory();
+                SaveToDatabase();
             }
         }
 
@@ -105,18 +105,18 @@ namespace Rano.SaveSystem
         }
 
         [ContextMenu("Save")]
-        public void CaptureToMemory()
+        public void SaveToDatabase()
         {
             var dict = CaptureState();
-            InMemoryDatabase.Instance.SetDictionary(_id, dict);
+            Game.Database.SetDictionary(_id, dict);
         }
 
         [ContextMenu("Load")]
-        public void RestoreFromMemory()
+        public void RestoreFromDatabase()
         {
-            if (InMemoryDatabase.Instance.HasKey(_id) == true)
+            if (Game.Database.HasKey(_id) == true)
             {
-                RestoreState(InMemoryDatabase.Instance.GetDictionary(_id));
+                RestoreState(Game.Database.GetDictionary(_id));
             }
             else
             {

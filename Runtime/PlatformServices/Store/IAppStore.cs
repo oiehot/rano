@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Rano.PlatformServices.Store
 {
-    public enum EAppStoreResult
+    public enum EGetVersionResult
     {
         Success,
         ParseError,
@@ -29,7 +29,7 @@ namespace Rano.PlatformServices.Store
         /// 앱스토어에서 이 앱의 마지막 버젼을 얻는다.
         /// </summary>
         public IEnumerator GetLatestVersionCoroutine(
-            System.Action<EAppStoreResult, SVersion?> callback
+            Action<EGetVersionResult, SVersion?> callback
         );
     }
 }

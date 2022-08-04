@@ -7,24 +7,16 @@ using Rano;
 
 namespace Rano.SaveSystem
 {
-    public sealed class SaveableManager : MonoSingleton<SaveableManager>
+    public sealed class SaveableManager : MonoBehaviour
     {
-        private InMemoryDatabase _storage;
         public bool IncludeInactive { get; set; } = true;
         public bool AutoSaveOnPause { get; set; } = false;
         public bool AutoSaveOnFocusOut { get; set; } = false;
         public bool AutoSaveOnExit { get; set; } = true;
         public Action OnSave { get; set; }
 
-        protected override void Awake()
+        private void OnApplicationQuit()
         {
-            base.Awake();
-            _storage = InMemoryDatabase.Instance;
-        }
-
-        protected override void OnApplicationQuit()
-        {
-            base.OnApplicationQuit();
             if (AutoSaveOnExit == true)
             {
                 Log.Info("OnApplicationQuit");
@@ -52,13 +44,6 @@ namespace Rano.SaveSystem
                 Save();
             }
         }
-        
-        public void Save()
-        {
-            OnSave?.Invoke();
-            Capture();
-            _storage.Save();
-        }
 
         private void Capture()
         {
@@ -68,10 +53,17 @@ namespace Rano.SaveSystem
                 string id = saveable.Id;
                 Log.Info($"{id} 게임오브젝트 상태저장");
                 var gameObjectState = saveable.CaptureState();
-                _storage.SetDictionary(id, gameObjectState);
+                Game.Database.SetDictionary(id, gameObjectState);
             }
         }
 
+        public void Save()
+        {
+            OnSave?.Invoke();
+            Capture();
+            Game.Database.Save();
+        }
+        
         [ContextMenu(nameof(LogStatus))]
         public void LogStatus()
         {

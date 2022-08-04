@@ -43,7 +43,7 @@ namespace Rano.PlatformServices.Store
             return null;
         }
         
-        public IEnumerator GetLatestVersionCoroutine(System.Action<EAppStoreResult, SVersion?> callback)
+        public IEnumerator GetLatestVersionCoroutine(System.Action<EGetVersionResult, SVersion?> callback)
         {
             using (UnityWebRequest webRequest = UnityWebRequest.Get(PageUrl))
             {
@@ -54,18 +54,18 @@ namespace Rano.PlatformServices.Store
                         var version = GetVersionOrNullByPageText(webRequest.downloadHandler.text);
                         if (version.HasValue)
                         {
-                            callback(EAppStoreResult.Success, version.Value);
+                            callback(EGetVersionResult.Success, version.Value);
                         }
                         else
                         {
-                            callback(EAppStoreResult.ParseError, null);
+                            callback(EGetVersionResult.ParseError, null);
                         }
                         break;                    
                     case UnityWebRequest.Result.ConnectionError:
                     case UnityWebRequest.Result.DataProcessingError:
                     case UnityWebRequest.Result.ProtocolError:
                     default:
-                        callback(EAppStoreResult.ConnectionError, null);
+                        callback(EGetVersionResult.ConnectionError, null);
                         break;
                 }
             }
