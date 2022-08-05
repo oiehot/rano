@@ -2,12 +2,10 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.Build.Reporting;
-using Rano;
-using RanoEditor.Helper;
 using UnityEditor.AddressableAssets.Build;
 using UnityEditor.Build;
 
-namespace RanoEditor.Build
+namespace Rano.Editor.Build
 {
     public class Builder : IBuilder
     {

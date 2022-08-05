@@ -1,15 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Rano;
 using UnityEngine.U2D;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
-using RanoEditor.Extensions;
 using UnityEditor.U2D;
 using UnityEngine;
 
-namespace RanoEditor.Build
+namespace Rano.Editor.Build
 {
     /// <summary>
     /// 빌드시 모든 SpriteAtlas 에셋의 IncludeInBuild를 꺼두고 완료되면 원상복구한다.

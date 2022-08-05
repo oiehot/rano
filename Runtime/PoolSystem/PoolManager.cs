@@ -1,8 +1,3 @@
-// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,7 +22,7 @@ namespace Rano.PoolSystem
     /// <ref>
     /// https://ansohxxn.github.io/unity%20lesson%202/ch10/
     /// </refs>
-    public sealed class PoolManager : MonoSingleton<PoolManager>
+    public sealed class PoolManager : BaseComponent
     {
         Dictionary<string, Pool> _pools = new Dictionary<string, Pool>();
         Transform _rootTransform;

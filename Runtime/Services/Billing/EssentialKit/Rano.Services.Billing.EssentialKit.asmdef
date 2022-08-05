@@ -1,0 +1,17 @@
+{
+    "name": "Rano.Services.Billing.EssentialKit",
+    "rootNamespace": "",
+    "references": [
+        "VoxelBusters.CoreLibrary",
+        "VoxelBusters.EssentialKit"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

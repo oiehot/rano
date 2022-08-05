@@ -1,14 +1,11 @@
-// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
+#if false
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Rano
+namespace Rano.Localization
 {
     /// <summary>
     /// LanaugeData.tsv는 모든 언어 데이터들이 다 들어있는 텍스트 파일이다.
@@ -54,3 +51,5 @@ namespace Rano
         }
     }
 }
+
+#endif

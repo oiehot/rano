@@ -1,0 +1,21 @@
+{
+    "name": "Rano.Editor.Intergrator.Admob",
+    "rootNamespace": "",
+    "references": [
+        "Rano",
+        "Rano.Services.Ad.Admob",
+        "Rano.Editor",
+        "GoogleMobileAds.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

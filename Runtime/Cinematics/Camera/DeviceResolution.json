@@ -1,0 +1,43 @@
+// https://www.paintcodeapp.com/news/ultimate-guide-to-iphone-resolutions
+// 360x640 * 3 = 1080x1920
+// ?x? * 3 = 1920x1200
+{
+    "flappybird":
+    {
+        "points": { "x": 288, "y": 512, "y/x": 1.77 }
+    },
+    "iphone_xs_max":
+    {
+        "size": 6.5,
+        "scale": 3,
+        "ppi": 458,
+        "points": { "x": 414, "y": 896 }
+    },
+    "iphone_x":
+    {
+        "ppi" : 458,
+        "size" : 5.8,
+        "scale" : 3,
+        "points": { "x": 375, "y": 812, "y/x": 2.16 },
+        "pixels": { "x": 1125, "y": 2436, "scale": 3 },
+        "physical": { "ppi": 458 }
+    },
+    "iphone_xr":
+    {
+        "ppi": 326,
+        "size": 6.1,
+        "scale": 2,
+        "points": { "x": 414, "y": 896, "y/x": 2.16 }
+    },
+    "iphone_8":
+    {
+        "ppi": 326,
+        "size": 4.7,
+        "scale": 2,
+        "points": { "x": 375, "y": 667, "y/x": 1.77 }
+    },
+    "ipad_prop_10p5":
+    {
+        "points": { "x": 834, "y": 1112, "y/x": 1.33 }
+    }
+}

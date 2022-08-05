@@ -1,0 +1,17 @@
+{
+    "name": "Rano.Services.Ad.Admob",
+    "rootNamespace": "",
+    "references": [
+        "Rano",
+        "Rano.Services.Ad"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

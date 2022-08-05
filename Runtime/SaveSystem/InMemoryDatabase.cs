@@ -1,13 +1,11 @@
 ﻿using System;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
 using UnityEngine;
 using Rano.IO;
 
 namespace Rano.SaveSystem
 {
-    public sealed class InMemoryDatabase : Singleton<InMemoryDatabase>
+    public sealed class InMemoryDatabase : IDatabase
     {
         private Dictionary<string, object> _dict;
         public string LastModifiedDateKey => $"{typeof(InMemoryDatabase).ToString()}.LastModifiedDate";
@@ -20,21 +18,6 @@ namespace Rano.SaveSystem
         public PrefsBool ResetOnStart { get; private set; } =
             new PrefsBool($"{typeof(InMemoryDatabase).ToString()}.ResetOnStart");
 #endif
-
-        public void LogStatus()
-        {
-            Log.Info($"{nameof(InMemoryDatabase)}");
-            Log.Info($"  LastModifiedDate Key: {LastModifiedDateKey}");
-            Log.Info($"  LastModifiedDate: {_dict[LastModifiedDateKey]}");
-            Log.Info($"  SavePath: {SavePath}");
-            Log.Info($"  TemporarySavePath: {TemporarySavePath}");
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Log.Info($"  JsonSavePath: {JsonSavePath}");
-            Log.Info($"  TemporaryJsonSavePath: {TemporaryJsonSavePath}");
-            Log.Info($"  ResetOnStart Key: {ResetOnStart.Key}");
-            Log.Info($"  ResetOnStart: {ResetOnStart.Value}");
-#endif
-        }
 
         public InMemoryDatabase()
         {
@@ -58,16 +41,41 @@ namespace Rano.SaveSystem
 #endif
         }
         
-        private void UpdateLastModifiedDate()
+        /// <summary>
+        /// 로컬파일을 읽어 메모리DB로 로드한다.
+        /// </summary>
+        public bool Load()
         {
-            _dict[LastModifiedDateKey] = DateTime.Now.ToString();
-        }
+            Dictionary<string, object> loadedDict;
 
-        private void Clear()
-        {
+            // 세이브 파일 체크
+            if (!System.IO.File.Exists(SavePath))
+            {
+                Log.Info($"{SavePath} 저장파일이 없어 로드하지 않습니다.");
+                return false;
+            }
+
+            // 저장된 파일 읽기
+            Log.Info($"{SavePath} 읽는중...");
+            try
+            {
+                var bytes = Rano.IO.LocalFile.ReadBytes(SavePath);
+                object data = Rano.Encoding.Binary.ConvertBinaryToObject(bytes);
+                loadedDict = (Dictionary<string, object>)data;
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+                Log.Warning($"{SavePath} 읽기 실패.");
+                return false;
+            }
+
             _dict.Clear();
+            _dict = loadedDict;
+            Log.Info($"{SavePath} 읽기완료.");
+            return true;
         }
-
+        
         /// <summary>
         /// 메모리DB를 로컬파일에 저장한다.
         /// TODO: 압축 및 암호화 필요.
@@ -103,51 +111,9 @@ namespace Rano.SaveSystem
             Log.Info($"{SavePath} 저장완료.");
         }
 
-        /// <summary>
-        /// 로컬파일을 읽어 메모리DB로 로드한다.
-        /// </summary>
-        public bool Load()
+        public void Clear()
         {
-            Dictionary<string, object> loadedDict;
-
-            // 세이브 파일 체크
-            if (!System.IO.File.Exists(SavePath))
-            {
-                Log.Info($"{SavePath} 저장파일이 없어 로드하지 않습니다.");
-                return false;
-            }
-
-            // 저장된 파일 읽기
-            Log.Info($"{SavePath} 읽는중...");
-            try
-            {
-                var bytes = Rano.IO.LocalFile.ReadBytes(SavePath);
-                object data = Rano.Encoding.Binary.ConvertBinaryToObject(bytes);
-                loadedDict = (Dictionary<string, object>)data;
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-                Log.Warning($"{SavePath} 읽기 실패.");
-                return false;
-            }
-
             _dict.Clear();
-            _dict = loadedDict;
-            Log.Info($"{SavePath} 읽기완료.");
-            return true;
-        }
-
-        public void SetDictionary(string key, Dictionary<string, object> value)
-        {
-            _dict[key] = value;
-            UpdateLastModifiedDate();
-        }
-
-        public void SetString(string key, string value)
-        {
-            _dict[key] = value;
-            UpdateLastModifiedDate();
         }
 
         public string GetString(string key, string defaultValue = null)
@@ -163,15 +129,47 @@ namespace Rano.SaveSystem
                 return defaultValue;
             }
         }
+        
+        public void SetString(string key, string value)
+        {
+            _dict[key] = value;
+            UpdateLastModifiedDate();
+        }
 
         public Dictionary<string, object> GetDictionary(string key)
         {
             return (Dictionary<string, object>)_dict[key];
         }
+        
+        public void SetDictionary(string key, Dictionary<string, object> value)
+        {
+            _dict[key] = value;
+            UpdateLastModifiedDate();
+        }        
 
         public bool HasKey(string key)
         {
             return _dict.ContainsKey(key);
+        }
+        
+        private void UpdateLastModifiedDate()
+        {
+            _dict[LastModifiedDateKey] = DateTime.Now.ToString();
+        }
+
+        public void LogStatus()
+        {
+            Log.Info($"{nameof(InMemoryDatabase)}");
+            Log.Info($"  LastModifiedDate Key: {LastModifiedDateKey}");
+            Log.Info($"  LastModifiedDate: {_dict[LastModifiedDateKey]}");
+            Log.Info($"  SavePath: {SavePath}");
+            Log.Info($"  TemporarySavePath: {TemporarySavePath}");
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Log.Info($"  JsonSavePath: {JsonSavePath}");
+            Log.Info($"  TemporaryJsonSavePath: {TemporaryJsonSavePath}");
+            Log.Info($"  ResetOnStart Key: {ResetOnStart.Key}");
+            Log.Info($"  ResetOnStart: {ResetOnStart.Value}");
+#endif
         }
     }
 }

@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEngine.U2D;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.AddressableAssets;
-using Rano;
 
 namespace Rano.Addressable
 {
@@ -37,7 +36,7 @@ namespace Rano.Addressable
     ///
     /// </remarks>
     // TODO: AddressableAssetManager에 포함시킬것.
-    public class AddressableSpriteAtlasManager : MonoSingleton<AddressableSpriteAtlasManager>
+    public class AddressableSpriteAtlasManager : BaseComponent
     {
         // private Dictionary<string, System.Action<SpriteAtlas>> _atlasRequests = new Dictionary<string, System.Action<SpriteAtlas>>();
         private Dictionary<string, SpriteAtlas> _spriteAtlases = new Dictionary<string, SpriteAtlas>();

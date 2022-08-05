@@ -1,4 +1,4 @@
-﻿namespace RanoEditor.Build
+﻿namespace Rano.Editor.Build
 {
     public interface IPreprocessAddressableBuild
     {

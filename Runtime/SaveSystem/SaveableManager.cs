@@ -1,15 +1,10 @@
 ﻿using System;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Collections.Generic;
 using UnityEngine;
-using Rano;
 
 namespace Rano.SaveSystem
 {
-    public sealed class SaveableManager : MonoSingleton<SaveableManager>
+    public sealed class SaveableManager : BaseComponent
     {
-        private InMemoryDatabase _storage;
         public bool IncludeInactive { get; set; } = true;
         public bool AutoSaveOnPause { get; set; } = false;
         public bool AutoSaveOnFocusOut { get; set; } = false;
@@ -19,7 +14,6 @@ namespace Rano.SaveSystem
         protected override void Awake()
         {
             base.Awake();
-            _storage = InMemoryDatabase.Instance;
         }
 
         protected override void OnApplicationQuit()
@@ -57,7 +51,7 @@ namespace Rano.SaveSystem
         {
             OnSave?.Invoke();
             Capture();
-            _storage.Save();
+            Game.Database.Save();
         }
 
         private void Capture()
@@ -68,7 +62,7 @@ namespace Rano.SaveSystem
                 string id = saveable.Id;
                 Log.Info($"{id} 게임오브젝트 상태저장");
                 var gameObjectState = saveable.CaptureState();
-                _storage.SetDictionary(id, gameObjectState);
+                Game.Database.SetDictionary(id, gameObjectState);
             }
         }
 

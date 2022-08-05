@@ -1,0 +1,17 @@
+{
+    "name": "Rano.Services.Billing",
+    "rootNamespace": "",
+    "references": [
+        "Rano",
+        "Rano.SaveSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

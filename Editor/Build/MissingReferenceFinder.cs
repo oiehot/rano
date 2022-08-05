@@ -1,9 +1,4 @@
-﻿// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
-using System.Collections;
+﻿using System.Collections;
 using System.Reflection;
 using System.Linq;
 using Rano;
@@ -11,7 +6,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace RanoEditor.Build
+namespace Rano.Editor.Build
 {
 	public class MissingReferenceFinder : MonoBehaviour
 	{

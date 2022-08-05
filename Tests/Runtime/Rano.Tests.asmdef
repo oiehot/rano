@@ -5,7 +5,8 @@
         "Rano",
         "Rano.Editor",
         "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "UnityEditor.TestRunner",
+        "Rano.Services.Cloud"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

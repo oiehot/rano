@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using Rano;
-using Rano.PlatformServices.Ad.Admob;
-using RanoEditor.Helper;
 using GoogleMobileAds.Editor;
+using Rano.Services.Ad.Admob;
 
-namespace RanoEditor.Intergrator.Admob
+namespace Rano.Editor.Intergrator.Admob
 {
     /// <summary>
     /// AdmobSettingsSO를 GoogleMobileAds Settings에 통합시킨다.

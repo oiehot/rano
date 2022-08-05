@@ -1,0 +1,19 @@
+{
+    "name": "Rano.Services.Store",
+    "rootNamespace": "",
+    "references": [
+        "Rano",
+        "Rano.SaveSystem",
+        "VoxelBusters.CoreLibrary",
+        "VoxelBusters.EssentialKit"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

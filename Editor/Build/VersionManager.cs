@@ -2,10 +2,9 @@ using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
-using Rano;
 using Rano.App;
 
-namespace RanoEditor.Build
+namespace Rano.Editor.Build
 {
     /// <summary>
     /// 빌드 버젼을 통합적으로 관리해줌

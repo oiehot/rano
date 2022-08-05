@@ -1,9 +1,4 @@
-﻿// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -27,7 +22,7 @@ namespace Rano.PoolSystem
     ///     AssetReferenceGameObjectB
     ///   
     /// </remarks>
-    public sealed class AddressablePoolManager : Singleton<AddressablePoolManager>
+    public sealed class AddressablePoolManager
     {
         private Dictionary<string, AddressablePool> _pools;
         private Transform _rootTransform;

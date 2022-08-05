@@ -1,10 +1,7 @@
 using System.IO;
-using UnityEngine;
 using UnityEditor;
-using Rano;
-using RanoEditor.OS;
 
-namespace RanoEditor.Build
+namespace Rano.Editor.Build
 {
     public static class BuildManager
     {

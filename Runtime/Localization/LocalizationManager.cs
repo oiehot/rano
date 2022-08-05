@@ -1,7 +1,4 @@
-// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
+#if false
 
 using System;
 using System.Collections;
@@ -9,9 +6,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Rano;
 
-namespace Rano
+namespace Rano.Localization
 {
-    public sealed class LocalizationManager : MonoSingleton<LocalizationManager>
+    public sealed class LocalizationManager : BaseComponent
     {
         private LocalizationLanguage language;
         private Dictionary<string, string> dict;
@@ -23,8 +20,6 @@ namespace Rano
             this.dict = new Dictionary<string, string>();
             this.fonts = new Dictionary<LocalizationLanguage, LocalizationFont>();
         }
-
-        #region Common
         
         public void SetLanguage(LocalizationLanguage language)
         {
@@ -53,11 +48,7 @@ namespace Rano
         {
             return new LocalizationLanguage(Application.systemLanguage);
         }
-
-        #endregion
-
-        #region TextTranslation
-
+        
         public void Load(LocalizationData data)
         {
             this.Clear();
@@ -84,14 +75,10 @@ namespace Rano
             }
         }
 
-        #endregion
-
         public void Clear()
         {
             this.dict.Clear();
         }
-
-        #region Font
 
         public void AddFont(LocalizationLanguage language, LocalizationFont font)
         {
@@ -128,8 +115,6 @@ namespace Rano
             else return false;
         }
 
-        #endregion
-
         /// <summary>씬 안의 모든 LocalizedText 컴포넌트를 리프레시한다</summary>
         public void Refresh()
         {
@@ -142,3 +127,5 @@ namespace Rano
         }
     }
 }
+
+#endif

@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-using Rano;
-using Rano.PlatformServices.Billing;
-using Rano.PlatformServices.Gaming;
-using RanoEditor.Helper;
+﻿using System.Collections.Generic;
+using Rano.Services.Gaming;
 using VoxelBusters.CoreLibrary.NativePlugins;
 using VoxelBusters.EssentialKit;
 
-namespace RanoEditor.Intergrator.EssentialKit
+namespace Rano.Editor.Intergrator.EssentialKit
 {
     public static class EssentialKitGameServicesIntergrator
     {

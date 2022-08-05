@@ -2,13 +2,11 @@
 
 using System;
 using System.Collections.Generic;
-using Rano;
-using Rano.PlatformServices.Billing;
-using RanoEditor.Helper;
+using Rano.Services.Billing;
 using VoxelBusters.CoreLibrary.NativePlugins;
 using VoxelBusters.EssentialKit;
 
-namespace RanoEditor.Intergrator.EssentialKit
+namespace Rano.Editor.Intergrator.EssentialKit
 {
     public static class EssentialKitBillingServicesIntergrator
     {
@@ -67,12 +65,12 @@ namespace RanoEditor.Intergrator.EssentialKit
             foreach (var iap in iaps)
             {
                 var platformIdOverrides = new NativePlatformConstantSet(
-                    iap.iosId,
-                    iap.tvosId,
-                    iap.androidId
+                    iap.IosId,
+                    null,
+                    iap.AndroidId
                 );
                 BillingProductType billingProductType;
-                switch (iap.productType)
+                switch (iap.Type)
                 {
                     case InAppProductType.Consumable:
                         billingProductType = BillingProductType.Consumable;
@@ -81,16 +79,16 @@ namespace RanoEditor.Intergrator.EssentialKit
                         billingProductType = BillingProductType.NonConsumable;
                         break;
                     default:
-                        throw new Exception($"Incompatible in-app product type ({iap.productType})");
+                        throw new Exception($"Incompatible in-app product type ({iap.Type})");
                 }
 
                 var product = new BillingProductDefinition(
-                    iap.id,
-                    iap.id,
+                    iap.Id,
+                    iap.Id,
                     platformIdOverrides,
                     billingProductType,
-                    iap.title,
-                    iap.description,
+                    iap.Title,
+                    iap.Description,
                     null,
                     null
                 );

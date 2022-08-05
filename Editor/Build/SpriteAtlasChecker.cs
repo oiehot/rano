@@ -1,18 +1,12 @@
 ﻿#if false
 
-// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
 using System.Linq;
 using UnityEngine.U2D;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
-using RanoEditor.Extensions;
 
-namespace RanoEditor.Build
+namespace Rano.Editor.Build
 {
 	/// <summary>
 	/// 모든 스프라이트 아틀라스의 IncludeInBuild를 체크하고, 켜져(On) 있으면 빌드를 중단한다.

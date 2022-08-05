@@ -1,0 +1,16 @@
+{
+    "name": "Rano.Localization",
+    "rootNamespace": "",
+    "references": [
+        "Rano"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
