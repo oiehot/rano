@@ -4,7 +4,7 @@ using System.Collections;
 namespace Rano.Mesh
 {
     [RequireComponent(typeof(LineRenderer))]
-    public class Circle : MonoBehaviour
+    public class Circle2 : MonoBehaviour
     {
         [Range(0,100)]
         public int segments = 50;

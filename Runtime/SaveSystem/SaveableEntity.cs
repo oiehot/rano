@@ -8,9 +8,24 @@ namespace Rano.SaveSystem
     public class SaveableEntity : MonoBehaviour
     {
         [SerializeField] private string _id = string.Empty;
+        
+        /// <summary>
+        /// 배치시 로드 순서. 작을수록 더 먼저 로드된다.
+        /// </summary>
+        [SerializeField] private int _order = 0;
+        
+        /// <summary>
+        /// Awake시 자동으로 로드되는지 여부
+        /// </summary>
         [SerializeField] private bool _autoLoad = false;
+        
+        /// <summary>
+        /// Destroy시 자동으로 저장할지 여부
+        /// </summary>
         [SerializeField] private bool _autoSaveOnDestroy = false;
+        
         public string Id => _id;
+        public int Order => _order;
 
         void Awake()
         {
@@ -18,7 +33,7 @@ namespace Rano.SaveSystem
             {
                 try
                 {
-                    Log.Info($"Restore from Memory ({_id})");
+                    Log.Info($"Load from Database ({_id})");
                     RestoreFromDatabase();
                 }
                 catch (Exception e)
@@ -36,7 +51,7 @@ namespace Rano.SaveSystem
         {
             if (_autoSaveOnDestroy)
             {
-                Log.Info($"Capture and Save to Memory ({_id})");
+                Log.Info($"Save to Database ({_id})");
                 SaveToDatabase();
             }
         }
@@ -51,12 +66,6 @@ namespace Rano.SaveSystem
         private void GenerateId()
         {
             _id = System.Guid.NewGuid().ToString();
-        }
-
-        public void SetId(string id)
-        {
-            // TODO: Validate
-            _id = id;
         }
 
         [ContextMenu("Set to ClearState")]
@@ -104,19 +113,22 @@ namespace Rano.SaveSystem
             }
         }
 
-        [ContextMenu("Save")]
+        [ContextMenu("Save To Database")]
         public void SaveToDatabase()
         {
-            var dict = CaptureState();
-            Game.Database.SetDictionary(_id, dict);
+            var gameObjectState = CaptureState();
+            SaveableManager saveableManager = GameObject.FindObjectOfType<SaveableManager>(includeInactive:true);
+            saveableManager.SaveStateToDatabase(_id, gameObjectState);
         }
 
-        [ContextMenu("Load")]
+        [ContextMenu("Restore From Database")]
         public void RestoreFromDatabase()
         {
-            if (Game.Database.HasKey(_id) == true)
+            SaveableManager saveableManager = GameObject.FindObjectOfType<SaveableManager>(includeInactive:true);
+            if (saveableManager.HasData(_id))
             {
-                RestoreState(Game.Database.GetDictionary(_id));
+                var stateDict = saveableManager.GetStateFromDatabase(_id);
+                RestoreState(stateDict);
             }
             else
             {
