@@ -6,7 +6,7 @@ using VoxelBusters.EssentialKit;
 
 namespace Rano.Services.Cloud
 {
-    public sealed class CloudManager : BaseComponent
+    public sealed class CloudManager : ManagerComponent
     {
         /// <summary>
         /// 기능의 활성화 여부. 계정에 로그인된 사용가능여부가 아니다.

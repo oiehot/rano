@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Rano.SaveSystem
 {
-    public sealed class SaveableManager : BaseComponent
+    public sealed class SaveableManager : ManagerComponent
     {
         public IDatabase Database { get; set; }
         public bool IncludeInactive { get; set; } = true;
@@ -12,11 +12,6 @@ namespace Rano.SaveSystem
         public bool AutoSaveOnFocusOut { get; set; } = false;
         public bool AutoSaveOnExit { get; set; } = true;
         public Action OnBeforeSave { get; set; }
-
-        protected override void Awake()
-        {
-            base.Awake();
-        }
 
         protected override void OnApplicationQuit()
         {

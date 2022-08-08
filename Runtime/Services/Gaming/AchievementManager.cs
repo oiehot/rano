@@ -7,7 +7,7 @@ using VoxelBusters.EssentialKit;
 
 namespace Rano.Services.Gaming
 {
-    public sealed class AchievementManager : BaseComponent
+    public sealed class AchievementManager : ManagerComponent
     {
         private readonly Dictionary<string, Achievement> _achievements = new Dictionary<string,Achievement>();
         private readonly Dictionary<string, AchievementInfo> _achievementInfos  = new Dictionary<string,AchievementInfo>();

@@ -5,7 +5,7 @@ using UnityEngine.Purchasing;
 
 namespace Rano.Services.Billing.UnityPurchase
 {
-    public sealed class UnityPurchaseManager : MonoBehaviour, IPurchaseManager, IStoreListener
+    public sealed class UnityPurchaseManager : ManagerComponent, IPurchaseManager, IStoreListener
     {
         private PurchaseServiceState _state = PurchaseServiceState.NotInitialized;
         private IStoreController _controller;
@@ -32,8 +32,9 @@ namespace Rano.Services.Billing.UnityPurchase
         public Action onRestoreAllPurchasesComplete { get; set; }
         public Action onRestoreAllPurchasesFailed { get; set; }
         
-        private void Awake()
+        protected void Awake()
         {
+            base.Awake();
             #if (!UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE_OSX))
                 _receiptValidator = this.GetRequiredComponent<LocalReceiptValidator>();
             #else

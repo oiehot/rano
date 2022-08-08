@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Rano.SoundSystem
 {
-    public sealed class SoundManager : BaseComponent
+    public sealed class SoundManager : ManagerComponent
     {
         Dictionary<string, AudioClip> clips;
         Dictionary<string, SoundLayer> layers;

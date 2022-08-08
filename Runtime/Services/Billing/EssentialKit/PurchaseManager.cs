@@ -18,7 +18,7 @@ namespace Rano.Services.Billing.EssentialKit
         Updated
     }
     
-    public sealed class PurchaseManager : MonoSingleton<PurchaseManager>
+    public sealed class PurchaseManager : ManagerComponent
     {
         /// <summary>
         /// 구매상품목록을 주기적으로 업데이트하는지 여부.

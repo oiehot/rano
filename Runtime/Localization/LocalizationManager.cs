@@ -8,7 +8,7 @@ using Rano;
 
 namespace Rano.Localization
 {
-    public sealed class LocalizationManager : BaseComponent
+    public sealed class LocalizationManager : ManagerComponent
     {
         private LocalizationLanguage language;
         private Dictionary<string, string> dict;

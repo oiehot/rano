@@ -17,7 +17,7 @@ namespace Rano.Network
         Connected = 1
     }
     
-    public sealed class NetworkManager : BaseComponent
+    public sealed class NetworkManager : ManagerComponent
     {
         private NetworkState _state;
 

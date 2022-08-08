@@ -17,7 +17,7 @@ namespace Rano.Services.Store
     /// <summary>
     /// 정책준수하에 리뷰요청 다이얼로그을 띄우거나 리뷰 페이지를 열어준다.
     /// </summary>
-    public class ReviewManager : BaseComponent, IRateMyAppController, ISaveLoadable
+    public class ReviewManager : ManagerComponent, IRateMyAppController, ISaveLoadable
     {
         private bool _askReviewRequested = false;
         private int _askReviewCount = 0;
@@ -62,7 +62,7 @@ namespace Rano.Services.Store
         {
             base.Awake();
             
-            Log.Info("Apply internationalized text to the review request dialog");
+            Log.Warning("TODO: Apply internationalized text to the review request dialog");
 
             // 기존 설정을 가져온다.
             RateMyAppSettings beforeSettings =

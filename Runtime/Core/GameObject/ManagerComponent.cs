@@ -2,13 +2,16 @@
 
 namespace Rano
 {
-    public class BaseComponent : MonoBehaviour
+    public class ManagerComponent : MonoBehaviour
     {
         private string ComponentName => GetType().Name;
         
         protected virtual void Awake()
         {
             Log.Sys($"{ComponentName}: Awake", caller: false);
+            
+            // 매니져 컴포넌트를 부착한 게임오브젝트는 씬 전환시 삭제되지 않아야 한다.
+            GameObject.DontDestroyOnLoad(gameObject);
         }
 
         protected virtual void OnEnable()

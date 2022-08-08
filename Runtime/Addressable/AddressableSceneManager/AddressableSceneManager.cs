@@ -13,7 +13,7 @@ using UnityEngine.ResourceManagement.ResourceLocations;
 
 namespace Rano.Addressable
 {
-    public sealed class AddressableSceneManager : BaseComponent
+    public sealed class AddressableSceneManager : ManagerComponent
     {
         Dictionary<object, SceneInstance> _scenes;
 

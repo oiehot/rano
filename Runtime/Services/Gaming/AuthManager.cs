@@ -5,7 +5,7 @@ using VoxelBusters.EssentialKit;
 
 namespace Rano.Services.Gaming
 {
-    public sealed class AuthManager : BaseComponent
+    public sealed class AuthManager : ManagerComponent
     {
         public Action OnAuthCompleted { get; set; }
         public Action OnAuthNotAvailable { get; set; }

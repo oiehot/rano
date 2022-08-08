@@ -4,7 +4,7 @@ using VoxelBusters.EssentialKit;
 
 namespace Rano.Services.Gaming
 {
-    public sealed class LeaderboardManager : BaseComponent
+    public sealed class LeaderboardManager : ManagerComponent
     {
         public bool IsFeatureAvailable => GameServices.IsAvailable() && GameServices.IsAuthenticated;
 

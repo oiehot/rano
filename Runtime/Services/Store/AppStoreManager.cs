@@ -14,7 +14,7 @@ namespace Rano.Services.Store
         UnknownError
     }
         
-    public class AppStoreManager : MonoBehaviour
+    public class AppStoreManager : ManagerComponent
     {
         private IAppStore _appstore;
         public Action OnUpdateRequired { get; set; }
@@ -24,8 +24,10 @@ namespace Rano.Services.Store
         private SVersion CurrentAppVersion => new SVersion(Application.version);
         private RuntimePlatform CurrentPlatform => Application.platform;
         
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             switch (CurrentPlatform)
             {
                 case RuntimePlatform.IPhonePlayer:

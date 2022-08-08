@@ -36,7 +36,7 @@ namespace Rano.Addressable
     ///
     /// </remarks>
     // TODO: AddressableAssetManager에 포함시킬것.
-    public class AddressableSpriteAtlasManager : BaseComponent
+    public class AddressableSpriteAtlasManager : ManagerComponent
     {
         // private Dictionary<string, System.Action<SpriteAtlas>> _atlasRequests = new Dictionary<string, System.Action<SpriteAtlas>>();
         private Dictionary<string, SpriteAtlas> _spriteAtlases = new Dictionary<string, SpriteAtlas>();
