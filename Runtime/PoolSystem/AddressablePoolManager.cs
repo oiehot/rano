@@ -51,7 +51,7 @@ namespace Rano.PoolSystem
             string assetName = reference.Asset.name;
             if (_pools.ContainsKey(assetName))
             {
-                Log.Info($"오브젝트 풀이 이미 존재함 ({assetName})");
+                Log.Warning($"오브젝트 풀이 이미 존재해서 생성할 수 없음 ({assetName})");
                 return;
             }
 
@@ -137,14 +137,16 @@ namespace Rano.PoolSystem
         public void Push(GameObject gameObject)
         {
             AddressablePool pool;
-            string assetName = gameObject.name;
-            if (_pools.TryGetValue(assetName, out pool) == true)
+            string poolName = gameObject.name;
+            
+            // 게임오브젝트의 이름으로 Pool을 얻는다.
+            if (_pools.TryGetValue(poolName, out pool) == true)
             {
                 pool.Push(gameObject);
             }
             else
             {
-                throw new Exception("풀이 없어서 Push할 수 없음.");
+                Log.Warning($"풀({poolName})이 없어서 Push할 수 없음.");
             }
         }
     }

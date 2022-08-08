@@ -96,8 +96,8 @@ namespace Rano.PoolSystem
         /// </remarks>
         public void Push(GameObject gameObject)
         {
-            gameObject.transform.SetParent(PoolTransform);
             gameObject.SetActive(false);
+            gameObject.transform.SetParent(PoolTransform);
             _stack.Push(gameObject);
         }
 
