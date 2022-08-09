@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
 using GoogleMobileAds.Editor;
 using Rano.Services.Ad.Admob;
 

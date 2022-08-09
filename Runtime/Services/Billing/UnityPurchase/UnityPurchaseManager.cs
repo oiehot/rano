@@ -32,7 +32,7 @@ namespace Rano.Services.Billing.UnityPurchase
         public Action onRestoreAllPurchasesComplete { get; set; }
         public Action onRestoreAllPurchasesFailed { get; set; }
         
-        protected void Awake()
+        protected override void Awake()
         {
             base.Awake();
             #if (!UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE_OSX))
