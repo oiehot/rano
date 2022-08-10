@@ -12,5 +12,8 @@ namespace Rano.SaveSystem
         public Dictionary<string, object> GetDictionary(string key);
         public void SetDictionary(string key, Dictionary<string, object> value);        
         public bool HasKey(string key);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD        
+        public bool UseResetOnStart { get; set; }
+#endif        
     }
 }

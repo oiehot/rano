@@ -13,10 +13,23 @@ namespace Rano.SaveSystem
         public string TemporarySavePath { get; private set; }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+        private PrefsBool _resetOnStartPref =
+            new PrefsBool($"{typeof(InMemoryDatabase).ToString()}.ResetOnStart");        
         public string JsonSavePath => $"{SavePath}.json";
         public string TemporaryJsonSavePath => $"{JsonSavePath}.tmp";
-        public PrefsBool ResetOnStart { get; private set; } =
-            new PrefsBool($"{typeof(InMemoryDatabase).ToString()}.ResetOnStart");
+        public bool UseResetOnStart
+        {
+            get
+            {
+                return _resetOnStartPref.Value;
+            }
+            set
+            {
+                string status = value ? "Enable" : "Disable";
+                Log.Info($"{status} {nameof(UseResetOnStart)}");
+                _resetOnStartPref.Value = value;
+            }
+        }
 #endif
 
         public InMemoryDatabase()
@@ -28,9 +41,9 @@ namespace Rano.SaveSystem
             TemporarySavePath = $"{SavePath}.tmp";
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (ResetOnStart.Value == true)
+            if (UseResetOnStart)
             {
-                Log.Warning($"{ResetOnStart.Key}가 켜져있어 로드하지 않고 시작합니다.");
+                Log.Warning($"ResetOnStart 플래그가 켜져있어 로드하지 않고 시작합니다.");
             }
             else
             {
@@ -78,11 +91,11 @@ namespace Rano.SaveSystem
         
         /// <summary>
         /// 메모리DB를 로컬파일에 저장한다.
-        /// TODO: 압축 및 암호화 필요.
         /// </summary>
         public void Save()
         {
             Log.Info($"{TemporarySavePath} 저장중...");
+            Log.Todo("압축 및 암호화 필요.");
             try
             {
                 var bytes = Rano.Encoding.Binary.ConvertObjectToBinary(_dict);
@@ -91,7 +104,8 @@ namespace Rano.SaveSystem
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 // 개발판에서는 json 파일도 저장한다.
                 Log.Info($"{TemporaryJsonSavePath} 저장중...");
-                var jsonString = Rano.Encoding.Json.ConvertObjectToString(_dict); // TODO: Save using FileStream
+                Log.Todo("파일스트림을 이용해서 저장해야함.");
+                var jsonString = Rano.Encoding.Json.ConvertObjectToString(_dict);
                 Rano.IO.LocalFile.WriteString(TemporaryJsonSavePath, jsonString);
 #endif
 
@@ -167,8 +181,8 @@ namespace Rano.SaveSystem
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             Log.Info($"  JsonSavePath: {JsonSavePath}");
             Log.Info($"  TemporaryJsonSavePath: {TemporaryJsonSavePath}");
-            Log.Info($"  ResetOnStart Key: {ResetOnStart.Key}");
-            Log.Info($"  ResetOnStart: {ResetOnStart.Value}");
+            Log.Info($"  ResetOnStart Key: {_resetOnStartPref.Key}");
+            Log.Info($"  {nameof(UseResetOnStart)}: {UseResetOnStart}");
 #endif
         }
     }
