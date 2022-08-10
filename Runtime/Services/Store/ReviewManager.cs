@@ -62,7 +62,7 @@ namespace Rano.Services.Store
         {
             base.Awake();
             
-            Log.Warning("TODO: Apply internationalized text to the review request dialog");
+            Log.Todo("Apply internationalized text to the review request dialog");
 
             // 기존 설정을 가져온다.
             RateMyAppSettings beforeSettings =

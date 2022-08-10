@@ -34,6 +34,10 @@ namespace Rano
         public static string infoTitleColor = "#ffffffff";
         public static string infoCallerColor = "#999999ff";
         public static string infoTextColor = "#999999ff";
+        
+        public static string todoTitleColor = "#ffffffff";
+        public static string todoCallerColor = "#ffbb00ff";
+        public static string todoTextColor = "#ffbb00ff";
 
         public static string warningTitleColor = "#ffff55ff";
         public static string warningCallerColor = "#ffff55ff";
@@ -100,6 +104,18 @@ namespace Rano
             }
         }
 
+        public static void Todo(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        {
+            if (caller)
+            {
+                UnityEngine.Debug.Log($"<size={fontSize}><color={todoTitleColor}>[TODO]</color> <color={todoCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={todoTextColor}>{text}</color></size>");
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"<size={fontSize}><color={todoTitleColor}[TODO]</color> <color={todoTextColor}>{text}</color></size>");                
+            }
+        }
+
         public static void Warning(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
             if (caller)
@@ -130,7 +146,6 @@ namespace Rano
         }
 
 #else
-
         public static void Sys(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
             if (caller) UnityEngine.Debug.Log($"[SYS] {ToShortFilepath(filePath)}.{member}[{line}]: {text}");
@@ -147,6 +162,10 @@ namespace Rano
         {
             if (caller) UnityEngine.Debug.Log($"[INFO] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
             else UnityEngine.Debug.Log($"[INFO]  {text}");
+        }
+
+        public static void Todo(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        {
         }
 
         public static void Warning(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
