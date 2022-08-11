@@ -33,7 +33,7 @@ namespace Rano.Editor.Inspector
                 EditorGUI.LabelField(position, label, new GUIContent("Property is not a reference type"));
                 GUI.color = previousColor;
             }
-        }        
+        }
     }
 }
 
