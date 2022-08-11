@@ -12,7 +12,12 @@
 		/// <returns></returns>
 		public static bool IsAssigned(this UnityEngine.Object obj)
 		{
-			return obj;
+			return (bool)obj;
+		}
+
+		public static bool IsNotAssigned(this UnityEngine.Object obj)
+		{
+			return !(bool)obj;
 		}
 
 		/// <summary>
@@ -28,6 +33,14 @@
 			return ReferenceEquals(obj, null);
 		}
 
+		/// <summary>
+		/// Wrapping객체가 null이 아닌지 체크한다.
+		/// </summary>
+		/// <remarks>
+		/// Native객체가 살아있는지 여부와는 관계없다.
+		/// </remarks>
+		/// <param name="obj"></param>
+		/// <returns></returns>
 		public static bool IsNotNull(this UnityEngine.Object obj)
         {
 			return !ReferenceEquals(obj, null);
