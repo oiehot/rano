@@ -2,6 +2,7 @@ using System;
 
 namespace Rano.SoundSystem
 {
+    #if false
     public class NotFoundSoundLayerException : Exception
     {
         public NotFoundSoundLayerException()
@@ -18,4 +19,5 @@ namespace Rano.SoundSystem
         {
         }
     }
+    #endif
 }

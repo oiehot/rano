@@ -1,153 +1,103 @@
+using System;
 using UnityEngine;
 
 namespace Rano.SoundSystem
 {
     public class SoundLayer : MonoBehaviour
     {
-        public static int classCount = 1;
-        public string layerName;
-        public float volume = 1.0f;
-        AudioSource[] audioSources;
-        string id
+        private static int ClassCount= 1;
+        private bool _isMute;
+        private AudioSource _audioSource;
+        [SerializeField] private string _name;
+        
+        public string Name
         {
             get
             {
-                return $"SoundLayer/{layerName}";
+                return _name;
+            }
+            set
+            {
+                _name = value;
             }
         }
-        bool mute = false;
+
+        public float Volume
+        {
+            get
+            {
+                return _audioSource.volume;
+            }
+            set
+            {
+                _audioSource.volume = value;
+            }
+        }
+        
+        public bool IsMute
+        {
+            get
+            {
+                return _isMute;
+            }
+            set
+            {
+                _isMute = value;
+                if (_isMute)
+                {
+                    Pause();
+                }
+                else
+                {
+                    Resume();
+                }
+            }
+        }
 
         void Awake()
         {
-            layerName = $"Unknown{SoundLayer.classCount++}";
-            audioSources = new AudioSource[5];
-            for (int i=0; i<audioSources.Length; i++)
+            if (String.IsNullOrEmpty(_name))
             {
-                audioSources[i] = gameObject.AddComponent<AudioSource>();
+                _name = $"UnknownSoundLayer{SoundLayer.ClassCount++}";
             }
+            _audioSource = gameObject.AddComponent<AudioSource>();
+            _audioSource.playOnAwake = false;
+            _audioSource.loop = false;
         }
 
-        /// <summary>
-        /// 출력이 가능한 오디오 소스를 찾는다.
-        /// </summary>
-        AudioSource GetAudioSource()
+        public void Play(AudioClip audioClip, bool loop=false)
         {
-            for (int i=0; i<audioSources.Length; i++)
-            {
-                if (!audioSources[i].isPlaying)
-                {
-                    return audioSources[i];
-                }
-            }
-            return null;
+            if (IsMute) return;
+            _audioSource.clip = audioClip;
+            _audioSource.loop = loop;
+            _audioSource.Play();
         }
 
-        /// <summary>
-        /// 사운드를 플레이한다.
-        /// </summary>
-        public AudioSource Play(AudioClip clip, bool loop=false)
+        public void PlayOneShot(AudioClip audioClip, float volume = 1.0f)
         {
-            // 뮤트되어 있으면 플레이 할 수 없다.
-            if (mute) return null;
-
-            AudioSource audioSource;
-            audioSource = GetAudioSource();
-            if (audioSource)
-            { 
-                audioSource.clip = clip;
-                audioSource.loop = loop;
-                audioSource.volume = volume;
-                audioSource.Play();
-                return audioSource;
-            }
-            else
-            {
-                Log.Warning($"{id}: Audio source is full. Unable to play Sound");
-                return null;
-            }
+            _audioSource.PlayOneShot(audioClip, volume);
         }
 
-        /// <summary>
-        /// 출력중인 특정 사운드를 중지한다.
-        /// </summary>
-        public void Stop(AudioClip clip)
+        public void Stop()
         {
-            for (int i=0; i<audioSources.Length; i++)
-            {
-                if (audioSources[i].isPlaying)
-                {
-                    if (audioSources[i].clip == clip)
-                    {
-                        audioSources[i].Stop();
-                    }
-                }
-            }
+            Log.Info($"Stop SoundLayer ({Name})");
+            _audioSource.Stop();
         }
 
-        /// <summary>
-        /// 모든 출력중인 사운드를 중지한다.
-        /// </summary>
-        public void StopAll()
-        {
-            Log.Info($"{id}: Stop all sounds");
-            for (int i=0; i<audioSources.Length; i++)
-            {
-                audioSources[i].Stop();
-            }
-        }
-
-        /// <summary>
-        /// 모든 사운드를 잠시 정지한다.
-        /// </summary>
         public void Pause()
         {
-            Log.Info($"{id}: Pause all sounds");
-            for (int i=0; i<audioSources.Length; i++)
-            {
-                audioSources[i].Pause();
-            }
+            Log.Info($"Pause SoundLayer ({Name})");
+            _audioSource.Pause();
         }
 
-        /// <summary>
-        /// 정지되었던 모든 사운드를 재개한다.
-        /// </summary>
         public void Resume()
         {
             // 뮤트되지 않은 상태에서만 하용한다.
-            if (!mute)
+            if (!IsMute)
             {
-                Log.Info($"{id}: Resume all sounds");
-                for (int i=0; i<audioSources.Length; i++)
-                {
-                    audioSources[i].UnPause();
-                }
+                Log.Info($"Resume SoundLayer ({Name})");
+                _audioSource.UnPause();
             }
-        }
-
-        /// <summary>
-        /// 사운드 Mute 여부를 설정한다.
-        /// </summary>
-        public void SetMute(bool mute)
-        {
-            this.mute = mute;
-            if (mute)
-            {
-                Log.Info($"{id}: OFF");
-                Pause();
-            }
-            else
-            {
-                Log.Info($"{id}: ON");
-                Resume();
-            }
-        }
-
-        /// <summary>
-        /// 사운드 Mute 여부를 얻는다.
-        /// </summary>
-        public bool GetMute()
-        {
-            return mute;
         }
     }
 }
