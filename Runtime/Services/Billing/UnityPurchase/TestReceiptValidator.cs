@@ -8,7 +8,7 @@ namespace Rano.Services.Billing.UnityPurchase
         public async Task<ValidatePurchaseResult> ValidateAsync(string rawReceipt)
         {
             await Task.Yield();
-            return new ValidatePurchaseResult(ValidatePurchaseResultType.SuccessTest, null);
+            return new ValidatePurchaseResult(EValidatePurchaseResultType.SuccessTest, null);
         }
     }
 }

@@ -69,9 +69,9 @@ namespace Rano.Services.Billing.UnityPurchase
             }
             catch (IAPSecurityException)
             {
-                return new ValidatePurchaseResult(ValidatePurchaseResultType.Failed, null);
+                return new ValidatePurchaseResult(EValidatePurchaseResultType.Failed, null);
             }
-            return new ValidatePurchaseResult(ValidatePurchaseResultType.Success, validateReceipts);
+            return new ValidatePurchaseResult(EValidatePurchaseResultType.Success, validateReceipts);
         }
     }
 }

@@ -62,7 +62,7 @@ namespace Rano.Services.Billing.UnityPurchase
                 var result = await _receiptValidator.ValidateAsync(product.receipt);
                 switch (result.Type)
                 {
-                    case ValidatePurchaseResultType.Success:
+                    case EValidatePurchaseResultType.Success:
                         foreach (var receipt in result.ValidateReceipts)
                         {
                             Log.Info($"영수증에서 검증됨 ({receipt.productID})");
@@ -70,12 +70,12 @@ namespace Rano.Services.Billing.UnityPurchase
                         }
                         break;
                     
-                    case ValidatePurchaseResultType.SuccessTest:
+                    case EValidatePurchaseResultType.SuccessTest:
                         Log.Info($"테스트영수증 검증됨 ({product.id})");
                         _purchaseHistory.SetValidate(product.id, true);
                         break;
                     
-                    case ValidatePurchaseResultType.Failed:
+                    case EValidatePurchaseResultType.Failed:
                         Log.Info($"영수증 검증에 실패하여 검증상태를 False로 설정 ({product.id})");
                         _purchaseHistory.SetValidate(product.id, false);
                         break;

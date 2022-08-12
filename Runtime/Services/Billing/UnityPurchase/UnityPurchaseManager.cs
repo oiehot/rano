@@ -7,14 +7,14 @@ namespace Rano.Services.Billing.UnityPurchase
 {
     public sealed class UnityPurchaseManager : ManagerComponent, IPurchaseManager, IStoreListener
     {
-        private PurchaseServiceState _state = PurchaseServiceState.NotInitialized;
+        private EPurchaseServiceState _state = EPurchaseServiceState.NotInitialized;
         private IStoreController _controller;
         private IExtensionProvider _extensions;
         private IReceiptValidator _receiptValidator;
         [SerializeField] private InAppProductSO[] _rawProducts;
      
-        public PurchaseServiceState State => _state;
-        public bool IsAvailable => _state == PurchaseServiceState.Available;        
+        public EPurchaseServiceState State => _state;
+        public bool IsAvailable => _state == EPurchaseServiceState.Available;        
         public InAppProductSO[] RawProducts
         {
             get => _rawProducts;
@@ -52,13 +52,13 @@ namespace Rano.Services.Billing.UnityPurchase
                 return;
             }
 
-            if (_state != PurchaseServiceState.NotInitialized)
+            if (_state != EPurchaseServiceState.NotInitialized)
             {
                 Log.Warning($"이미 초기화가 되었습니다. (state:{_state})");
                 return;
             }
             
-            _state = PurchaseServiceState.Initializing;
+            _state = EPurchaseServiceState.Initializing;
             var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
             
             // 원시상품들의 정보를 초기화시에 사용한다.
@@ -83,7 +83,7 @@ namespace Rano.Services.Billing.UnityPurchase
                     #if (UNITY_EDITOR || DEVELOPMENT_BUILD)
                         UnityEngine.Debug.LogWarning(e);
                     #endif
-                    _state = PurchaseServiceState.InitializeFailed;
+                    _state = EPurchaseServiceState.InitializeFailed;
                     this.onInitializeFailed?.Invoke();
                     return;
                 }
@@ -99,7 +99,7 @@ namespace Rano.Services.Billing.UnityPurchase
                 #if (UNITY_EDITOR || DEVELOPMENT_BUILD)
                     UnityEngine.Debug.LogWarning(e);
                 #endif
-                _state = PurchaseServiceState.InitializeFailed;
+                _state = EPurchaseServiceState.InitializeFailed;
                 this.onInitializeFailed?.Invoke();
             }
         }
@@ -126,7 +126,7 @@ namespace Rano.Services.Billing.UnityPurchase
         public void Purchase(string productId)
         {
             Log.Info($"구매요청 ({productId})");
-            if (_state != PurchaseServiceState.Available)
+            if (_state != EPurchaseServiceState.Available)
             {
                 Log.Warning($"구매가능한 상태가 아닙니다. (currentState:{_state})");
                 return;
@@ -140,7 +140,7 @@ namespace Rano.Services.Billing.UnityPurchase
         public void RestoreAllPurchases()
         {
             Log.Info($"구매복구 요청");
-            if (_state != PurchaseServiceState.Available)
+            if (_state != EPurchaseServiceState.Available)
             {
                 Log.Warning($"구매복구 할 수 있는 상태가 아닙니다. (state:{_state})");
                 return;
@@ -177,14 +177,14 @@ namespace Rano.Services.Billing.UnityPurchase
                 .Select(product => product.ConvertToInAppProduct())
                 .ToArray();
             this.onInitialized?.Invoke(inAppProducts);
-            _state = PurchaseServiceState.Available;
+            _state = EPurchaseServiceState.Available;
             Log.Info($"초기화 완료됨.");
         }
 
         public void OnInitializeFailed(InitializationFailureReason error)
         {
             Log.Warning($"초기화 실패 ({error})");
-            _state = PurchaseServiceState.InitializeFailed;
+            _state = EPurchaseServiceState.InitializeFailed;
             this.onInitializeFailed?.Invoke();
         }
         
@@ -236,18 +236,18 @@ namespace Rano.Services.Billing.UnityPurchase
             var result = await _receiptValidator.ValidateAsync(purchasedProduct.receipt);
             switch (result.Type)
             {
-                case ValidatePurchaseResultType.Success:
+                case EValidatePurchaseResultType.Success:
                     foreach (var receipt in result.ValidateReceipts)
                     {
                         OnValidatePurchaseSuccess(receipt.productID);
                     }
                     break;
                 
-                case ValidatePurchaseResultType.SuccessTest:
+                case EValidatePurchaseResultType.SuccessTest:
                     OnValidatePurchaseSuccess(purchasedProduct.definition.id);
                     break;
                 
-                case ValidatePurchaseResultType.Failed:
+                case EValidatePurchaseResultType.Failed:
                 default:
                     OnValidatePurchaseFailed(purchasedProduct);
                     break;
@@ -272,7 +272,7 @@ namespace Rano.Services.Billing.UnityPurchase
         
         public InAppProduct GetProduct(string productId)
         {
-            if (_state != PurchaseServiceState.Available) return null;
+            if (_state != EPurchaseServiceState.Available) return null;
             Product product = _controller.products.WithID(productId);
             if (product != null) return product.ConvertToInAppProduct();
             return null;
@@ -280,7 +280,7 @@ namespace Rano.Services.Billing.UnityPurchase
         
         public InAppProduct[] GetProducts()
         {
-            if (_state != PurchaseServiceState.Available) return null;
+            if (_state != EPurchaseServiceState.Available) return null;
             var result = _controller.products.all
                 .Select(product => product.ConvertToInAppProduct())
                 .ToArray();

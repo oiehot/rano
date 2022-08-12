@@ -2,7 +2,7 @@
 
 namespace Rano.Services.Billing.UnityPurchase
 {
-    public enum ValidatePurchaseResultType
+    public enum EValidatePurchaseResultType
     {
         Failed,
         Success,
@@ -11,13 +11,13 @@ namespace Rano.Services.Billing.UnityPurchase
 
     public struct ValidatePurchaseResult
     {
-        private ValidatePurchaseResultType _type;
+        private EValidatePurchaseResultType _type;
         private IPurchaseReceipt[] _validateReceipts;
 
-        public ValidatePurchaseResultType Type => _type;
+        public EValidatePurchaseResultType Type => _type;
         public IPurchaseReceipt[] ValidateReceipts => _validateReceipts;
 
-        public ValidatePurchaseResult(ValidatePurchaseResultType type, IPurchaseReceipt[] validateReceipts)
+        public ValidatePurchaseResult(EValidatePurchaseResultType type, IPurchaseReceipt[] validateReceipts)
         {
             _type = type;
             _validateReceipts = validateReceipts;

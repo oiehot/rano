@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Rano.IO;
@@ -130,7 +132,7 @@ namespace Rano.SaveSystem
             _dict.Clear();
         }
 
-        public string GetString(string key, string defaultValue = null)
+        public string? GetString(string key, string? defaultValue = null)
         {
             object value;
 
@@ -150,9 +152,16 @@ namespace Rano.SaveSystem
             UpdateLastModifiedDate();
         }
 
-        public Dictionary<string, object> GetDictionary(string key)
+        public Dictionary<string, object>? GetDictionary(string key)
         {
-            return (Dictionary<string, object>)_dict[key];
+            if (_dict.TryGetValue(key, out object value))
+            {
+                return (Dictionary<string, object>)value;
+            }
+            else
+            {
+                return null;
+            }
         }
         
         public void SetDictionary(string key, Dictionary<string, object> value)

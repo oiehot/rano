@@ -18,7 +18,8 @@ namespace Rano.SaveSystem
         {
         }
     }
-
+    
+    #if false
     public class GameObjectDataNotFoundException : Exception
     {
         public string SaveableEntityId { get; private set; }
@@ -40,4 +41,6 @@ namespace Rano.SaveSystem
             SaveableComponentName = saveableComponentName;
         }
     }
+    #endif
+
 }

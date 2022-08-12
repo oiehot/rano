@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,7 +8,7 @@ namespace Rano.SaveSystem
 {
     [DisallowMultipleComponent]
     public class SaveableEntity : MonoBehaviour
-    {
+    {   
         [SerializeField] private string _id = string.Empty;
         
         /// <summary>
@@ -14,47 +16,13 @@ namespace Rano.SaveSystem
         /// </summary>
         [SerializeField] private int _order = 0;
         
-        /// <summary>
-        /// Awake시 자동으로 로드되는지 여부
-        /// </summary>
-        [SerializeField] private bool _autoLoad = false;
+        public string Id
+        {
+            get => _id;
+            set => _id = value;
+        }
         
-        /// <summary>
-        /// Destroy시 자동으로 저장할지 여부
-        /// </summary>
-        [SerializeField] private bool _autoSaveOnDestroy = false;
-        
-        public string Id => _id;
         public int Order => _order;
-
-        void Awake()
-        {
-            if (_autoLoad)
-            {
-                try
-                {
-                    Log.Info($"Load from Database ({_id})");
-                    RestoreFromDatabase();
-                }
-                catch (Exception e)
-                {
-                    Log.Info($"저장된 데이터가 없거나 복구중에 예외가 발생하여 초기값으로 설정합니다. ({_id})");
-#if (UNITY_EDITOR || DEVELOPMENT_BUILD)
-                    Debug.LogWarning(e);
-#endif
-                    DefaultState();
-                }
-            }
-        }
-
-        void OnDestroy()
-        {
-            if (_autoSaveOnDestroy)
-            {
-                Log.Info($"Save to Database ({_id})");
-                SaveToDatabase();
-            }
-        }
 
         void Reset()
         {
@@ -62,91 +30,173 @@ namespace Rano.SaveSystem
         }
 
         // 실수로 Id를 바꿀 수 있기 때문에 해제함.
-        //[ContextMenu("Generate Id", false, 1401)]
+        // [ContextMenu("Generate Id", false, 1401)]
         private void GenerateId()
         {
             _id = System.Guid.NewGuid().ToString();
         }
 
         [ContextMenu("Set to ClearState")]
-        public void ClearState()
+        public bool ClearState()
         {
             foreach (var saveableComponent in GetComponents<ISaveLoadable>())
             {
-                saveableComponent.ClearState();
+                try
+                {
+                    saveableComponent.ClearState();
+                }
+                catch (Exception e)
+                {
+                    Log.Warning($"게임오브젝트를 초기상태로 만드는 중에 예외가 발생 (component:{saveableComponent})");
+                    Log.Exception(e);
+                    return false;
+                }
             }
+            return true;
         }
 
         [ContextMenu("Set to DefaultState")]
-        public void DefaultState()
+        public bool DefaultState()
         {
             foreach (var saveableComponent in GetComponents<ISaveLoadable>())
             {
-                saveableComponent.DefaultState();
+                try
+                {
+                    saveableComponent.DefaultState();
+                }
+                catch (Exception e)
+                {
+                    Log.Warning($"게임오브젝트를 기본상태로 만드는 중에 예외가 발생 (component:{saveableComponent})");
+                    Log.Exception(e);
+                    return false;
+                }
             }
+            return true;
         }
 
-        public Dictionary<string, object> CaptureState()
+
+        /// <summary>
+        /// 게임오브젝트에 달린 모든 ISaveLoadable 컴포넌트들의 상태를 캡쳐한다.
+        /// </summary>
+        /// <returns>상태 데이터들, 실패하면 null이 리턴됨</returns>
+        public Dictionary<string, object>? CaptureState()
         {
-            var dict = new Dictionary<string, object>();
+            // TODO: 두 개 이상의 컴포넌트가 있는 예외상황 대처.
+            var componentStates = new Dictionary<string, object>();
             foreach (var component in GetComponents<ISaveLoadable>())
             {
-                // TODO: 두 개 이상의 컴포넌트가 있는 예외상황 대처.
-                dict[component.GetType().ToString()] = component.CaptureState();
-            }
-            return dict;
-        }
-
-        public void RestoreState(object dict)
-        {
-            var componentStates = (Dictionary<string, object>)dict;
-            foreach (var saveableComponent in GetComponents<ISaveLoadable>())
-            {
-                // TODO: 두 개 이상의 동일컴포넌트가 있는 예외상황 대처.
-                string saveableComponentName = saveableComponent.GetType().ToString();
-                if (componentStates.TryGetValue(saveableComponentName, out object componentState) == false)
+                object componentState;
+                try
                 {
-                    throw new ComponentDataNotFoundException(_id, saveableComponentName);
+                    componentState = component.CaptureState();
                 }
-                saveableComponent.ValidateState(componentState);
-                saveableComponent.RestoreState(componentState);
+                catch (Exception e)
+                {
+                    Log.Warning($"게임오브젝트의 상태를 캡쳐하는데 예외가 발생 (component:{component})");
+                    Log.Exception(e);
+                    return null;
+                }
+                var componentName = component.GetType().ToString();
+                componentStates[componentName] = componentState;
             }
+            return componentStates;
         }
 
-        [ContextMenu("Save To Database")]
-        public void SaveToDatabase()
+        /// <summary>
+        /// 게임오브젝트에 달린 모든 ISaveLoadable 컴포넌트들의 상태를 복구한다.
+        /// </summary>
+        /// <param name="dict">컴포넌트들의 데이터</param>
+        /// <param name="useDefaultStateIfFailed">상태복구 실패시 기본상태를 사용할지 여부</param>
+        /// <returns>복구 결과</returns>
+        public bool RestoreState(object dict, bool useDefaultStateIfFailed)
         {
-            var gameObjectState = CaptureState();
-            SaveableManager saveableManager = GameObject.FindObjectOfType<SaveableManager>(includeInactive:true);
-            saveableManager.SaveStateToDatabase(_id, gameObjectState);
-        }
-
-        [ContextMenu("Restore From Database")]
-        public void RestoreFromDatabase()
-        {
-            SaveableManager saveableManager = GameObject.FindObjectOfType<SaveableManager>(includeInactive:true);
-            if (saveableManager.HasData(_id))
+            // TODO: 두 개 이상의 동일컴포넌트가 있는 예외상황 대처.
+            var componentStates = (Dictionary<string, object>)dict;
+            
+            // 게임오브젝트에 달린 모든 ISaveLoadable 인터페이스를 지원하는 컴포넌트들의 상태를 복구한다.
+            foreach (ISaveLoadable component in GetComponents<ISaveLoadable>())
             {
-                var stateDict = saveableManager.GetStateFromDatabase(_id);
-                RestoreState(stateDict);
+                string componentName = component.GetType().ToString();
+                
+                // 게임오브젝트 상태 데이터에서 컴포넌트의 데이터를 찾는데 성공한 경우:
+                if (componentStates.TryGetValue(componentName, out object componentState) == true)
+                {
+                    // 상태 데이터를 검증한다.
+                    try
+                    {
+                        component.ValidateState(componentState);
+                        component.RestoreState(componentState);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Info($"컴포넌트의 상태데이터검증 또는 상태복원 중 예외 발생 (component:{componentName})");
+                        Log.Exception(e);
+                        if (useDefaultStateIfFailed)
+                        {
+                            Log.Info($"컴포넌트의 상태데이터검증 또는 상태복원에 실패하여 기본상태로 설정 (component:{componentName}");
+                            try
+                            {
+                                component.DefaultState();
+                            }
+                            catch (Exception e2)
+                            {
+                                Log.Warning($"컴포넌트를 기본상태로 만드는 중 예외가 발생 (component:{componentName})");
+                                Log.Exception(e2);
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            Log.Warning($"컴포넌트의 상태데이터검증 또는 상태복원 실패 (component:{componentName})");
+                            return false;
+                        }
+                    }
+                }
+                // 게임오브젝트 상태 데이터에서 컴포넌트의 데이터를 찾는데 실패한 경우:
+                else
+                {
+                    // 상태복구 실패시 기본상태를 사용하기로 한 경우 컴포넌트를 기본상태로 만든다.
+                    if (useDefaultStateIfFailed)
+                    {
+                        try
+                        {
+                            Log.Info($"컴포넌트의 상태데이터를 찾을 수 없어 기본상태로 설정 (component:{componentName}");
+                            component.DefaultState();
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Warning($"컴포넌트를 기본상태로 만드는 중 예외가 발생 (component:{component})");
+                            Log.Exception(e);
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        Log.Warning($"컴포넌트의 상태데이터를 찾을 수 없어 상태복원에 실패함 (component:{componentName})");
+                        return false;
+                    }
+                }
             }
-            else
-            {
-                throw new GameObjectDataNotFoundException(_id);
-            }
+            return true;
         }
-
-        public string ToJsonString()
+        
+        public string? ToJsonString()
         {
             var dict = CaptureState();
-            return Rano.Encoding.Json.ConvertObjectToString(dict);
+            if (dict != null)
+            {
+                return Rano.Encoding.Json.ConvertObjectToString(dict);
+            }
+            else return null;
         }
 
         [ContextMenu("Print Json", false, 1301)]
         public void PrintJsonString()
         {
             Log.Info($"{_id}:");
-            Debug.Log(ToJsonString());
+            string? log = ToJsonString();
+            if (log != null) Debug.Log(ToJsonString());
+            else Log.Info("  (ToJson Failed)");
         }
     }
 }

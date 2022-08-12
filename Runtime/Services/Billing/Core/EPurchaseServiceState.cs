@@ -1,6 +1,6 @@
 ﻿namespace Rano.Services.Billing
 {
-    public enum PurchaseServiceState
+    public enum EPurchaseServiceState
     {
         NotInitialized,
         Initializing,

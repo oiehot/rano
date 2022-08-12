@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Rano.Services.Ad
 {
@@ -26,8 +27,9 @@ namespace Rano.Services.Ad
         [Header("Ad Settings")]
         [SerializeField] private AdSO _adInfo;
 
+        
         [Header("Settings")]
-        [SerializeField] private bool _autoLoadOnAwake = true;
+        [FormerlySerializedAs("_autoLoadOnAwake")] [SerializeField] private bool _autoLoadOnEnable = true;
         [SerializeField] private bool _autoReload = true;
 
         protected object LockObject => _lockObject;
@@ -50,9 +52,9 @@ namespace Rano.Services.Ad
 
         protected virtual void OnEnable()
         {
-            if (_autoLoadOnAwake == true)
+            if (_autoLoadOnEnable == true)
             {
-                Log.Info($"{AdName} - AutoLoadOnAwake 플래그가 켜져있어 자동으로 광고를 로드합니다.");
+                Log.Info($"{AdName} - AutoLoadOnEnable 플래그가 켜져있어 자동으로 광고를 로드합니다.");
                 LoadAd();
             }
         }

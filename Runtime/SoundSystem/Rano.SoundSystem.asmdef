@@ -2,7 +2,9 @@
     "name": "Rano.SoundSystem",
     "rootNamespace": "",
     "references": [
-        "Rano"
+        "Rano",
+        "Rano.SaveSystem",
+        "DOTween.Modules"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,5 +1,9 @@
+#nullable enable
+
 using System;
+using DG.Tweening;
 using UnityEngine;
+using Rano.SaveSystem;
 
 namespace Rano.SoundSystem
 {
@@ -14,26 +18,28 @@ namespace Rano.SoundSystem
         System
     }
     
-    public sealed class SoundManager : ManagerComponent
+    [Serializable]
+    public struct SSoundManagerData
     {
+        public float masterVolume;
+    }
+    
+    public sealed class SoundManager : ManagerComponent, ISaveLoadable
+    {
+        private const float DEFAULT_MASTER_VOLUME = 1.0f;
         private SoundLayer[] _soundLayers;
-        private AudioListener _audioListener;
+        private AudioListener? _audioListener;
+        private SaveableManager? _saveableManager;
 
-        public float MasterVolume
-        {
-            get
-            {
-                return AudioListener.volume;
-            }
-            set
-            {
-                AudioListener.volume = value;
-            }
-        }
+        public float MasterVolume => AudioListener.volume;
 
         protected override void Awake()
         {
             base.Awake();
+
+            _saveableManager = GameObject.FindObjectOfType<SaveableManager>();
+
+            SetMasterVolume(DEFAULT_MASTER_VOLUME);
             
             int soundlayerSize = System.Enum.GetValues(typeof(ESoundLayerType)).Length;
             _soundLayers = new SoundLayer[soundlayerSize];
@@ -55,19 +61,44 @@ namespace Rano.SoundSystem
             }
         }
 
-        private SoundLayer CreateSoundLayer(string soundLayerName, float volume=1.0f)
-        {
+        private SoundLayer CreateSoundLayer(string soundLayerName)
+        {   
             Log.Info($"Create a SoundLayer ({soundLayerName})");
             
+            // GameObject를 생성한다.
             GameObject go = new GameObject(soundLayerName);
             UnityEngine.Object.DontDestroyOnLoad(go);
             go.transform.parent = gameObject.transform;
             
+            // SoundLayer 컴포넌트 부착한다.
             SoundLayer soundLayer = go.AddComponent<SoundLayer>();
             soundLayer.Name = soundLayerName;
-            soundLayer.Volume = volume;
             
+            // SaveableEntity 컴포넌트 부착한다.
+            SaveableEntity saveableEntity = go.AddComponent<SaveableEntity>();
+            saveableEntity.Id = $"{typeof(SoundManager)}.{soundLayerName}";
+            
+            // SoundLayer 상태를 복원한다.
+            if (_saveableManager)
+            {
+                _saveableManager.Load(saveableEntity, true);
+            }
+            else
+            {
+                Log.Warning($"{nameof(SaveableManager)}가 없으므로 복원하지 않습니다 ({saveableEntity.Id})");
+            }
+
             return soundLayer;
+        }
+
+        public void SetMasterVolume(float volume)
+        {
+            AudioListener.volume = volume;
+        }
+
+        public void SetMasterVolumeFade(float volume, float fadeDuration = 0.25f)
+        {
+            throw new NotImplementedException();
         }
 
         public SoundLayer GetSoundLayer(ESoundLayerType soundLayerType)
@@ -124,6 +155,44 @@ namespace Rano.SoundSystem
             {
                 soundLayer.Resume();
             }
+        }
+        
+        #endregion
+        
+        #region Implementation of ISaveLoadable
+
+        public void ClearState()
+        {
+            SetMasterVolume(DEFAULT_MASTER_VOLUME);
+        }
+        
+        public void DefaultState()
+        {
+            SetMasterVolume(DEFAULT_MASTER_VOLUME);
+        }
+        
+        public object CaptureState()
+        {
+            SSoundManagerData state = new SSoundManagerData
+            {
+                masterVolume = MasterVolume
+            };
+            return state;
+        }
+        
+        public void ValidateState(object state)
+        {
+            SSoundManagerData data = (SSoundManagerData) state;
+            if (data.masterVolume < 0f || data.masterVolume > 1f)
+            {
+                throw new StateValidateException("masterVolume은 0이상 1이하여야 합니다.");
+            }
+        }
+        
+        public void RestoreState(object state)
+        {
+            var data = (SSoundManagerData)state;
+            SetMasterVolume(data.masterVolume);
         }
         
         #endregion
