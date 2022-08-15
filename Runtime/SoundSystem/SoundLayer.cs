@@ -4,15 +4,8 @@ using DG.Tweening;
 using Rano.SaveSystem;
 
 namespace Rano.SoundSystem
-{   
-    [Serializable]
-    public struct SSoundLayerData
-    {
-        public float volume;
-        public bool mute;
-    }
-    
-    public class SoundLayer : MonoBehaviour, ISaveLoadable
+{
+    public class SoundLayer : MonoBehaviour
     {
         private const float DEFAULT_VOLUME = 1.0f;
         private const float DEFAULT_PITCH = 1.0f;
@@ -34,6 +27,12 @@ namespace Rano.SoundSystem
         {
             get => _audioSource.volume;
             private set => _audioSource.volume = value;
+        }
+
+        public float TargetVolume
+        {
+            get => _targetVolume;
+            set => _targetVolume = value;
         }
         
         public bool IsPlaying => _audioSource.isPlaying;
@@ -62,7 +61,7 @@ namespace Rano.SoundSystem
 
         public void PlayOneShot(AudioClip audioClip, float volume = 1.0f)
         {
-            if (audioClip == null) return;
+            if (!audioClip) return;
             _audioSource.PlayOneShot(audioClip, volume);
         }
 
@@ -104,7 +103,7 @@ namespace Rano.SoundSystem
             _targetVolume = volume;
             _audioSource.volume = volume;
         }
-        
+
         public void SetVolumeFade(float volume, float fadeDuration)
         {
             if (_isMute == true)
@@ -119,24 +118,23 @@ namespace Rano.SoundSystem
         public void SetMute(bool value)
         {
             if (_isMute == value) return;
-            
+
             // 뮤트를 켜서 소리를 없애는 경우:
             if (value == true)
             {
                 _isMute = true;
+                _audioSource.mute = true;
                 _audioSource.volume = 0f;
-                // TODO: _audioSource.mute = true;
-                // TODO: _audioSource.mute = true;
-                // TODO: _audioSource.mute = true;
-                // TODO: _audioSource.mute = true;
-                // TODO: _audioSource.mute = true;
+                Log.Info($"{_name} Muted");
             }
             // 뮤트를 끄고 소리를 나오게 하는 경우:
             else
             {
                 _isMute = false;
+                _audioSource.mute = false;
                 _audioSource.volume = _targetVolume;
-            }         
+                Log.Info($"{_name} Un-Muted");
+            }
         }
         
         public void SetMuteFade(bool value, float fadeDuration)
@@ -148,57 +146,29 @@ namespace Rano.SoundSystem
             {
                 _isMute = true;
                 _audioSource.DOKill();
-                _audioSource.DOFade(0f, fadeDuration);
+                _audioSource.DOFade(0f, fadeDuration)
+                    .OnComplete(
+                        () =>
+                        {
+                            _audioSource.mute = true;
+                            Log.Info($"{_name} Muted");
+                        }
+                    );
             }
             // 뮤트를 끄고 소리를 나오게 하는 경우:
             else
             {
                 _isMute = false;
                 _audioSource.DOKill();
-                _audioSource.DOFade(_targetVolume, fadeDuration);
+                _audioSource.DOFade(_targetVolume, fadeDuration)
+                    .OnComplete(
+                        () =>
+                        {
+                            _audioSource.mute = false;
+                            Log.Info($"{_name} Un-Muted");
+                        }
+                    );                    
             }         
         }
-                
-        #region Implementation of ISaveLoadable
-
-        public void ClearState()
-        {
-            SetVolume(DEFAULT_VOLUME);
-            SetMute(false);
-        }
-        
-        public void DefaultState()
-        {
-            SetVolume(DEFAULT_VOLUME);
-            SetMute(false);
-        }
-        
-        public object CaptureState()
-        {
-            SSoundLayerData state = new SSoundLayerData
-            {
-                volume = _targetVolume,
-                mute = _isMute
-            };
-            return state;
-        }
-        
-        public void ValidateState(object state)
-        {
-            SSoundLayerData data = (SSoundLayerData)state;
-            if (data.volume < 0f)
-            {
-                throw new StateValidateException($"{nameof(data.volume)}은 0이상이어야 합니다.");
-            }
-        }
-        
-        public void RestoreState(object state)
-        {
-            var data = (SSoundLayerData)state;
-            SetVolume(data.volume);
-            SetMute(data.mute);
-        }
-        
-        #endregion
     }
 }

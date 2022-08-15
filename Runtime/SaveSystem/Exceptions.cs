@@ -2,6 +2,23 @@
 
 namespace Rano.SaveSystem
 {
+    public class NotFoundDataException : Exception
+    {
+        public NotFoundDataException()
+        {
+        }
+
+        public NotFoundDataException(string message)
+            : base(message)
+        {
+        }
+
+        public NotFoundDataException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+    
     public class StateValidateException : Exception
     {
         public StateValidateException()

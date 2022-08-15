@@ -1,0 +1,19 @@
+{
+    "name": "Rano.Editor.SoundSystem",
+    "rootNamespace": "",
+    "references": [
+        "Rano",
+        "Rano.SoundSystem"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

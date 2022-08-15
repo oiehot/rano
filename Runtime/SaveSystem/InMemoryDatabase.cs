@@ -152,6 +152,24 @@ namespace Rano.SaveSystem
             UpdateLastModifiedDate();
         }
 
+        public bool GetBool(string key)
+        {
+            if (_dict.TryGetValue(key, out object value))
+            {
+                return (bool)value;
+            }
+            else
+            {
+                throw new NotFoundDataException($"데이터를 찾을 수 없음 (key: {key})");
+            }
+        }
+
+        public void SetBool(string key, bool value)
+        {
+            _dict[key] = value;
+            UpdateLastModifiedDate();
+        }
+
         public Dictionary<string, object>? GetDictionary(string key)
         {
             if (_dict.TryGetValue(key, out object value))

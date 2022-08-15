@@ -196,8 +196,7 @@ namespace Rano.SaveSystem
             }
             catch (Exception e)
             {
-                Log.Warning($"데이터베이스에서 상태를 얻는중 예외가 발생 (id:{saveableEntity.Id})");
-                Log.Exception(e);
+                Log.Info($"데이터베이스에서 상태를 얻는중 예외가 발생했습니다 (id:{saveableEntity.Id})");
                 states = null;
             }
             
@@ -213,7 +212,7 @@ namespace Rano.SaveSystem
                 }
                 else
                 {
-                    Log.Warning($"저장된 데이터가 없어 로드하지 못했습니다 (id:{saveableEntity.Id})");
+                    Log.Info($"저장된 데이터가 없어 로드하지 않았습니다 (id:{saveableEntity.Id})");
                     return false;                    
                 }
             }

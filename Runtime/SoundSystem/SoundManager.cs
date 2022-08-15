@@ -1,9 +1,11 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 using Rano.SaveSystem;
+using UnityEditor.UI;
 
 namespace Rano.SoundSystem
 {
@@ -17,13 +19,21 @@ namespace Rano.SoundSystem
         UI,
         System
     }
+
+    [Serializable]
+    public struct SSoundLayerData
+    {
+        public float volume;
+        public bool mute;
+    }
     
     [Serializable]
     public struct SSoundManagerData
     {
         public float masterVolume;
+        public Dictionary<String, SSoundLayerData> soundLayers;
     }
-    
+
     public sealed class SoundManager : ManagerComponent, ISaveLoadable
     {
         private const float DEFAULT_MASTER_VOLUME = 1.0f;
@@ -73,20 +83,6 @@ namespace Rano.SoundSystem
             // SoundLayer 컴포넌트 부착한다.
             SoundLayer soundLayer = go.AddComponent<SoundLayer>();
             soundLayer.Name = soundLayerName;
-            
-            // SaveableEntity 컴포넌트 부착한다.
-            SaveableEntity saveableEntity = go.AddComponent<SaveableEntity>();
-            saveableEntity.Id = $"{typeof(SoundManager)}.{soundLayerName}";
-            
-            // SoundLayer 상태를 복원한다.
-            if (_saveableManager)
-            {
-                _saveableManager.Load(saveableEntity, true);
-            }
-            else
-            {
-                Log.Warning($"{nameof(SaveableManager)}가 없으므로 복원하지 않습니다 ({saveableEntity.Id})");
-            }
 
             return soundLayer;
         }
@@ -101,34 +97,34 @@ namespace Rano.SoundSystem
             throw new NotImplementedException();
         }
 
-        public SoundLayer GetSoundLayer(ESoundLayerType soundLayerType)
+        public SoundLayer? GetSoundLayer(ESoundLayerType soundLayerType)
         {
             return _soundLayers[(int)soundLayerType];
         }
         
         public void PlayOneShot(ESoundLayerType soundLayerType, AudioClip audioClip, float volume=1.0f)
         {
-            GetSoundLayer(soundLayerType).PlayOneShot(audioClip, volume);
+            GetSoundLayer(soundLayerType)?.PlayOneShot(audioClip, volume);
         }
         
         public void Play(ESoundLayerType soundLayerType, AudioClip audioClip, bool loop=false)
         {
-            GetSoundLayer(soundLayerType).Play(audioClip, loop);
+            GetSoundLayer(soundLayerType)?.Play(audioClip, loop);
         }
 
         public void Pause(ESoundLayerType soundLayerType)
         {
-            GetSoundLayer(soundLayerType).Pause();
+            GetSoundLayer(soundLayerType)?.Pause();
         }
         
         public void Resume(ESoundLayerType soundLayerType)
         {
-            GetSoundLayer(soundLayerType).Resume();
+            GetSoundLayer(soundLayerType)?.Resume();
         }        
 
         public void Stop(ESoundLayerType soundLayerType)
         {
-            GetSoundLayer(soundLayerType).Stop();
+            GetSoundLayer(soundLayerType)?.Stop();
         }
         
         #region Method for All SoundLayers
@@ -156,6 +152,15 @@ namespace Rano.SoundSystem
                 soundLayer.Resume();
             }
         }
+
+        public bool IsAllMuted(ESoundLayerType[] soundLayerTypes)
+        {
+            foreach (ESoundLayerType soundLayerType in soundLayerTypes)
+            {
+                if (GetSoundLayer(soundLayerType)?.IsMute == false) return false;
+            }
+            return true;
+        }
         
         #endregion
         
@@ -173,10 +178,27 @@ namespace Rano.SoundSystem
         
         public object CaptureState()
         {
+            // SoundLayer 들의 상태를 준비한다.
+            Dictionary<String, SSoundLayerData> soundLayerDatas = new Dictionary<string, SSoundLayerData>();
+            
+            for (int i=0; i < _soundLayers.Length; i++)
+            {
+                ESoundLayerType soundLayerType = (ESoundLayerType)i;
+                SSoundLayerData soundLayerData = new SSoundLayerData
+                {
+                    mute = _soundLayers[i].IsMute,
+                    volume = _soundLayers[i].TargetVolume
+                };
+                soundLayerDatas.Add(soundLayerType.ToString(), soundLayerData);
+            }
+            
+            // SoundManager의 상태를 준비한다.
             SSoundManagerData state = new SSoundManagerData
             {
-                masterVolume = MasterVolume
+                masterVolume = MasterVolume,
+                soundLayers = soundLayerDatas
             };
+            
             return state;
         }
         
@@ -187,12 +209,40 @@ namespace Rano.SoundSystem
             {
                 throw new StateValidateException("masterVolume은 0이상 1이하여야 합니다.");
             }
+
+            foreach (KeyValuePair<string, SSoundLayerData> kv in data.soundLayers)
+            {
+                string soundLayerName = kv.Key; 
+                SSoundLayerData soundLayerData = kv.Value;
+                float volume = soundLayerData.volume;
+                if (volume < 0f || volume > 1f)
+                {
+                    throw new StateValidateException($"사운드레이어의 볼륨은 0이상 1이하여야 합니다 (soundLayer: {soundLayerName})");
+                }
+            }
         }
         
         public void RestoreState(object state)
         {
             var data = (SSoundManagerData)state;
+
+            // SoundManager 컴포넌트의 복구
             SetMasterVolume(data.masterVolume);
+            
+            // SoundLayer들의 복구
+            foreach (KeyValuePair<string, SSoundLayerData> soundLayerDataKv in data.soundLayers)
+            {
+                string soundLayerName = soundLayerDataKv.Key;
+                SSoundLayerData soundLayerData = soundLayerDataKv.Value;
+
+                ESoundLayerType soundLayerType;
+                if (ESoundLayerType.TryParse(soundLayerName, out soundLayerType) == true)
+                {
+                    int idx = (int)soundLayerType;
+                    _soundLayers[idx].SetVolume(soundLayerData.volume);
+                    _soundLayers[idx].SetMute(soundLayerData.mute);
+                }
+            }
         }
         
         #endregion

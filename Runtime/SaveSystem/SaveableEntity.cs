@@ -129,8 +129,7 @@ namespace Rano.SaveSystem
                     }
                     catch (Exception e)
                     {
-                        Log.Info($"컴포넌트의 상태데이터검증 또는 상태복원 중 예외 발생 (component:{componentName})");
-                        Log.Exception(e);
+                        Log.Info($"컴포넌트의 상태데이터검증 또는 상태복원 중 예외 발생 (component:{componentName}, exception:{e})");
                         if (useDefaultStateIfFailed)
                         {
                             Log.Info($"컴포넌트의 상태데이터검증 또는 상태복원에 실패하여 기본상태로 설정 (component:{componentName}");
@@ -140,8 +139,7 @@ namespace Rano.SaveSystem
                             }
                             catch (Exception e2)
                             {
-                                Log.Warning($"컴포넌트를 기본상태로 만드는 중 예외가 발생 (component:{componentName})");
-                                Log.Exception(e2);
+                                Log.Warning($"컴포넌트를 기본상태로 만드는 중 예외가 발생 (component:{componentName}, exception:{e2})");
                                 return false;
                             }
                         }
@@ -165,8 +163,7 @@ namespace Rano.SaveSystem
                         }
                         catch (Exception e)
                         {
-                            Log.Warning($"컴포넌트를 기본상태로 만드는 중 예외가 발생 (component:{component})");
-                            Log.Exception(e);
+                            Log.Warning($"컴포넌트를 기본상태로 만드는 중 예외가 발생 (component:{component}, exception:{e})");
                             return false;
                         }
                     }

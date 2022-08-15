@@ -8,6 +8,13 @@ using System.Runtime.CompilerServices;
 // <size=14>Size</size>
 // <color=#000000ff>Black</color>
 
+// TODO: Log.Info => Log.DEBUG_INFO
+// TODO: Log.Info => Log.RELEASE_WARNING
+// TODO: Log.DEBUG_INFO("Hello World!");
+// TODO: Log.RELEASE_INFO("Hello World!");
+// TODO: Debug.Info("Hello World");
+// TODO: Release.Info("Hello WOrld");
+
 namespace Rano
 {
     public static class Log
