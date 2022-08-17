@@ -1,197 +1,271 @@
 using System;
 using System.IO;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
-
-// <b>Bold</b>
-// <i>Italic</i>
-// <size=14>Size</size>
-// <color=#000000ff>Black</color>
-
-// TODO: Log.Info => Log.DEBUG_INFO
-// TODO: Log.Info => Log.RELEASE_WARNING
-// TODO: Log.DEBUG_INFO("Hello World!");
-// TODO: Log.RELEASE_INFO("Hello World!");
-// TODO: Debug.Info("Hello World");
-// TODO: Release.Info("Hello WOrld");
 
 namespace Rano
 {
     public static class Log
     {
+        private enum ELogType
+        {
+            Default,
+            Info,
+            Warning,
+            Error,
+            System,
+            Important,
+            Todo
+        }
+        
+        private static readonly int FONT_SIZE = 12;
+
+        private static readonly string DEFAULT_TITLE_COLOR = "#aaaaaaff";
+        private static readonly string DEFAULT_CALLER_COLOR = "#aaaaaaff";
+        private static readonly string DEFAULT_TEXT_COLOR = "#aaaaaaff";
+
+        private static readonly string INFO_TITLE_COLOR = "#ffffffff";
+        private static readonly string INFO_CALLER_COLOR = "#999999ff";
+        private static readonly string INFO_TEXT_COLOR = "#999999ff";
+        
+        private static readonly string WARNING_TITLE_COLOR = "#ffff55ff";
+        private static readonly string WARNING_CALLER_COLOR = "#ffff55ff";
+        private static readonly string WARNING_TEXT_COLOR = "#ffff55ff";
+
+        private static readonly string ERROR_TITLE_COLOR = "#ff5555ff";
+        private static readonly string ERROR_CALLER_COLOR = "#ff5555ff";
+        private static readonly string ERROR_TEXT_COLOR = "#ff5555ff";
+        
+        private static readonly string SYSTEM_TITLE_COLOR = "#ffffffff";
+        private static readonly string SYSTEM_CALLER_COLOR = "#00ffffff";
+        private static readonly string SYSTEM_TEXT_COLOR = "#00ffffff";
+
+        private static readonly string IMPORTANT_TITLE_COLOR = "#00ff00ff";
+        private static readonly string IMPORTANT_CALLER_COLOR = "#00ff00ff";
+        private static readonly string IMPORTANT_TEXT_COLOR = "#00ff00ff";
+
+        private static readonly string TODO_TITLE_COLOR = "#ffbb00ff";
+        private static readonly string TODO_CALLER_COLOR = "#ffbb00ff";
+        private static readonly string TODO_TEXT_COLOR = "#ffbb00ff";
+        
         private static string ToShortFilepath(string filePath)
         {
             var tokens = filePath.Split(new[] { '/', '\\' });
             var filenameWithExt = tokens[tokens.Length - 1];
             return Path.GetFileNameWithoutExtension(filenameWithExt);
         }
-
-#if (UNITY_EDITOR)
-
-        public static int fontSize = 12;
-
-        public static string systemTitleColor = "#ffffffff";
-        public static string systemCallerColor = "#00ffffff";
-        public static string systemTextColor = "#00ffffff";
-
-        public static string importantTitleColor = "#ffffffff";
-        public static string importantCallerColor = "#00ff00ff";
-        public static string importantTextColor = "#00ff00ff";
-
-        public static string infoTitleColor = "#ffffffff";
-        public static string infoCallerColor = "#999999ff";
-        public static string infoTextColor = "#999999ff";
         
-        public static string todoTitleColor = "#ffffffff";
-        public static string todoCallerColor = "#ffbb00ff";
-        public static string todoTextColor = "#ffbb00ff";
-
-        public static string warningTitleColor = "#ffff55ff";
-        public static string warningCallerColor = "#ffff55ff";
-        public static string warningTextColor = "#ffff55ff";
-
-        public static string errorTitleColor = "#ff5555ff";
-        public static string errorCallerColor = "#ff5555ff";
-        public static string errorTextColor = "#ff5555ff";
-
-        public static string Caller
+        private static string WithColorTag(string text, string color)
         {
-            get
-            {
-                StackTrace stackTrace = new StackTrace();
-                System.Reflection.MethodBase method;
-
-                try
-                {
-                    method = stackTrace.GetFrame(2).GetMethod();
-                }
-                catch
-                {
-                    return $"UnknownClass.UnknownMethod()";
-                }
-                string methodName = method.Name;
-                string className = method.DeclaringType.Name;
-                return $"{className}.{methodName}()";
-            }
+            #if UNITY_EDITOR
+                return $"<color={color}>{text}</color>";
+            #else
+                return text;
+            #endif
         }
 
+        private static string WithSizeTag(string text, int size)
+        {
+            #if UNITY_EDITOR
+                return $"<size={size}>{text}</size>";
+            #else
+                return text;
+            #endif
+        }
+        
+        private static string GetTitleColor(ELogType logType)
+        {
+            string result;
+            #if UNITY_EDITOR
+                result = logType switch
+                {
+                    ELogType.Info => INFO_TITLE_COLOR,
+                    ELogType.Warning => WARNING_TITLE_COLOR,
+                    ELogType.Error => ERROR_TITLE_COLOR,
+                    ELogType.System => SYSTEM_TITLE_COLOR,
+                    ELogType.Important => IMPORTANT_TITLE_COLOR,
+                    ELogType.Todo => TODO_TITLE_COLOR,
+                    _ => DEFAULT_TITLE_COLOR
+                };
+                return result;
+            #else
+                result = null;
+            #endif
+        }
+
+        private static string GetCallerColor(ELogType logType)
+        {
+            string result;
+            #if UNITY_EDITOR
+                result = logType switch
+                {
+                    ELogType.Info => INFO_CALLER_COLOR,
+                    ELogType.Warning => WARNING_CALLER_COLOR,
+                    ELogType.Error => ERROR_CALLER_COLOR,
+                    ELogType.System => SYSTEM_CALLER_COLOR,
+                    ELogType.Important => IMPORTANT_CALLER_COLOR,
+                    ELogType.Todo => TODO_CALLER_COLOR,
+                    _ => DEFAULT_CALLER_COLOR
+                };
+                return result;
+            #else
+                result = null;
+            #endif
+        }
+
+        private static string GetTextColor(ELogType logType)
+        {
+            string result;
+            #if UNITY_EDITOR
+                result = logType switch
+                {
+                    ELogType.Info => INFO_TEXT_COLOR,
+                    ELogType.Warning => WARNING_TEXT_COLOR,
+                    ELogType.Error => ERROR_TEXT_COLOR,
+                    ELogType.System => SYSTEM_TEXT_COLOR,
+                    ELogType.Important => IMPORTANT_TEXT_COLOR,
+                    ELogType.Todo => TODO_TEXT_COLOR,
+                    _ => DEFAULT_TEXT_COLOR
+                };
+                return result;
+            #else
+                result = null;
+            #endif
+        }
+
+        private static string GetLogTypeText(ELogType logType)
+        {
+            string result;
+            result = logType switch
+            {
+                ELogType.Info => "[INFO]",
+                ELogType.Warning => "[WARN]",
+                ELogType.Error => "[ERR]",
+                ELogType.System => "[SYS]",
+                ELogType.Important => "[IMPORTANT]",
+                ELogType.Todo => "[TODO]",
+                _ => "[UNKNOWN]"
+            };
+            return result;
+        }
+        
+        private static void Print(ELogType logType, string text, bool caller, string filePath, int line, string member)
+        {
+            string logTypeText = WithColorTag(GetLogTypeText(logType), GetTitleColor(logType));
+            string logText = WithColorTag(text, GetTextColor(logType));
+            
+            string callerText;
+            if (caller) callerText = WithColorTag($"{ToShortFilepath(filePath)}.{member}[{line}]: ", GetCallerColor(logType));
+            else callerText = "";
+            
+            string resultText = WithSizeTag($"{logTypeText} {callerText}{logText}", FONT_SIZE);
+
+            switch (logType)
+            {
+                case ELogType.Info:
+                    UnityEngine.Debug.Log(resultText);
+                    break;
+                case ELogType.Warning:
+                    UnityEngine.Debug.LogWarning(resultText);
+                    break;
+                case ELogType.Error:
+                    UnityEngine.Debug.LogError(resultText);
+                    break;
+                default:
+                    UnityEngine.Debug.Log(resultText);
+                    break;
+            }
+        }
+        
+        #region Logging Methods for Debug
+        
+        public static void Info(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        {
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Print(ELogType.Info, text, caller, filePath, line, member);
+            #endif
+        }
+        
+        public static void Warning(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        {
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Print(ELogType.Warning, text, caller, filePath, line, member);
+            #endif
+        }
+        
+        public static void Error(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        {
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Print(ELogType.Error, text, caller, filePath, line, member);
+            #endif
+        }
+        
         public static void Sys(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            if (caller)
-            {
-                UnityEngine.Debug.Log($"<size={fontSize}><color={systemTitleColor}>[SYS]</color> <color={systemCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={systemTextColor}>{text}</color></size>");
-            }
-            else
-            {
-                UnityEngine.Debug.Log($"<size={fontSize}><color={systemTitleColor}>[SYS]</color> <color={systemTextColor}>{text}</color></size>");
-            }
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Print(ELogType.System, text, caller, filePath, line, member);
+            #endif
         }
 
         public static void Important(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            if (caller)
-            {
-                UnityEngine.Debug.Log($"<size={fontSize}><color={importantTitleColor}>[IMPR]</color> <color={importantCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={importantTextColor}>{text}</color></size>");
-            }
-            else
-            {
-                UnityEngine.Debug.Log($"<size={fontSize}><color={importantTitleColor}>[IMPR]</color> <color={importantTextColor}>{text}</color></size>");
-            }
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Print(ELogType.Important, text, caller, filePath, line, member);
+            #endif
+        }
+
+        public static void Todo(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        {
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Print(ELogType.Todo, text, caller, filePath, line, member);
+            #endif
+        }
+
+        public static void Exception(Exception e)
+        {
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                UnityEngine.Debug.LogException(e);
+            #endif
         }
         
-        public static void Info(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        #endregion
+        
+        #region Logging Methods for Release
+        
+        public static void ReleaseInfo(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            if (caller)
-            {
-                UnityEngine.Debug.Log($"<size={fontSize}><color={infoTitleColor}>[INFO]</color> <color={infoCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={infoTextColor}>{text}</color></size>");
-            }
-            else
-            {
-                UnityEngine.Debug.Log($"<size={fontSize}><color={infoTitleColor}>[INFO]</color> <color={infoTextColor}>{text}</color></size>");                
-            }
+            Print(ELogType.Info, text, caller, filePath, line, member);
         }
 
-        public static void Todo(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        public static void ReleaseWarning(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            if (caller)
-            {
-                UnityEngine.Debug.Log($"<size={fontSize}><color={todoTitleColor}>[TODO]</color> <color={todoCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={todoTextColor}>{text}</color></size>");
-            }
-            else
-            {
-                UnityEngine.Debug.Log($"<size={fontSize}><color={todoTitleColor}[TODO]</color> <color={todoTextColor}>{text}</color></size>");                
-            }
+            Print(ELogType.Warning, text, caller, filePath, line, member);
         }
 
-        public static void Warning(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        public static void ReleaseError(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            if (caller)
-            {
-                UnityEngine.Debug.LogWarning($"<size={fontSize}><color={warningTitleColor}>[WARN]</color> <color={warningCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={warningTextColor}>{text}</color></size>");
-            }
-            else
-            {
-                UnityEngine.Debug.LogWarning($"<size={fontSize}><color={warningTitleColor}>[WARN]</color> <color={warningTextColor}>{text}</color></size>");
-            }
+            Print(ELogType.Error, text, caller, filePath, line, member);
         }
-
-        public static void Error(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        {
-            if (caller)
-            {
-                UnityEngine.Debug.LogError($"<size={fontSize}><color={errorTitleColor}>[ERR]</color> <color={errorCallerColor}>{ToShortFilepath(filePath)}.{member}[{line}]</color>: <color={errorTextColor}>{text}</color></size>");
-            }
-            else
-            {
-                UnityEngine.Debug.LogError($"<size={fontSize}><color={errorTitleColor}>[ERR]</color> <color={errorTextColor}>{text}</color></size>");
-            }
-        }
-
-        public static void Exception(Exception e)
-        {
-            UnityEngine.Debug.LogException(e);
-        }
-
-#else
-        public static void Sys(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        {
-            if (caller) UnityEngine.Debug.Log($"[SYS] {ToShortFilepath(filePath)}.{member}[{line}]: {text}");
-            else UnityEngine.Debug.Log($"[SYS]  {text}");
-        }
-
-        public static void Important(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        {
-            if (caller) UnityEngine.Debug.Log($"[IMPORTANT] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
-            else UnityEngine.Debug.Log($"[IMPORTANT]  {text}");
-        }
-
-        public static void Info(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        {
-            if (caller) UnityEngine.Debug.Log($"[INFO] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
-            else UnityEngine.Debug.Log($"[INFO]  {text}");
-        }
-
-        public static void Todo(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        {
-        }
-
-        public static void Warning(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        {
-            if (caller) UnityEngine.Debug.LogWarning($"[WARN] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
-            else UnityEngine.Debug.LogWarning($"[WARN]  {text}");
-        }
-
-        public static void Error(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        {
-            if (caller) UnityEngine.Debug.LogError($"[ERR] {ToShortFilepath(filePath)}.{member}[{line}]:  {text}");
-            else UnityEngine.Debug.LogError($"[ERR]  {text}");
-        }
-
-        public static void Exception(Exception e)
-        {
-            UnityEngine.Debug.LogException(e);
-        }
-#endif
-
+        
+        // public static void ReleaseSys(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        // {
+        //     Print(ELogType.System, text, caller, filePath, line, member);
+        // }
+        //
+        // public static void ReleaseImportant(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        // {
+        //     Print(ELogType.Important, text, caller, filePath, line, member);
+        // }
+        //
+        // public static void ReleaseTodo(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
+        // {
+        //     Print(ELogType.Todo, text, caller, filePath, line, member);
+        // }
+        //
+        // public static void ReleaseException(Exception e)
+        // {
+        //     UnityEngine.Debug.LogException(e);
+        // }
+        
+        #endregion
     }
 }

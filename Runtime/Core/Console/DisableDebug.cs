@@ -1,3 +1,5 @@
+#if false
+
 #if UNITY_EDITOR
     #define ENABLE_LOG
 #elif DEVELOPMENT_BUILD
@@ -120,5 +122,7 @@ public class Debug
     {
     }
 }
+
+#endif
 
 #endif
