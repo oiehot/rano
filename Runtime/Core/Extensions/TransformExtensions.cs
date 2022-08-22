@@ -30,5 +30,15 @@ namespace Rano
             trans.localRotation = Quaternion.identity;
             trans.localScale = new Vector3(1, 1, 1);
         }
+
+        // public static Vector2 ToRectTransformPosition(this Transform transform, Camera camera, RectTransform rectTransform)
+        // {
+        //     Vector2 viewportPos = camera.WorldToViewportPoint(transform.position);
+        //     Vector2 result = new Vector2(
+        //         ((viewportPos.x * rectTransform.sizeDelta.x) - (rectTransform.sizeDelta.x * 0.5f)),
+        //         ((viewportPos.y * rectTransform.sizeDelta.y) - (rectTransform.sizeDelta.y * 0.5f))
+        //     );
+        //     return result;
+        // }
     }
 }

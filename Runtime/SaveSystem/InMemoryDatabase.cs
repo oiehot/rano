@@ -164,6 +164,20 @@ namespace Rano.SaveSystem
             }
         }
 
+        public bool TryGetBool(string key, out bool result)
+        {
+            if (_dict.TryGetValue(key, out object value))
+            {
+                result = (bool)value;
+                return true;
+            }
+            else
+            {
+                result = default(bool);
+                return false;
+            }
+        }
+
         public void SetBool(string key, bool value)
         {
             _dict[key] = value;
