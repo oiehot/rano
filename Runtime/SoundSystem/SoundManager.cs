@@ -2,10 +2,8 @@
 
 using System;
 using System.Collections.Generic;
-using DG.Tweening;
 using UnityEngine;
 using Rano.SaveSystem;
-using UnityEditor.UI;
 
 namespace Rano.SoundSystem
 {

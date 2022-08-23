@@ -1,5 +1,4 @@
-﻿using UnityEditor.UI;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Rano.Animation
 {

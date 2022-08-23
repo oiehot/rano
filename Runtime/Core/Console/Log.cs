@@ -18,6 +18,8 @@ namespace Rano
         }
         
         private static readonly int FONT_SIZE = 12;
+        
+        #if UNITY_EDITOR
 
         private static readonly string DEFAULT_TITLE_COLOR = "#aaaaaaff";
         private static readonly string DEFAULT_CALLER_COLOR = "#aaaaaaff";
@@ -46,6 +48,7 @@ namespace Rano
         private static readonly string TODO_TITLE_COLOR = "#ffbb00ff";
         private static readonly string TODO_CALLER_COLOR = "#ffbb00ff";
         private static readonly string TODO_TEXT_COLOR = "#ffbb00ff";
+        #endif
         
         private static string ToShortFilepath(string filePath)
         {
@@ -74,9 +77,8 @@ namespace Rano
         
         private static string GetTitleColor(ELogType logType)
         {
-            string result;
             #if UNITY_EDITOR
-                result = logType switch
+                string result = logType switch
                 {
                     ELogType.Info => INFO_TITLE_COLOR,
                     ELogType.Warning => WARNING_TITLE_COLOR,
@@ -88,15 +90,14 @@ namespace Rano
                 };
                 return result;
             #else
-                result = null;
+                return null;
             #endif
         }
 
         private static string GetCallerColor(ELogType logType)
         {
-            string result;
             #if UNITY_EDITOR
-                result = logType switch
+                string result = logType switch
                 {
                     ELogType.Info => INFO_CALLER_COLOR,
                     ELogType.Warning => WARNING_CALLER_COLOR,
@@ -108,15 +109,14 @@ namespace Rano
                 };
                 return result;
             #else
-                result = null;
+                return null;
             #endif
         }
 
         private static string GetTextColor(ELogType logType)
         {
-            string result;
             #if UNITY_EDITOR
-                result = logType switch
+                string result = logType switch
                 {
                     ELogType.Info => INFO_TEXT_COLOR,
                     ELogType.Warning => WARNING_TEXT_COLOR,
@@ -128,14 +128,13 @@ namespace Rano
                 };
                 return result;
             #else
-                result = null;
+                return null;
             #endif
         }
 
         private static string GetLogTypeText(ELogType logType)
         {
-            string result;
-            result = logType switch
+            string result = logType switch
             {
                 ELogType.Info => "[INFO]",
                 ELogType.Warning => "[WARN]",
