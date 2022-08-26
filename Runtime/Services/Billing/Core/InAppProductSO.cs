@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Rano.Services.Billing
@@ -9,7 +10,7 @@ namespace Rano.Services.Billing
         NonConsumable,
         Subscription
     }
-    
+
     [CreateAssetMenu(fileName = "InAppProduct", menuName = "Rano/Services/Billing/InAppProduct")]
     public class InAppProductSO : ScriptableObject
     {

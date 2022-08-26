@@ -2,14 +2,15 @@
     "name": "Rano.Localization",
     "rootNamespace": "",
     "references": [
-        "Rano"
+        "Rano",
+        "Unity.Localization"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
-    "autoReferenced": true,
+    "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false

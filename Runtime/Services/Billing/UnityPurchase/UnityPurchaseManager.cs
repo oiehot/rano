@@ -64,6 +64,7 @@ namespace Rano.Services.Billing.UnityPurchase
             // 원시상품들의 정보를 초기화시에 사용한다.
             foreach (InAppProductSO rawProduct in _rawProducts)
             {
+                Debug.Assert(rawProduct != null);
                 Log.Info($"Add RawProduct ({rawProduct.Id})");
                 try
                 {
@@ -81,7 +82,7 @@ namespace Rano.Services.Billing.UnityPurchase
                 {
                     Log.Warning($"Add RawProduct Failed ({rawProduct.Id}");
                     #if (UNITY_EDITOR || DEVELOPMENT_BUILD)
-                        UnityEngine.Debug.LogWarning(e);
+                        Log.Exception(e);
                     #endif
                     _state = EPurchaseServiceState.InitializeFailed;
                     this.onInitializeFailed?.Invoke();
