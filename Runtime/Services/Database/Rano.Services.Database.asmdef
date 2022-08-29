@@ -1,16 +1,19 @@
 {
-    "name": "Rano.Services.Cloud",
+    "name": "Rano.Services.Database",
     "rootNamespace": "",
     "references": [
-        "VoxelBusters.CoreLibrary",
-        "VoxelBusters.EssentialKit",
         "Rano"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Firebase.App.dll",
+        "Firebase.Firestore.dll",
+        "Firebase.TaskExtension.dll",
+        "Unity.Tasks.dll"
+    ],
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],

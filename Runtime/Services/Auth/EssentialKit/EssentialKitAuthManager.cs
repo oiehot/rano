@@ -1,11 +1,13 @@
-﻿using System;
+﻿#if false
+
+using System;
 using System.Threading.Tasks;
 using VoxelBusters.CoreLibrary;
 using VoxelBusters.EssentialKit;
 
 namespace Rano.Services.Gaming
 {
-    public sealed class AuthManager : ManagerComponent
+    public sealed class EssentialKitAuthManager : ManagerComponent
     {
         public Action OnAuthCompleted { get; set; }
         public Action OnAuthNotAvailable { get; set; }
@@ -104,3 +106,5 @@ namespace Rano.Services.Gaming
         }
     }
 }
+
+#endif
