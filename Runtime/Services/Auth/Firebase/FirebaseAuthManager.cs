@@ -8,18 +8,56 @@ namespace Rano.Services.Auth
 {   
     public sealed partial class FirebaseAuthManager : ManagerComponent
     {
-        private EAuthState _state = EAuthState.Initializing;
         private FirebaseAuth? _auth;
         private FirebaseUser? _user;
-        public bool IsInitializing => _state == EAuthState.Initializing;
-
-        public IAuthUser? User
+        private FirebaseAnonymousAuth? _anonymousAuth;
+        // private FirebaseEmailAuth? _emailAuth;
+        // private FirebaseGpgsAuth? _gpgsAuth;
+        // private FirebaseGameCenterAuth? _gameCenterAuth;
+        public FirebaseAuth? Auth => _auth;
+        public FirebaseAnonymousAuth? Anonymous => _anonymousAuth;
+        // public FirebaseEmailAuth? Email => _emailAuth;
+        // public FirebaseGpgsAuth Gpgs => _gpgsAuth;
+        // public FirebaseGameCenterAuth GameCenter => _gameCenterAuth;
+        public bool IsInitialized => _auth != null;
+        public bool IsSignedIn
         {
             get
             {
-                if (_user != null) return new FirebaseAuthUser(_user);
+                if (_auth != null && _auth.CurrentUser != null)
+                {
+                    return true;
+                }
+                else return false;
+            }
+        }
+        // public IAuthUser? User
+        // {
+        //     get
+        //     {
+        //         if (_user != null) return new FirebaseAuthUser(_user);
+        //         else return null;
+        //     }
+        // }
+        public string? UserId
+        {
+            get
+            {
+                if (_auth != null && _auth.CurrentUser != null)
+                {
+                    return _auth.CurrentUser.UserId;
+                }
                 else return null;
             }
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            _anonymousAuth = new FirebaseAnonymousAuth(this);
+            // _emailAuth = new FirebaseEmailAuth(this);
+            // _gpgsAuth = new FirebaseGpgsAuth(this);
+            // _gameCenterAuth = new FirebaseGameCenterAuth(this);
         }
 
         protected override void OnEnable()
@@ -39,18 +77,23 @@ namespace Rano.Services.Auth
             _auth = null;
         }
 
+        /// <summary>
+        /// Firebase를 초기화한다.
+        /// </summary>
+        /// <remarks>
+        /// 이전에 SignIn했었다면, 다시 SignIn하지 않더라도
+        /// _auth.CurrentUser에 로그인된 사용자가 남아있다.
+        /// </remarks>
         private void Initialize()
         {
-            _state = EAuthState.Initializing;
             try
             {
                 _auth = FirebaseAuth.DefaultInstance;
             }
             catch
             {
-                Log.Warning("FirebaseAuth 초기화 실패");
+                Log.Warning(AuthMessages.AUTHMANAGER_INIT_FAILED);
                 _auth = null;
-                _state = EAuthState.SignedOut;
                 return;
             }
             _auth.StateChanged += HandleAuthStateChanged;
@@ -61,7 +104,7 @@ namespace Rano.Services.Auth
         {
             if (_auth == null)
             {
-                Log.Warning("A state change event occurred even though it is not in the initialized state. It cannot be processed.");
+                Log.Warning(AuthMessages.AUTHMANGER_IS_NOT_INITIALIZED);
                 return;
             }
             
@@ -70,111 +113,131 @@ namespace Rano.Services.Auth
                 bool signedIn = (_user != _auth.CurrentUser) && (_auth.CurrentUser != null);
                 if (!signedIn && _user != null)
                 {
-                    Log.Important($"Signed out");
-                    _state = EAuthState.SignedOut;
+                    Log.Important(AuthMessages.SIGNED_OUT);
                 }
                 _user = _auth.CurrentUser;
                 if (signedIn)
                 {
-                    Log.Important($"Signed in (Id:{_user!.UserId})");
-                    _state = EAuthState.SignedIn;
+                    Log.Important($"{AuthMessages.SIGNED_IN} (Id:{_user!.UserId})");
                 }
             }
         }
 
         /// <summary>
-        /// 익명으로 로그인한다.
+        /// 인증 프로파이더로 부터 받은 자격증명을 통해 Sign In한다.
         /// </summary>
-        public async Task SignInAnonymousAync()
+        /// <param name="credential">인증플랫폼으로 받은 자격증명</param>
+        public async Task<bool> SignInWithCredentialAsync(Credential credential)
         {
             if (_auth == null)
             {
-                Log.Warning("Authentication is not initialized. Can't Sign In");
-                return;
+                Log.Warning(AuthMessages.AUTHMANGER_IS_NOT_INITIALIZED);
+                return false;
             }
-            
-            if (_auth.CurrentUser != null)
-            {
-                Log.Info("Already signed in. Skip the SignIn");
-                return;
-            }
-                
-            Log.Sys("SignIn by Anonymous Progress...");
-            EAuthState previousState = _state;
-            _state = EAuthState.SignInProgress;
-
-            Task<FirebaseUser> task;
             try
             {
-                task = _auth.SignInAnonymouslyAsync();
-                await task;
+                FirebaseUser user = await _auth.SignInWithCredentialAsync(credential);
             }
             catch (Exception e)
             {
-                Log.Warning("SignIn by Anonymous Exception occured");
+                Log.Warning(AuthMessages.SIGN_IN_WITH_CREDENTIAL_ERROR);
                 Log.Exception(e);
-                _state = previousState;
-                return;
+                return false;
             }
-
-            if (task.IsCanceled)
-            {
-                Log.Warning($"SignIn by Anonymous Canceled");
-                _state = EAuthState.SignedOut;
-                return;
-            }
-
-            if (task.IsFaulted)
-            {
-                Log.Warning($"SignIn by Anonymous Failed ({task.Exception})");
-                _state = EAuthState.SignedOut;
-                return;
-            }
-
-            _user = task.Result;
-            Log.Important($"SignIn by Anonymous Success (DisplayName:{_user.DisplayName}, Id:{_user.UserId})");
+            Log.Important(AuthMessages.SIGN_IN_WITH_CREDENTIAL_SUCCESS);
+            return true;
         }
 
         /// <summary>
-        /// 로그 아웃한다.
+        /// 현재 SignIn된 Firebase계정에 플랫폼으로 받은 자격증명을 연결시킨다.
+        /// </summary>
+        /// <param name="credential">플랫폼으로 받은 자격증명</param>
+        public async Task<bool> LinkWithCredentialAsync(Credential credential)
+        {
+            if (_auth == null)
+            {
+                Log.Warning(AuthMessages.AUTHMANGER_IS_NOT_INITIALIZED);
+                return false;
+            }
+            if (_auth.CurrentUser == null)
+            {
+                Log.Warning(AuthMessages.CREDENTIAL_LINK_FAILED_NOT_SIGNED_IN);
+                return false;
+            }
+            try
+            {
+                FirebaseUser user = await _auth.CurrentUser.LinkWithCredentialAsync(credential);
+            }
+            catch (Exception e)
+            {
+                Log.Warning(AuthMessages.CREDENTIAL_LINK_ERROR);
+                Log.Exception(e);
+                return false;
+            }
+            Log.Info(AuthMessages.CREDENTIAL_LINK_SUCCESS);
+            return true;
+        }
+
+        public async Task<bool> UnlinkProviderAsync(string providerStr)
+        {
+            if (_auth == null)
+            {
+                Log.Warning(AuthMessages.AUTHMANGER_IS_NOT_INITIALIZED);
+                return false;
+            }
+            if (_auth.CurrentUser == null)
+            {
+                Log.Warning(AuthMessages.CREDENTIAL_UNLINK_FAILED_NOT_SIGNED_IN);
+                return false;
+            }
+            try
+            {
+                FirebaseUser user = await _auth.CurrentUser.UnlinkAsync(providerStr);
+            }
+            catch (Exception e)
+            {
+                Log.Warning(AuthMessages.CREDENTIAL_UNLINK_ERROR);
+                Log.Exception(e);
+                return false;
+            }
+            Log.Important(AuthMessages.CREDENTIAL_UNLINK_SUCCESS);
+            return true;
+        }
+        
+        /// <summary>
+        /// SignOut한다.
         /// </summary>
         /// <remarks>익명인 경우 SignOut되면 UUID가 갱신되어 계정 정보가 분실된다.</remarks>
         public void SignOut()
         {
             if (_auth == null)
             {
-                Log.Warning("Authentication is not initialized. Can't Sign Out");
+                Log.Warning(AuthMessages.AUTHMANGER_IS_NOT_INITIALIZED);
                 return;
             }
             
             if (_user != null)
             {
-                EAuthState previousState = _state;
-                _state = EAuthState.SignOutProgress;
                 try
                 {
                     _auth.SignOut();
                 }
                 catch (Exception e)
                 {
-                    Log.Warning("An exception occurred during SignOut");
+                    Log.Warning(AuthMessages.SIGN_OUT_ERROR);
                     Log.Exception(e);
-                    _state = previousState;
                     return;
                 }
-                Log.Sys($"Sign out (Id:{_user.UserId})");
             }
             else
             {
-                Log.Info("Already signed out. Skip the SignOut");
+                Log.Info(AuthMessages.SIGNED_OUT_ALREADY);
             }
         }
         
         public void LogStatus()
         {
-            Log.Info("FirebaseAuthManager:");
-            Log.Info($"  State: {_state}");
-            Log.Info($"  IsInitializing: {IsInitializing}");
+            Log.Info($"{nameof(FirebaseAuthManager)}:");
             Log.Info($"  FirebaseAuth: {_auth}");
             Log.Info($"  FirebaseUser: {_user}");
             if (_user != null)
