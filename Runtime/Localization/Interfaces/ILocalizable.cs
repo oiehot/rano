@@ -1,4 +1,6 @@
-﻿namespace Rano.Localization
+﻿using System.Globalization;
+
+namespace Rano.Localization
 {
     /// <summary>
     /// 국제화 지원 인터페이스.
@@ -10,6 +12,6 @@
     /// </remarks>
     public interface ILocalizable
     {
-        public void UpdateLocalizableString();
+        public void OnLocaleChanged(CultureInfo cultureInfo);
     }
 }

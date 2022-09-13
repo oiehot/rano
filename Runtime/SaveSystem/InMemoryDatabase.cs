@@ -43,12 +43,18 @@ namespace Rano.SaveSystem
             TemporarySavePath = $"{SavePath}.tmp";
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            bool loadOnStart = true;
+            
             if (UseResetOnStart)
             {
-                Log.Warning($"ResetOnStart 플래그가 켜져있어 로드하지 않고 시작합니다.");
+                Log.Important($"ResetOnStart 플래그가 켜져있어 로드하지 않고 시작합니다.");
+                loadOnStart = false;
+                
             }
-            else
+            
+            if (loadOnStart)
             {
+                Log.Important($"정상적으로 로드합니다.");
                 Load();
             }
 #else

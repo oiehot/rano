@@ -4,9 +4,11 @@ namespace Rano.Localization
 {
     public static class LocalizedStringHelper
     {
+        private static readonly string CoreStringTable = "CoreStringTable";
+        
         public static string LOCSTR(string key)
         {
-            LocalizedString localizedString = new LocalizedString("CoreStringTable", key);
+            LocalizedString localizedString = new LocalizedString(CoreStringTable, key);
             return localizedString.GetLocalizedString();            
         }
         
@@ -26,7 +28,6 @@ namespace Rano.Localization
         // {
         //     return localizedString.GetLocalizedString();
         // }
-        //
         
         // public static string LOCSTR(TableReference tableReference, TableEntryReference tableEntryReference)
         // {
