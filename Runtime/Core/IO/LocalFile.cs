@@ -1,46 +1,108 @@
+#nullable enable
+
+using System;
+
 namespace Rano.IO
 {
     public static class LocalFile
     {
-        public static void WriteBytes(string filePath, byte[] bytes)
+        public static bool WriteBytes(string filePath, byte[] bytes)
         {
-            System.IO.File.WriteAllBytes(filePath, bytes);
-        }
-
-        public static void WriteString(string filePath, string str)
-        {
-            WriteBytes(filePath, System.Text.Encoding.UTF8.GetBytes(str));
-        }
-
-        public static byte[] ReadBytes(string filePath)
-        {
-            if (!System.IO.File.Exists(filePath))
+            try
             {
-                throw new System.IO.FileNotFoundException($"파일을 찾지 못했습니다 ({filePath})");
+                System.IO.File.WriteAllBytes(filePath, bytes);
             }
-            byte[] bytes = System.IO.File.ReadAllBytes(filePath);
+            catch (Exception e)
+            {
+                Log.Exception(e);
+                return false;
+            }
+            return true;
+        }
+
+        public static bool WriteString(string filePath, string str)
+        {
+            byte[] bytes;
+            try
+            {
+                bytes = System.Text.Encoding.UTF8.GetBytes(str);
+            }
+            catch (Exception e)
+            {
+                Log.Exception(e);
+                return false;
+            }
+            return WriteBytes(filePath, bytes);
+        }
+
+        public static byte[]? ReadBytes(string filePath)
+        {
+            if (System.IO.File.Exists(filePath) == false) return null;
+            
+            byte[] bytes;
+            try
+            {
+                bytes = System.IO.File.ReadAllBytes(filePath);    
+            }
+            catch (Exception e)
+            {
+                Log.Exception(e);
+                return null;
+            }
             return bytes;
         }
 
-        public static string ReadString(string filePath)
+        public static string? ReadString(string filePath)
         {
-            byte[] bytes = ReadBytes(filePath);
-            return System.Text.Encoding.UTF8.GetString(bytes);
+            byte[]? bytes = ReadBytes(filePath);
+            if (bytes == null) return null;
+
+            string str;
+            try
+            {
+                str = System.Text.Encoding.UTF8.GetString(bytes);
+            }
+            catch (Exception e)
+            {
+                Log.Exception(e);
+                return null;
+            }
+            return str;
         }
 
-        public static void Move(string srcPath, string destPath, bool overwrite)
+        public static void Move(string srcPath, string destPath, bool force)
         {
-            if(overwrite == false && System.IO.File.Exists(destPath))
+            bool exists;
+            try
             {
+                exists = System.IO.File.Exists(destPath);
+            }
+            catch (Exception e)
+            {
+                Log.Exception(e);
+                return;
+            }
+            
+            if (force == false && exists) return;
+
+            try
+            {
+                if (force && exists) System.IO.File.Delete(destPath);
+            }
+            catch (Exception e)
+            {
+                Log.Exception(e);
                 return;
             }
 
-            if(overwrite == true && System.IO.File.Exists(destPath))
+            try
             {
-                System.IO.File.Delete(destPath);
+                System.IO.File.Move(srcPath, destPath);
             }
-            System.IO.File.Move(srcPath, destPath);
-            return;
+            catch (Exception e)
+            {
+                Log.Exception(e);
+            }
         }
     }
 }

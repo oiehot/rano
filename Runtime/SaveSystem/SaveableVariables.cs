@@ -1,17 +1,18 @@
 ﻿#nullable enable
 
 using UnityEngine;
+using Rano.Database;
 
 namespace Rano.SaveSystem
 {
     public class SaveableBool : MonoBehaviour
     {
-        private IDatabase _database;
+        private ILocalDatabase _database;
         private string _key;
         
         public string Key => _key;
 
-        public SaveableBool(IDatabase database, string key)
+        public SaveableBool(ILocalDatabase database, string key)
         {
             _database = database;
             _key = key;

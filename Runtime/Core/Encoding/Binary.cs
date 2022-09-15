@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -7,25 +9,42 @@ namespace Rano.Encoding
 {
     public static class Binary
     {
-        public static byte[] ConvertObjectToBinary(object obj)
+        public static byte[]? ConvertObjectToBinary(object obj)
         {
-            byte[] bytes = null;
-            BinaryFormatter binaryFormatter = new BinaryFormatter();
-            using (MemoryStream memoryStream = new MemoryStream())
+            byte[] bytes;
+            try
             {
-                binaryFormatter.Serialize(memoryStream, obj);
-                bytes = memoryStream.ToArray();
+                BinaryFormatter binaryFormatter = new BinaryFormatter();
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    binaryFormatter.Serialize(memoryStream, obj);
+                    bytes = memoryStream.ToArray();
+                }
             }
+            catch (Exception e)
+            {
+                Log.Exception(e);
+                return null;
+            }
+            
             return bytes;
         }
 
-        public static object ConvertBinaryToObject(byte[] bytes)
+        public static object? ConvertBinaryToObject(byte[] bytes)
         {
-            var binaryFormatter = new BinaryFormatter();
             object obj;
-            using (MemoryStream memoryStream = new MemoryStream(bytes))
+            try
             {
-                obj = binaryFormatter.Deserialize(memoryStream);
+                var binaryFormatter = new BinaryFormatter();
+                using (MemoryStream memoryStream = new MemoryStream(bytes))
+                {
+                    obj = binaryFormatter.Deserialize(memoryStream);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Exception(e);
+                return null;
             }
             return obj;
         }

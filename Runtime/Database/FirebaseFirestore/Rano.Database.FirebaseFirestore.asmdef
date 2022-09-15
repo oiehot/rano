@@ -1,5 +1,5 @@
 {
-    "name": "Rano.SaveSystem",
+    "name": "Rano.Database.FirebaseFirestore",
     "rootNamespace": "",
     "references": [
         "Rano",
@@ -8,8 +8,14 @@
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Firebase.App.dll",
+        "Firebase.Auth.dll",
+        "Firebase.Firestore.dll",
+        "Firebase.TaskExtension.dll",
+        "Unity.Tasks.dll"
+    ],
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],

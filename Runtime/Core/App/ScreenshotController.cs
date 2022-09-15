@@ -15,7 +15,7 @@ namespace Rano.App
         
         private void Capture()
         {
-            string date = DateTime.Now.ToString("yyyymmdd_HHmmss");
+            string date = DateTime.UtcNow.ToLocalTime().ToString("yyyymmdd_HHmmss");
             string path = directory + '/' + date + ".png";
             ScreenCapture.CaptureScreenshot(path);
             Log.Important("Capture Screenshot to " + path);

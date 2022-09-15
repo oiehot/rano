@@ -72,7 +72,7 @@ namespace Rano.Services.Billing
                 savedProduct.receipt = newProduct.receipt;
                 savedProduct.hasReceipt = newProduct.hasReceipt;
                 savedProduct.validated = true;
-                savedProduct.lastValidateDateTime = DateTime.Now;
+                savedProduct.lastValidateDateTime = DateTime.UtcNow;
                 savedProduct.purchaseCount++;
             }
             else
@@ -87,7 +87,7 @@ namespace Rano.Services.Billing
             {
                 Log.Info($"PurchaseHistory에 저장된 상품의 검증상태를 False로 업데이트합니다 ({productId})");
                 product.validated = false;
-                product.lastValidateDateTime = DateTime.Now;
+                product.lastValidateDateTime = DateTime.UtcNow;
             }
             else
             {
@@ -120,7 +120,7 @@ namespace Rano.Services.Billing
             {
                 // Log.Info($"PurchaseHistory에 저장된 상품의 검증상태를 업데이트합니다 (productId:{productId}, validate:{value})");
                 product.validated = value;
-                product.lastValidateDateTime = DateTime.Now;
+                product.lastValidateDateTime = DateTime.UtcNow;
             }
             else
             {

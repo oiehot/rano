@@ -1,0 +1,22 @@
+﻿{
+  "name": "Rano.Auth.Firebase",
+  "rootNamespace": "",
+  "references": [
+    "Rano",
+    "Rano.Auth"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "Firebase.App.dll",
+    "Firebase.TaskExtension.dll",
+    "Firebase.Auth.dll",
+    "Unity.Tasks.dll"
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

@@ -1,14 +1,13 @@
 {
-    "name": "Rano.SaveSystem",
+    "name": "Rano.Auth",
     "rootNamespace": "",
     "references": [
-        "Rano",
-        "Rano.Database"
+        "Rano"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
+    "overrideReferences": true,
     "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [],

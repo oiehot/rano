@@ -230,7 +230,7 @@ namespace Rano.Services.Billing.EssentialKit
             }
             
             _state = PurchaseManagerState.Updated;
-            _lastUpdatedDateTime = DateTime.Now;
+            _lastUpdatedDateTime = DateTime.UtcNow;
         }
 
 #if (UNITY_EDITOR || DEVELOPMENT_BUILD)

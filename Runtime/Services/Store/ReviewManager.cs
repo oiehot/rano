@@ -50,7 +50,7 @@ namespace Rano.Services.Store
         public bool CanAskReview {
             get
             {
-                if ((_lastAskReviewDateTime + _askReviewTimeSpan) <= DateTime.Now)
+                if ((_lastAskReviewDateTime + _askReviewTimeSpan) <= DateTime.UtcNow)
                 {
                     return true;
                 }
@@ -114,7 +114,7 @@ namespace Rano.Services.Store
         {
             Log.Info("Review request accepted");
             _openReviewCount++;
-            _lastOpenReviewDateTime = DateTime.Now;    
+            _lastOpenReviewDateTime = DateTime.UtcNow;    
             // VoxelBusters.EssentialKit.RateMyApp 에 의해서 자동적으로 열린다.
         }
         
@@ -143,7 +143,7 @@ namespace Rano.Services.Store
         {
             Log.Info("Opens the review request dialog");
             _askReviewCount++;
-            _lastAskReviewDateTime = DateTime.Now;
+            _lastAskReviewDateTime = DateTime.UtcNow;
             _askReviewRequested = true;
         }
 
@@ -154,7 +154,7 @@ namespace Rano.Services.Store
         public void ShowReview()
         {
             _openReviewCount++;
-            _lastOpenReviewDateTime = DateTime.Now;
+            _lastOpenReviewDateTime = DateTime.UtcNow;
             VoxelBusters.EssentialKit.Utilities.RequestStoreReview();
         }
         

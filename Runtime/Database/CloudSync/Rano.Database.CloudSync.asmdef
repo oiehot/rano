@@ -1,15 +1,18 @@
 {
-    "name": "Rano.SaveSystem",
+    "name": "Rano.Database.CloudSync",
     "rootNamespace": "",
     "references": [
         "Rano",
+        "Rano.Auth",
         "Rano.Database"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Firebase.Firestore.dll"
+    ],
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],
