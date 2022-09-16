@@ -1,14 +1,10 @@
 {
-    "name": "Rano.Editor.GoogleDoc",
+    "name": "Rano.GoogleDoc",
     "rootNamespace": "",
     "references": [
-        "Rano",
-        "Rano.Editor",
-        "Rano.GoogleDoc"
+        "Rano"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

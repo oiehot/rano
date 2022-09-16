@@ -1,14 +1,20 @@
 {
-    "name": "Rano",
+    "name": "Rano.Leaderboard",
     "rootNamespace": "",
     "references": [
-        "DOTween.Modules"
+        "Rano",
+        "Rano.Auth",
+        "Rano.Database"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Firebase.App.dll",
+        "Firebase.Database.dll",
+        "Unity.Tasks.dll"
+    ],
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],

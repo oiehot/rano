@@ -1,19 +1,15 @@
 {
-    "name": "Rano.Editor.GoogleDoc",
+    "name": "Rano.Ad",
     "rootNamespace": "",
     "references": [
-        "Rano",
-        "Rano.Editor",
-        "Rano.GoogleDoc"
+        "Rano"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
-    "autoReferenced": false,
+    "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false

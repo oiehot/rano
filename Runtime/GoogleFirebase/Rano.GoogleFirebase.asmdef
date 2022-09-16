@@ -1,18 +1,21 @@
 {
-    "name": "Rano.Editor.GoogleDoc",
+    "name": "Rano.GoogleFirebase",
     "rootNamespace": "",
     "references": [
-        "Rano",
-        "Rano.Editor",
-        "Rano.GoogleDoc"
+        "Rano"
     ],
     "includePlatforms": [
-        "Editor"
+        "Android",
+        "Editor",
+        "iOS"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Firebase.App.dll",
+        "Unity.Tasks.dll"
+    ],
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],

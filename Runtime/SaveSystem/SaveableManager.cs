@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using UnityEngine;
 using Rano.Database;
 
@@ -161,6 +162,7 @@ namespace Rano.SaveSystem
             catch (Exception e)
             {
                 Log.Info($"데이터베이스에서 상태를 얻는중 예외가 발생했습니다 (id:{saveableEntity.Id})");
+                Log.Exception(e);
                 states = null;
             }
             

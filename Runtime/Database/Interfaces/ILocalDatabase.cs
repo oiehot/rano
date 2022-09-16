@@ -9,8 +9,10 @@ namespace Rano.Database
     {
         public bool IsInitialized { get; }
         public DateTime LastModifiedDateTime { get; set; }
-        
-        public byte[]? GetArchive();
+
+        public string? GetJsonArchive();
+        public byte[]? GetBinaryArchive();
+        public bool LoadFromJson(string jsonString);
         public bool LoadFromBinary(byte[] bytes);
         public bool LoadFromBinaryFile(string filePath);
         public bool Load();

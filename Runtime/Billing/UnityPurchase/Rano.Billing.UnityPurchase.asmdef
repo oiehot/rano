@@ -1,14 +1,16 @@
 {
-    "name": "Rano.Editor.GoogleDoc",
+    "name": "Rano.Billing.UnityPurchase",
     "rootNamespace": "",
     "references": [
+        "UnityEngine.Purchasing",
+        "UnityEngine.Purchasing.Stores",
+        "UnityEngine.Purchasing.Security",
+        "UnityEngine.Purchasing.SecurityCore",
+        "UnityEngine.Purchasing.SecurityStub",
         "Rano",
-        "Rano.Editor",
-        "Rano.GoogleDoc"
+        "Rano.Billing"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

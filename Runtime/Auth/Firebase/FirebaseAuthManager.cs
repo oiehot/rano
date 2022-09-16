@@ -14,7 +14,7 @@ namespace Rano.Auth.Firebase
         internal FirebaseAuth? Auth => _auth;
         public IAuthModule? Anonymous => _anonymousAuth;
         public bool IsInitialized => _auth != null;
-        public bool IsSignedIn
+        public bool IsAuthenticated
         {
             get
             {
@@ -22,6 +22,8 @@ namespace Rano.Auth.Firebase
                 else return false;
             }
         }
+        
+        // TODO: UserDisplayName을 얻으려면?
         public string? UserId
         {
             get
@@ -203,6 +205,17 @@ namespace Rano.Auth.Firebase
                 Log.Info(Constants.SIGNED_OUT_ALREADY);
             }
             return true;
+        }
+        
+        public void LogUser(FirebaseUser user)
+        {
+            Log.Info($"User:");
+            Log.Info($"  UserId: {user.UserId}");
+            Log.Info($"  DisplayName: {user.DisplayName}");
+            Log.Info($"  Email: {user.Email}");
+            Log.Info($"  PhoneNumber: {user.PhoneNumber}");            
+            Log.Info($"  IsAnonymous: {user.IsAnonymous}");
+            Log.Info($"  IsEmailVerified: {user.IsEmailVerified}");
         }
         
         public void LogStatus()

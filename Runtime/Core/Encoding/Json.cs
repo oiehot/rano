@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -19,26 +21,54 @@ namespace Rano.Encoding
         /// <summary>
         /// 인스턴스 => JsonString
         /// </summary>
-        public static string ConvertObjectToString(object obj)
+        public static string? ConvertObjectToString(object obj)
         {
-            string jsonString = JsonConvert.SerializeObject(obj, SerializerSettings);
-            return jsonString;
+            string? result;
+            try
+            {
+                result = JsonConvert.SerializeObject(obj, SerializerSettings);
+            }
+            catch (Exception e)
+            {
+                Log.Exception(e);
+                result = null;
+            }
+            return result;
         }
 
         /// <summary>
         /// JsonString => T
         /// </summary>
-        public static T ConvertStringToObject<T>(string jsonString)
+        public static T? ConvertStringToObject<T>(string jsonString) where T : class
         {
-            return JsonConvert.DeserializeObject<T>(jsonString, SerializerSettings);
+            T? result;
+            try
+            {
+                result = JsonConvert.DeserializeObject<T>(jsonString, SerializerSettings);
+            }
+            catch (Exception e)
+            {
+                Log.Exception(e);
+                return null;
+            }
+            return result;
         }
 
         /// <summary>
         /// JsonString => object
         /// </summary>
-        public static object ConvertStringToObject(string jsonString)
+        public static object? ConvertStringToObject(string jsonString)
         {
-            object result = JsonConvert.DeserializeObject(jsonString, SerializerSettings);
+            object? result;
+            try
+            {
+                result = JsonConvert.DeserializeObject(jsonString, SerializerSettings);
+            }
+            catch (Exception e)
+            {
+                Log.Exception(e);
+                return null;
+            }
             return result;
         }
 

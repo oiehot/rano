@@ -2,7 +2,7 @@
 using System.IO;
 using UnityEngine;
 using UnityEditor;
-using Rano.Services.GoogleDoc;
+using Rano.GoogleDoc;
 
 namespace Rano.Editor.GoogleDoc
 {

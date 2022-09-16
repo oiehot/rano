@@ -17,15 +17,19 @@ namespace Rano.Auth.Firebase
 
         public async Task<bool> SignInAsync()
         {
+            FirebaseUser user;
+            
             if (_authManager.Auth == null)
             {
                 Log.Warning(Constants.AUTHMANGER_IS_NOT_INITIALIZED);
                 return false;
             }
+            
             Log.Info(Constants.SIGN_IN_ANONYMOUSLY_TRYING);
+            
             try
             {
-                FirebaseUser user = await _authManager.Auth.SignInAnonymouslyAsync();
+                user = await _authManager.Auth.SignInAnonymouslyAsync();
             }
             catch (Exception e)
             {
@@ -33,8 +37,11 @@ namespace Rano.Auth.Firebase
                 Log.Exception(e);
                 return false;
             }
+            _authManager.LogUser(user);
+            
             Log.Info(Constants.SIGN_IN_ANONYMOUSLY_SUCCESS);
             return true;
         }
+
     }
 }

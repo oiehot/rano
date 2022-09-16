@@ -8,6 +8,7 @@ namespace Rano.Auth
     {
         public string? UserId { get; }
         public bool IsInitialized { get; }
+        public bool IsAuthenticated { get; }
         public bool Initialize();
         public bool SignOut();
     }

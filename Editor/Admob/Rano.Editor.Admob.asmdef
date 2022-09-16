@@ -1,10 +1,11 @@
 {
-    "name": "Rano.Editor.GoogleDoc",
+    "name": "Rano.Editor.Admob",
     "rootNamespace": "",
     "references": [
         "Rano",
         "Rano.Editor",
-        "Rano.GoogleDoc"
+        "Rano.Ad.Admob",
+        "GoogleMobileAds.Editor"
     ],
     "includePlatforms": [
         "Editor"
