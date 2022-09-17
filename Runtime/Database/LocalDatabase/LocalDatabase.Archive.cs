@@ -138,7 +138,7 @@ namespace Rano.Database
             // 임시파일을 정식파일로 이동.
             LocalFile.Move(tmpPath, filePath, true);
 
-            Log.Info($"저장 완료 ({filePath}, bytes:{bytes.Length})");
+            Log.Info($"저장 완료 ({filePath}, {bytes.Length} bytes)");
             return true;
         }
         

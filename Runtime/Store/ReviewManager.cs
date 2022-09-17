@@ -10,7 +10,7 @@ using Rano.SaveSystem;
 namespace Rano.Store
 {
     [Serializable]
-    public struct SReviewManagerData
+    public class ReviewManagerData
     {
         public int askReviewCount;
         public int openReviewCount;
@@ -182,7 +182,7 @@ namespace Rano.Store
         
         public object CaptureState()
         {
-            SReviewManagerData state = new SReviewManagerData
+            ReviewManagerData state = new ReviewManagerData
             {
                 askReviewCount = _askReviewCount,
                 openReviewCount = _openReviewCount,
@@ -194,7 +194,7 @@ namespace Rano.Store
         
         public void ValidateState(object state)
         {
-            SReviewManagerData data = (SReviewManagerData) state;
+            ReviewManagerData data = (ReviewManagerData) state;
             if (data.askReviewCount < 0)
             {
                 throw new StateValidateException("askReviewCount가 0이하일 수는 없음");
@@ -207,7 +207,7 @@ namespace Rano.Store
         
         public void RestoreState(object state)
         {
-            var data = (SReviewManagerData) state;
+            var data = (ReviewManagerData) state;
             _askReviewCount = data.askReviewCount;
             _openReviewCount = data.openReviewCount;
             _lastAskReviewDateTime = data.lastAskReviewDateTime;

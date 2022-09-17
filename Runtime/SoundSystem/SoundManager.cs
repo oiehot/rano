@@ -19,17 +19,17 @@ namespace Rano.SoundSystem
     }
 
     [Serializable]
-    public struct SSoundLayerData
+    public class SoundLayerData
     {
         public float volume;
         public bool mute;
     }
     
     [Serializable]
-    public struct SSoundManagerData
+    public class SoundManagerData
     {
         public float masterVolume;
-        public Dictionary<String, SSoundLayerData> soundLayers;
+        public Dictionary<String, SoundLayerData> soundLayers;
     }
 
     public sealed class SoundManager : ManagerComponent, ISaveLoadable
@@ -174,12 +174,12 @@ namespace Rano.SoundSystem
         public object CaptureState()
         {
             // SoundLayer 들의 상태를 준비한다.
-            Dictionary<String, SSoundLayerData> soundLayerDatas = new Dictionary<string, SSoundLayerData>();
+            Dictionary<String, SoundLayerData> soundLayerDatas = new Dictionary<string, SoundLayerData>();
             
             for (int i=0; i < _soundLayers.Length; i++)
             {
                 ESoundLayerType soundLayerType = (ESoundLayerType)i;
-                SSoundLayerData soundLayerData = new SSoundLayerData
+                SoundLayerData soundLayerData = new SoundLayerData
                 {
                     mute = _soundLayers[i].IsMute,
                     volume = _soundLayers[i].TargetVolume
@@ -188,7 +188,7 @@ namespace Rano.SoundSystem
             }
             
             // SoundManager의 상태를 준비한다.
-            SSoundManagerData state = new SSoundManagerData
+            SoundManagerData state = new SoundManagerData
             {
                 masterVolume = MasterVolume,
                 soundLayers = soundLayerDatas
@@ -199,16 +199,16 @@ namespace Rano.SoundSystem
         
         public void ValidateState(object state)
         {
-            SSoundManagerData data = (SSoundManagerData) state;
+            SoundManagerData data = (SoundManagerData) state;
             if (data.masterVolume < 0f || data.masterVolume > 1f)
             {
                 throw new StateValidateException("masterVolume은 0이상 1이하여야 합니다.");
             }
 
-            foreach (KeyValuePair<string, SSoundLayerData> kv in data.soundLayers)
+            foreach (KeyValuePair<string, SoundLayerData> kv in data.soundLayers)
             {
                 string soundLayerName = kv.Key; 
-                SSoundLayerData soundLayerData = kv.Value;
+                SoundLayerData soundLayerData = kv.Value;
                 float volume = soundLayerData.volume;
                 if (volume < 0f || volume > 1f)
                 {
@@ -219,16 +219,16 @@ namespace Rano.SoundSystem
         
         public void RestoreState(object state)
         {
-            var data = (SSoundManagerData)state;
+            var data = (SoundManagerData)state;
 
             // SoundManager 컴포넌트의 복구
             SetMasterVolume(data.masterVolume);
             
             // SoundLayer들의 복구
-            foreach (KeyValuePair<string, SSoundLayerData> soundLayerDataKv in data.soundLayers)
+            foreach (KeyValuePair<string, SoundLayerData> soundLayerDataKv in data.soundLayers)
             {
                 string soundLayerName = soundLayerDataKv.Key;
-                SSoundLayerData soundLayerData = soundLayerDataKv.Value;
+                SoundLayerData soundLayerData = soundLayerDataKv.Value;
 
                 ESoundLayerType soundLayerType;
                 if (ESoundLayerType.TryParse(soundLayerName, out soundLayerType) == true)

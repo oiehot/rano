@@ -24,7 +24,7 @@ namespace Rano.SaveSystem
 
 #if USE_ACCOUNT_DATA_TEST
         [Serializable]
-        private struct AccountData
+        private class AccountData
         {
             public int age;
             public string name;
@@ -32,7 +32,7 @@ namespace Rano.SaveSystem
 #endif
 
         [Serializable]
-        private struct PlayerData
+        private class PlayerData
         {
             public int level;
             public int exp;

@@ -23,9 +23,9 @@ namespace Rano.GoogleFirebase
             }
             catch (Exception e)
             {
-                Log.Exception(e);
                 Log.Warning("Firebase Check and Fix dependencies Error");
                 Log.Warning("Firebase Initialize Failed");
+                Log.Exception(e);
                 return false;
             }
 
@@ -39,6 +39,7 @@ namespace Rano.GoogleFirebase
                 {
                     Log.Warning("Can't get firebase app default instance");
                     Log.Warning("Firebase Initialize Failed");
+                    Log.Exception(e);
                     return false;
                 }
             }
