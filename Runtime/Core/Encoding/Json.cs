@@ -164,8 +164,8 @@ namespace Rano.Encoding
                 //DateFormatHandling = DateFormatHandling.MicrosoftDateFormat; // "\/Date(1640677652925)\/"
                 DateFormatHandling = DateFormatHandling.IsoDateFormat; // "2021-12-28T07:46:03.808355Z"
                 DateParseHandling = DateParseHandling.DateTime;
-                //DateTimeZoneHandling = DateTimeZoneHandling.Utc; // "2021-12-28T07:46:03.808355Z"
-                DateTimeZoneHandling = DateTimeZoneHandling.Local; // "2021-12-28T16:48:54.787381+09:00"
+                DateTimeZoneHandling = DateTimeZoneHandling.Utc; // "2021-12-28T07:46:03.808355Z"
+                // DateTimeZoneHandling = DateTimeZoneHandling.Local; // "2021-12-28T16:48:54.787381+09:00"
 
                 FloatParseHandling = FloatParseHandling.Double;
                 //this.FloatParseHandling = FloatParseHandling.Decimal;

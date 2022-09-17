@@ -144,8 +144,8 @@ namespace Rano.Database.CloudSync
             Log.Info($"로컬 데이터를 클라우드로 올립니다");
             
             // 압축된 세이브 데이터를 준비한다.
-            string jsonStr = _local.GetJsonArchive();
-            if (jsonStr == null) return false;
+            byte[]? bytes = _local.GetArchive();
+            if (bytes == null) return false;
             
             // 수정날짜 DateTime을 준비한다.
             DateTime utcDateTime;
@@ -174,7 +174,7 @@ namespace Rano.Database.CloudSync
             // 클라우드로 올릴 데이터를 준비한다.
             Dictionary<string, object> uploadDict = new Dictionary<string, object>
             {
-                [Constants.SAVE_DATA_KEY] = jsonStr,
+                [Constants.SAVE_DATA_KEY] = bytes,
                 [Constants.LAST_MODIFIED_TIMESTAMP_KEY] = timestamp
             };
 
@@ -212,20 +212,21 @@ namespace Rano.Database.CloudSync
             }
 
             // 읽어온 데이트 정리한다. 
-            string? jsonString;
+            byte[]? bytes;
             try
             {
-                jsonString = (string)saveData;
+                Blob blob = (Blob)saveData;
+                bytes = blob.ToBytes();
             }
             catch (Exception e)
             {
                 Log.Exception(e);
                 return false;
             }
-            if (jsonString == null) return false;
+            if (bytes == null) return false;
             
             // 정리된 데이터로 로컬 데이터베이스를 로드한다.
-            bool loadResult = _local.LoadFromJson(jsonString);
+            bool loadResult = _local.LoadFromArchive(bytes);
             if (loadResult == false) return false;
             
             // 로컬 업데이트 날짜를 클라우드와 동일하게 맞춘다.

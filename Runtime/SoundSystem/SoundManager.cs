@@ -37,16 +37,12 @@ namespace Rano.SoundSystem
         private const float DEFAULT_MASTER_VOLUME = 1.0f;
         private SoundLayer[] _soundLayers;
         private AudioListener? _audioListener;
-        // private SaveableManager? _saveableManager;
 
         public float MasterVolume => AudioListener.volume;
 
         protected override void Awake()
         {
             base.Awake();
-
-            Log.Todo("SoundManager에서 SaveableManager 싱글톤을 참조할 필요가 없으면 이 코드를 정리할것.");
-            // _saveableManager = GameObject.FindObjectOfType<SaveableManager>();
 
             SetMasterVolume(DEFAULT_MASTER_VOLUME);
             

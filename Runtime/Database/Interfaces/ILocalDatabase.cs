@@ -9,16 +9,11 @@ namespace Rano.Database
     {
         public bool IsInitialized { get; }
         public DateTime LastModifiedDateTime { get; set; }
-
-        public string? GetJsonArchive();
-        public byte[]? GetBinaryArchive();
-        public bool LoadFromJson(string jsonString);
-        public bool LoadFromBinary(byte[] bytes);
-        public bool LoadFromBinaryFile(string filePath);
         public bool Load();
-        public bool SaveAsBinaryFile(string filePath);
+        public bool LoadFromArchive(byte[] bytes);
         public bool Save();
         public void Clear();
+        public byte[]? GetArchive();
         public string? GetString(string key, string? defaultValue = null); // TODO: 옵셔널 처리, 구현체들
         public void SetString(string key, string value);
         public bool GetBool(string key);

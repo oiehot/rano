@@ -11,11 +11,13 @@ namespace Rano.Database
     [Serializable]
     public struct LocalDatabaseData
     {
+        public int serializationVersion;
         public DateTime lastModifiedDateTime;
     }
     
     public sealed partial class LocalDatabase : ILocalDatabase
     {
+        private const int SERIALIZATION_VERSION = 1;
         private const string SYSTEM_DATA_KEY = "@System";
         
         private enum EState
@@ -62,21 +64,6 @@ namespace Rano.Database
             Initialize();
         }
         
-        private object CaptureSystemData()
-        {
-            var state = new LocalDatabaseData
-            {
-                lastModifiedDateTime = _lastModifiedDateTime
-            };
-            return state;
-        }
-        
-        private void RestoreSystemData(object state)
-        {
-            LocalDatabaseData data = (LocalDatabaseData)state;
-            _lastModifiedDateTime = data.lastModifiedDateTime;
-        }
-
         private void Initialize()
         {
             Log.Sys($"{typeof(LocalDatabase).ToString()}: Initializing...", caller: false);
@@ -113,21 +100,44 @@ namespace Rano.Database
 #endif
         }
 
+        private Dictionary<string, object> GetDictionaryArchive()
+        {
+            // 클래스 자체의 정보는 Dictionary에 저장되지 않으므로
+            // 클래스 정보를 취합하여 Dictionary에 넣는다.
+            object systemData = CaptureSystemData();
+            _dict[SYSTEM_DATA_KEY] = systemData;
+            return _dict;
+        }
+        
         public bool Load()
         {
-            // return LoadFromBinaryFile(_savePath);
-            return LoadFromJsonFile(_savePath);
+            return LoadFromFile(_savePath);
         }
 
         public bool Save()
         {
-            // return SaveAsBinaryFile(_savePath);
-            return SaveAsJsonFile(_savePath);
+            return SaveAsFile(_savePath);
         }
 
         public void Clear()
         {
             _dict.Clear();
+        }
+        
+        private object CaptureSystemData()
+        {
+            var state = new LocalDatabaseData
+            {
+                lastModifiedDateTime = _lastModifiedDateTime,
+                serializationVersion = SERIALIZATION_VERSION
+            };
+            return state;
+        }
+        
+        private void RestoreSystemData(object state)
+        {
+            LocalDatabaseData data = (LocalDatabaseData)state;
+            _lastModifiedDateTime = data.lastModifiedDateTime;
         }
 
         public string? GetString(string key, string? defaultValue = null)
