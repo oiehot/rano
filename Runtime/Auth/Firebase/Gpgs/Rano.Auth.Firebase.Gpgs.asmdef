@@ -1,0 +1,24 @@
+{
+    "name": "Rano.Auth.Firebase.Gpgs",
+    "rootNamespace": "",
+    "references": [
+        "Rano",
+        "Rano.Auth",
+        "Rano.Auth.Firebase",
+        "GooglePlayGames"
+    ],
+    "includePlatforms": [
+        "Android",
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Firebase.Auth.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

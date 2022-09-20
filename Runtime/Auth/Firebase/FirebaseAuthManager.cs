@@ -10,9 +10,7 @@ namespace Rano.Auth.Firebase
     {
         private FirebaseAuth? _auth;
         private FirebaseUser? _user;
-        private FirebaseAnonymousAuth? _anonymousAuth;
-        internal FirebaseAuth? Auth => _auth;
-        public IAuthModule? Anonymous => _anonymousAuth;
+        public FirebaseAuth? Auth => _auth;
         public bool IsInitialized => _auth != null;
         public bool IsAuthenticated
         {
@@ -65,9 +63,6 @@ namespace Rano.Auth.Firebase
             }
             _auth.StateChanged += HandleAuthStateChanged;
             HandleAuthStateChanged(this, null);
-            
-            _anonymousAuth = new FirebaseAnonymousAuth(this);
-            
             return true;
         }
         
@@ -98,7 +93,7 @@ namespace Rano.Auth.Firebase
         /// 인증 프로파이더로 부터 받은 자격증명을 통해 Sign In한다.
         /// </summary>
         /// <param name="credential">인증플랫폼으로 받은 자격증명</param>
-        internal async Task<bool> SignInWithCredentialAsync(Credential credential)
+        public async Task<bool> SignInWithCredentialAsync(Credential credential)
         {
             if (_auth == null)
             {
@@ -115,6 +110,7 @@ namespace Rano.Auth.Firebase
                 Log.Exception(e);
                 return false;
             }
+            
             Log.Important(Constants.SIGN_IN_WITH_CREDENTIAL_SUCCESS);
             return true;
         }
@@ -123,7 +119,7 @@ namespace Rano.Auth.Firebase
         /// 현재 SignIn된 Firebase계정에 플랫폼으로 받은 자격증명을 연결시킨다.
         /// </summary>
         /// <param name="credential">플랫폼으로 받은 자격증명</param>
-        internal async Task<bool> LinkWithCredentialAsync(Credential credential)
+        public async Task<bool> LinkWithCredentialAsync(Credential credential)
         {
             if (_auth == null)
             {
@@ -149,7 +145,7 @@ namespace Rano.Auth.Firebase
             return true;
         }
 
-        internal async Task<bool> UnlinkProviderAsync(string providerStr)
+        public async Task<bool> UnlinkProviderAsync(string providerStr)
         {
             if (_auth == null)
             {

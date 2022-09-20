@@ -179,91 +179,52 @@ namespace Rano
         
         public static void Info(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            #if (ENABLE_LOG || UNITY_EDITOR || DEVELOPMENT_BUILD)
                 Print(ELogType.Info, text, caller, filePath, line, member);
             #endif
         }
         
         public static void Warning(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            #if (ENABLE_LOG || UNITY_EDITOR || DEVELOPMENT_BUILD)
                 Print(ELogType.Warning, text, caller, filePath, line, member);
             #endif
         }
         
         public static void Error(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            #if (ENABLE_LOG || UNITY_EDITOR || DEVELOPMENT_BUILD)        
                 Print(ELogType.Error, text, caller, filePath, line, member);
             #endif
         }
         
         public static void Sys(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            #if (ENABLE_LOG || UNITY_EDITOR || DEVELOPMENT_BUILD)  
                 Print(ELogType.System, text, caller, filePath, line, member);
             #endif
         }
 
         public static void Important(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            #if (ENABLE_LOG || UNITY_EDITOR || DEVELOPMENT_BUILD)
                 Print(ELogType.Important, text, caller, filePath, line, member);
             #endif
         }
 
         public static void Todo(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            #if (ENABLE_LOG || UNITY_EDITOR || DEVELOPMENT_BUILD)  
                 Print(ELogType.Todo, text, caller, filePath, line, member);
             #endif
         }
 
         public static void Exception(Exception e)
         {
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            #if (ENABLE_LOG || UNITY_EDITOR || DEVELOPMENT_BUILD)  
                 UnityEngine.Debug.LogException(e);
             #endif
         }
-        
-        #endregion
-        
-        #region Logging Methods for Release
-        
-        public static void ReleaseInfo(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        {
-            Print(ELogType.Info, text, caller, filePath, line, member);
-        }
-
-        public static void ReleaseWarning(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        {
-            Print(ELogType.Warning, text, caller, filePath, line, member);
-        }
-
-        public static void ReleaseError(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        {
-            Print(ELogType.Error, text, caller, filePath, line, member);
-        }
-        
-        // public static void ReleaseSys(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        // {
-        //     Print(ELogType.System, text, caller, filePath, line, member);
-        // }
-        //
-        // public static void ReleaseImportant(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        // {
-        //     Print(ELogType.Important, text, caller, filePath, line, member);
-        // }
-        //
-        // public static void ReleaseTodo(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        // {
-        //     Print(ELogType.Todo, text, caller, filePath, line, member);
-        // }
-        //
-        // public static void ReleaseException(Exception e)
-        // {
-        //     UnityEngine.Debug.LogException(e);
-        // }
         
         #endregion
     }

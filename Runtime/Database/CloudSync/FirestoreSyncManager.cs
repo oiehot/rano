@@ -73,6 +73,7 @@ namespace Rano.Database.CloudSync
         /// <remarks>더 최신인 데이터를 원본으로 사용한다.</remarks>
         public async Task<bool> SyncAsync()
         {
+            Log.Todo("동기화 실패 메시지 띄우기(원인으로)");
             if (_local == null || _cloud == null || _auth == null) return false;
             if (_auth.UserId == null) return false;
             if (_state != EState.Ready) return false;

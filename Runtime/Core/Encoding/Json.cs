@@ -103,20 +103,27 @@ namespace Rano.Encoding
             /// <summary>
             /// 이름으로 타입을 찾고 사용이 불가능한 타입이면 예외를 발생시킨다.
             /// </summary>
-            public Type BindToType(string assemblyName, string typeName)
+            public Type BindToType(string? assemblyName, string typeName)
             {
-                Type type = Type.GetType($"{typeName}, {assemblyName}");
+                Type? type = null;
+                
+                if (assemblyName != null)
+                {
+                    type = Type.GetType($"{typeName}, {assemblyName}");    
+                }
+                
                 if (type == null)
                 {
-                    throw new UnknownTypeException($"로드할 수 없는 데이터 타입 ({typeName}, {assemblyName})");
+                    throw new UnknownTypeException($"로드할 수 없는 데이터 타입 (type:{typeName}, assembly:{assemblyName})");
                 }
+                
                 return type;
             }
 
             /// <summary>
             /// Type을 string으로 반환한다.
             /// </summary>
-            public void BindToName(Type serializedType, out string assemblyName, out string typeName)
+            public void BindToName(Type serializedType, out string? assemblyName, out string? typeName)
             {
                 // ex) Rano
                 // ex) mscorlib
