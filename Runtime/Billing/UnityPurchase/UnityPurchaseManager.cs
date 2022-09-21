@@ -50,7 +50,7 @@ namespace Rano.Billing.UnityPurchase
         
         public void Initialize()
         {
-            Log.Info("구매서비스 초기화 시작.");
+            Log.Info("초기화 시작.");
             
             if (_state == EState.Initializing)
             {
@@ -240,7 +240,6 @@ namespace Rano.Billing.UnityPurchase
 
         public void OnPurchaseFailed(Product product, PurchaseFailureReason failureReason)
         {
-            Log.Todo("국제화 필요한지 여부 확인하고 문자열 국제화 시킬 것");
             string reason = failureReason switch
             {
                 PurchaseFailureReason.Unknown => "원인불명",

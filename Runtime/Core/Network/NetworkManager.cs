@@ -1,8 +1,5 @@
 using System;
 using System.Collections;
-using System.Diagnostics.Eventing.Reader;
-using System.Runtime.CompilerServices;
-using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
@@ -30,10 +27,6 @@ namespace Rano.Network
         public Action onConnected;
         public Action onDisconnected;
 
-        /// <summary>네트워크 연결상태를 리턴한다.</summary>
-        /// <example>
-        /// networkManager.Status == NetworkStatus.Connected;
-        /// </example>
         public NetworkState State => _state;
         public bool IsConnected => _state == NetworkState.Connected;
 
@@ -61,26 +54,26 @@ namespace Rano.Network
 
                 if (ping.isDone && ping.time >= 0)
                 {
-                    /* Ping recevied,  Set to Connected */
+                    // 핑을 받으면 연견된 것으로 간주한다.
                     if (_state == NetworkState.Unknown || _state == NetworkState.Disconnected)
                     {
-                        Log.Sys("Network Connected");
+                        Log.Sys("네트워크 연결됨");
                         _state = NetworkState.Connected;
                         onConnected?.Invoke();
                     }
                 }
                 else
                 {
-                    /* Ping not received or timeout, Set to Disconnected */
+                    // 핑을 받지 못했거나 시간을 초과했다면 끊어진 것으로 간주한다.
                     if (_state == NetworkState.Unknown || _state == NetworkState.Connected)
                     {
-                        Log.Sys("Network Disconnected");
+                        Log.Sys("네트워크 끊어짐");
                         _state = NetworkState.Disconnected;
                         onDisconnected?.Invoke();
                     }
                 }
 
-                // Retry after a while
+                // 잠시 후에 재시도한다.
                 yield return CoroutineYieldCache.WaitForSeconds(pingNextTime);
             }
         }
@@ -90,12 +83,12 @@ namespace Rano.Network
         /// </summary>
         public async Task WaitForConnectionTestCompletedAsync()
         {
-            Log.Info("Wait for the network connection test to complete.", caller:false);
+            Log.Info("네트워크 연결 테스트 중...");
             while (_state == NetworkState.Unknown)
             {
                 await Task.Delay(25);
             }
-            Log.Info("Network connection test completed.",caller:false);
+            Log.Info("네트워크 연결 테스트가 완료되었습니다");
         }
     }
 }

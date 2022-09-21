@@ -11,6 +11,9 @@ namespace Rano.Billing
         public Dictionary<string, InAppProduct> products;
     }
     
+    /// <summary>
+    /// 구매 영수증을 보관한다.
+    /// </summary>
     public sealed class PurchaseHistory : MonoBehaviour, IPurchaseHistory, ISaveLoadable
     {
         private IPurchaseManager _purchaseManager;
@@ -105,10 +108,15 @@ namespace Rano.Billing
                 }
                 else
                 {
-                    // 주의: 에디터에서는 이미 있으면 업데이트 하지 않는다. 로컬데이터가 우선시 되기 때문이다.
-                    Log.Info($"PurchaseHistory 상품정보 업데이트 생략됨 ({product.id}, reason:로컬데이터 우선)");
+                    // 이미 있으면 업데이트 하지 않는다.
+                    // 예를 들어 PurchaseHistory가 로컬 세이브데이터에 의해서 복원된 경우에 해당한다.
+                    //
+                    // GPGS나 GameCenter 서비스를 이용하는 환경에서는
+                    // 구매 히스토리 데이터를 로컬이 아닌 클라우드에서 전달받은 값으로 설정해야 한다. (product)
+                    Log.Info($"PurchaseHistory 상품정보 업데이트 생략됨 ({product.id}, reason:이미 있음)");
                 }
             #else
+
                 Log.Info($"PurchaseHistory 상품정보 업데이트됨 ({product.id})");
                 _products[product.id] = product;
             #endif   

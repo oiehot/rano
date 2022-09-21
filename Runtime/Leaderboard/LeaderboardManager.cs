@@ -40,8 +40,7 @@ namespace Rano.Leaderboard
                 #if UNITY_EDITOR
                     const string firebaseDatabaseUrl = "https://bigtree-56229591-default-rtdb.firebaseio.com";
                     Log.Todo("에디터 환경에서 실행하면 google-services.json를 통해 실시간 데이터베이스 주소를 얻지 못하는 문제가 발생함.");
-                    Log.Todo("안드로이드나 iOS 빌드에서 이 문제가 생기지 않는다면, 이 경고를 제거할것.");
-                    Log.Todo($"임시로 다음 FirebaseDatabaseUrl을 사용 ({firebaseDatabaseUrl})");                    
+                    Log.Todo($"다음 FirebaseDatabaseUrl을 사용하여 FirebaseDatabase 인스턴스를 얻음 ({firebaseDatabaseUrl})");
                     _db = FirebaseDatabase.GetInstance(firebaseDatabaseUrl);
                 #else
                     _db = FirebaseDatabase.DefaultInstance;
@@ -93,7 +92,7 @@ namespace Rano.Leaderboard
                 return false;
             }
                 
-            Query query = _root.Child(USERS).OrderByChild("northpole_highscore").LimitToLast(count);
+            Query query = _root!.Child(USERS).OrderByChild("northpole_highscore").LimitToLast(count);
             // Task<DataSnapshot> dataSnapshot = await query.Reference.GetValueAsync();
             DataSnapshot result = await query.GetValueAsync();
             
