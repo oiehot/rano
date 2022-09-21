@@ -7,14 +7,20 @@ namespace Rano.Billing.UnityPurchase
 {
     public sealed class UnityPurchaseManager : ManagerComponent, IPurchaseManager, IStoreListener
     {
-        private EPurchaseServiceState _state = EPurchaseServiceState.NotInitialized;
+        private enum EState
+        {
+            None,
+            Initializing,
+            Initialized,
+        }
+        
+        private EState _state = EState.None;
         private IStoreController _controller;
         private IExtensionProvider _extensions;
         private IReceiptValidator _receiptValidator;
         [SerializeField] private InAppProductSO[] _rawProducts;
      
-        public EPurchaseServiceState State => _state;
-        public bool IsAvailable => _state == EPurchaseServiceState.Available;        
+        public bool IsInitialized => _state >= EState.Initialized;
         public InAppProductSO[] RawProducts
         {
             get => _rawProducts;
@@ -46,26 +52,43 @@ namespace Rano.Billing.UnityPurchase
         {
             Log.Info("구매서비스 초기화 시작.");
             
+            if (_state == EState.Initializing)
+            {
+                Log.Warning($"이미 초기화가 진행중입니다");
+                return;
+            }
+            if (_state == EState.Initialized)
+            {
+                Log.Warning($"이미 초기화가 되었습니다");
+                return;
+            }
             if (_rawProducts == null || _rawProducts.Length <= 0)
             {
                 Log.Warning("원시상품들이 없으면 초기화할 수 없습니다.");
                 return;
             }
 
-            if (_state != EPurchaseServiceState.NotInitialized)
+            // 초기화 중 설정
+            _state = EState.Initializing;
+            
+            // ConfigurationBuilder 인스턴스 생성
+            ConfigurationBuilder builder;
+            try
             {
-                Log.Warning($"이미 초기화가 되었습니다. (state:{_state})");
+                builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
+            }
+            catch (Exception e)
+            {
+                Log.Warning("UnityEngine.Purchasing의 ConfigurationBuilder 인스턴스를 만드는 중 예외 발생");
+                Log.Exception(e);
                 return;
             }
-            
-            _state = EPurchaseServiceState.Initializing;
-            var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
-            
+
             // 원시상품들의 정보를 초기화시에 사용한다.
             foreach (InAppProductSO rawProduct in _rawProducts)
             {
-                Debug.Assert(rawProduct != null);
-                Log.Info($"Add RawProduct ({rawProduct.Id})");
+                UnityEngine.Debug.Assert(rawProduct != null);
+                Log.Info($"원시상품 추가 ({rawProduct.Id})");
                 try
                 {
                     builder.AddProduct(
@@ -80,27 +103,24 @@ namespace Rano.Billing.UnityPurchase
                 }
                 catch (Exception e)
                 {
-                    Log.Warning($"Add RawProduct Failed ({rawProduct.Id}");
-                    #if (UNITY_EDITOR || DEVELOPMENT_BUILD)
-                        Log.Exception(e);
-                    #endif
-                    _state = EPurchaseServiceState.InitializeFailed;
+                    Log.Warning($"원시상품 추가 실패 ({rawProduct.Id}");
+                    Log.Exception(e);
+                    _state = EState.None;
                     this.onInitializeFailed?.Invoke();
                     return;
                 }
             }
 
+            // UnityPurchasing 초기화
             try
             {
                 UnityPurchasing.Initialize(this, builder);
             }
             catch (Exception e)
             {
-                Log.Warning($"UnityPurchasing.Initialize Failed");
-                #if (UNITY_EDITOR || DEVELOPMENT_BUILD)
-                    UnityEngine.Debug.LogWarning(e);
-                #endif
-                _state = EPurchaseServiceState.InitializeFailed;
+                Log.Warning($"UnityPurchasing 초기화 실패");
+                Log.Exception(e);
+                _state = EState.None;
                 this.onInitializeFailed?.Invoke();
             }
         }
@@ -127,12 +147,21 @@ namespace Rano.Billing.UnityPurchase
         public void Purchase(string productId)
         {
             Log.Info($"구매요청 ({productId})");
-            if (_state != EPurchaseServiceState.Available)
+            if (_state != EState.Initialized)
             {
-                Log.Warning($"구매가능한 상태가 아닙니다. (currentState:{_state})");
+                Log.Warning($"초기화가 되지 않아 구매할 수 없습니다");
                 return;
             }
-            _controller.InitiatePurchase(productId);
+            try
+            {
+                _controller.InitiatePurchase(productId);    
+            }
+            catch (Exception e)
+            {
+                Log.Warning($"구매 중 예외 발생 ({productId})");
+                Log.Exception(e);
+                return;
+            }
         }
 
         /// <summary>
@@ -141,7 +170,7 @@ namespace Rano.Billing.UnityPurchase
         public void RestoreAllPurchases()
         {
             Log.Info($"구매복구 요청");
-            if (_state != EPurchaseServiceState.Available)
+            if (_state != EState.Initialized)
             {
                 Log.Warning($"구매복구 할 수 있는 상태가 아닙니다. (state:{_state})");
                 return;
@@ -157,13 +186,13 @@ namespace Rano.Billing.UnityPurchase
         {
             if (result)
             {
-                // This does not mean anything was restored, merely that the restoration process succeeded.
-                Log.Info("구매복구에 성공했습니다.");
+                // 구매 복구되지 않더라도 절차가 성공하면 실행됨.
+                Log.Info("구매복구 성공");
                 this.onRestoreAllPurchasesComplete?.Invoke();
             }
             else
             {
-                Log.Warning("구매복구에 실패했습니다.");
+                Log.Warning("구매복구 실패");
                 this.onRestoreAllPurchasesFailed?.Invoke();
             }
         }
@@ -171,21 +200,24 @@ namespace Rano.Billing.UnityPurchase
         public void OnInitialized(IStoreController controller, IExtensionProvider extensions)
         {
             UnityEngine.Debug.Assert(controller != null && extensions != null);
+            
             _controller = controller;
             _extensions = extensions;
 
+            // UnityPurchase의 Product를 Rano에서 사용하는 InAppProduct로 변환한다.
             InAppProduct[] inAppProducts = _controller.products.all
                 .Select(product => product.ConvertToInAppProduct())
                 .ToArray();
+            
+            Log.Info($"초기화 완료");
+            _state = EState.Initialized;
             this.onInitialized?.Invoke(inAppProducts);
-            _state = EPurchaseServiceState.Available;
-            Log.Info($"초기화 완료됨.");
         }
 
         public void OnInitializeFailed(InitializationFailureReason error)
         {
             Log.Warning($"초기화 실패 ({error})");
-            _state = EPurchaseServiceState.InitializeFailed;
+            _state = EState.None;
             this.onInitializeFailed?.Invoke();
         }
         
@@ -208,7 +240,7 @@ namespace Rano.Billing.UnityPurchase
 
         public void OnPurchaseFailed(Product product, PurchaseFailureReason failureReason)
         {
-            // TODO: 국제화
+            Log.Todo("국제화 필요한지 여부 확인하고 문자열 국제화 시킬 것");
             string reason = failureReason switch
             {
                 PurchaseFailureReason.Unknown => "원인불명",
@@ -226,6 +258,9 @@ namespace Rano.Billing.UnityPurchase
             this.onPurchaseFailed?.Invoke(productId, reason);
         }
         
+        /// <summary>
+        /// </summary>
+        /// <remarks>IStoreListener 인터페이스의 메소드 구현</remarks>
         public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs purchaseEvent)
         {
             ValidatePurchaseAsync(purchaseEvent.purchasedProduct);
@@ -268,12 +303,12 @@ namespace Rano.Billing.UnityPurchase
         {
             string productId = purchasedProduct.definition.id;
             this.onValidatePurchaseFailed?.Invoke(productId);
-            Log.Warning($"영수증 검증에 실패했습니다 ({purchasedProduct.receipt})");   
+            Log.Warning($"영수증 검증에 실패했습니다 ({purchasedProduct.receipt})");
         }
         
         public InAppProduct GetProduct(string productId)
         {
-            if (_state != EPurchaseServiceState.Available) return null;
+            if (IsInitialized == false) return null;
             Product product = _controller.products.WithID(productId);
             if (product != null) return product.ConvertToInAppProduct();
             return null;
@@ -281,7 +316,7 @@ namespace Rano.Billing.UnityPurchase
         
         public InAppProduct[] GetProducts()
         {
-            if (_state != EPurchaseServiceState.Available) return null;
+            if (IsInitialized == false) return null;
             var result = _controller.products.all
                 .Select(product => product.ConvertToInAppProduct())
                 .ToArray();
@@ -292,10 +327,10 @@ namespace Rano.Billing.UnityPurchase
         public void LogStatus()
         {
             Log.Info($"{nameof(UnityPurchaseManager)} Status:");
-            Log.Info($"  State: {State}");
-            Log.Info($"  IsAvailable: {IsAvailable}");
+            Log.Info($"  State: {_state}");
+            Log.Info($"  IsInitialized: {IsInitialized}");
             Log.Info($"  rawProducts: {_rawProducts.Length}");
-            if (IsAvailable)
+            if (IsInitialized)
             {
                 Log.Info($"  products:");
                 Product[] products = _controller.products.all;
@@ -309,9 +344,9 @@ namespace Rano.Billing.UnityPurchase
 
         public void LogProduct(string productId)
         {
-            if (!IsAvailable)
+            if (IsInitialized == false)
             {
-                Log.Warning($"초기화되지 않았습니다 (state:{State})");
+                Log.Warning($"초기화되지 않아 상품을 출력할 수 없습니다 ({productId})");
                 return;
             }
             
@@ -327,9 +362,9 @@ namespace Rano.Billing.UnityPurchase
         [ContextMenu("Log Products")]
         public void LogProducts()
         {
-            if (!IsAvailable)
+            if (IsInitialized == false)
             {
-                Log.Warning($"초기화되지 않았습니다 (state:{State})");
+                Log.Warning($"초기화되지 않아 상품들을 출력할 수 없습니다");
                 return;
             }
 

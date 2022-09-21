@@ -1,0 +1,18 @@
+{
+    "name": "Rano.UGS",
+    "rootNamespace": "",
+    "references": [
+        "Rano",
+        "Unity.Services.Core",
+        "Unity.Services.Core.Environments"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

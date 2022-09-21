@@ -4,10 +4,9 @@ namespace Rano.Billing
 {
     public interface IPurchaseManager
     {
-        EPurchaseServiceState State { get; }
-        bool IsAvailable { get; }
-        InAppProductSO[] RawProducts { get; set; }
+        bool IsInitialized { get; }
         
+        InAppProductSO[] RawProducts { get; set; }
         Action<InAppProduct[]> onInitialized { get; set; }
         Action onInitializeFailed { get; set; }
         Action<InAppProduct[]> onUpdateSuccess { get; set; }
