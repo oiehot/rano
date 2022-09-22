@@ -74,7 +74,7 @@ namespace Rano.Database.FirebaseFirestore
         /// </summary>
         /// <param name="collectionName">컬렉션 이름</param>
         /// <returns>컬렉션 레퍼런스</returns>
-        private CollectionReference? GetCollectionReference(string collectionName)
+        public CollectionReference? GetCollectionReference(string collectionName)
         {
             CollectionReference? collectionReference;
             
@@ -85,7 +85,7 @@ namespace Rano.Database.FirebaseFirestore
             }
             
             // Collection 이름에 문제가 없는지 체크.
-            if (IsValidatedCollectionName(collectionName) == false)
+            if (IsValidCollectionName(collectionName) == false)
             {
                 Log.Warning($"{Constants.INVALID_COLLECTION_NAME} ({collectionName}");
                 return null;
@@ -116,7 +116,7 @@ namespace Rano.Database.FirebaseFirestore
         /// <param name="collectionName">컬렉션 이름</param>
         /// <param name="documentName">문서 이름</param>
         /// <returns>문서 레퍼런스</returns>
-        private DocumentReference? GetDocumentReference(string collectionName, string documentName)
+        public DocumentReference? GetDocumentReference(string collectionName, string documentName)
         {
             CollectionReference? collectionReference;
             DocumentReference? documentReference;
@@ -130,7 +130,7 @@ namespace Rano.Database.FirebaseFirestore
             collectionReference = GetCollectionReference(collectionName);
             if (collectionReference == null) return null;
             
-            if (IsValidatedDocumentName(documentName) == false)
+            if (IsValidDocumentName(documentName) == false)
             {
                 Log.Warning($"{Constants.INVALID_DOCUMENT_NAME} ({documentName})");
                 return null;
@@ -160,7 +160,7 @@ namespace Rano.Database.FirebaseFirestore
         /// </summary>
         /// <param name="document">문서 레퍼런스</param>
         /// <returns>문서 스냅샷 Task</returns>
-        private async Task<DocumentSnapshot?> GetDocumentSnapshotReferenceAsync(DocumentReference document)
+        public async Task<DocumentSnapshot?> GetDocumentSnapshotReferenceAsync(DocumentReference document)
         {
             DocumentSnapshot? snapshot;
             try
@@ -187,7 +187,7 @@ namespace Rano.Database.FirebaseFirestore
         /// <param name="dict">설정할 데이터</param>
         /// <param name="setOptions">설정 옵션</param>
         /// <returns>설정 결과(bool) Task</returns>
-        private async Task<bool> SetDocumentAsync(DocumentReference document, Dictionary<string, object> dict, SetOptions setOptions)
+        public async Task<bool> SetDocumentAsync(DocumentReference document, Dictionary<string, object> dict, SetOptions setOptions)
         {
             try
             {
@@ -199,7 +199,7 @@ namespace Rano.Database.FirebaseFirestore
                 Log.Exception(e);
                 return false;
             }
-            Log.Info($"{Constants.SET_DOCUMENT_SUCCESS} ({setOptions})");
+            Log.Sys($"{Constants.SET_DOCUMENT_SUCCESS} ({setOptions})");
             return true;
         }
 
@@ -209,7 +209,7 @@ namespace Rano.Database.FirebaseFirestore
         /// <param name="document">문서 레퍼런스</param>
         /// <param name="dict">업데이트 할 내용</param>
         /// <returns>업데이트 결과(bool) Task</returns>
-        private async Task<bool> UpdateDocumentAsync(DocumentReference document, Dictionary<string, object> dict)
+        public async Task<bool> UpdateDocumentAsync(DocumentReference document, Dictionary<string, object> dict)
         {
             try
             {
@@ -221,7 +221,7 @@ namespace Rano.Database.FirebaseFirestore
                 Log.Exception(e);
                 return false;
             }
-            Log.Info(Constants.UPDATE_DOCUMENT_SUCCESS);
+            Log.Sys(Constants.UPDATE_DOCUMENT_SUCCESS);
             return true;
         }
 
@@ -230,7 +230,7 @@ namespace Rano.Database.FirebaseFirestore
         /// </summary>
         /// <param name="document">문서 레퍼런스</param>
         /// <returns>삭제 결과(bool) Task</returns>
-        private async Task<bool> DeleteDocumentAsync(DocumentReference document)
+        public async Task<bool> DeleteDocumentAsync(DocumentReference document)
         {
             try
             {
@@ -242,7 +242,7 @@ namespace Rano.Database.FirebaseFirestore
                 Log.Exception(e);
                 return false;
             }
-            Log.Info(Constants.DELETE_DOCUMENT_SUCCESS);
+            Log.Sys(Constants.DELETE_DOCUMENT_SUCCESS);
             return true;            
         }
         
@@ -323,7 +323,7 @@ namespace Rano.Database.FirebaseFirestore
         /// </summary>
         /// <param name="collectionName">컬렉션 이름</param>
         /// <returns>결과</returns>
-        public bool IsValidatedCollectionName(string collectionName)
+        public bool IsValidCollectionName(string collectionName)
         {
             if (String.IsNullOrEmpty(collectionName) == true) return false;
             return true;
@@ -334,7 +334,7 @@ namespace Rano.Database.FirebaseFirestore
         /// </summary>
         /// <param name="documentName">문서 이름</param>
         /// <returns>결과</returns>
-        public bool IsValidatedDocumentName(string documentName)
+        public bool IsValidDocumentName(string documentName)
         {
             if (String.IsNullOrEmpty(documentName) == true) return false;
             return true;

@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Text;
 
@@ -20,7 +22,7 @@ namespace Rano
             }
         }
 
-        public static DateTime ToDateTime(this string str)
+        public static DateTime ToDateTime(this string? str)
         {
             DateTime result;
 
@@ -41,6 +43,11 @@ namespace Rano
             }
 
             return result;
+        }
+
+        public static string ToCamelCase(this string src)
+        {
+            return char.ToLowerInvariant(src[0]) + src[1..];
         }
     }
 }

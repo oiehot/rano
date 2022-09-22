@@ -1,189 +1,213 @@
 ﻿#nullable enable
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Rano.Auth;
-using Firebase.Database;
-using UnityEngine;
+using Rano.Auth.Firebase;
+using Rano.Database.FirebaseFirestore;
+using Firebase.Firestore;
 
 namespace Rano.Leaderboard
 {
-    /// <see cref="https://firebase.google.com/docs/database/unity/save-data?hl=ko&authuser=0"/>
+    /// <summary>
+    /// 리더보드를 관리한다.
+    /// </summary>
     public sealed class LeaderboardManager : ManagerComponent
     {
-        private const string USERS = "users";
-        
-        private IAuthManager? _auth;
-        private FirebaseDatabase? _db;
-        private DatabaseReference? _root;
-        public bool IsInitialized => (_auth != null && _db != null && _root != null);
-        public bool IsAuthentiacted => (_auth != null ? _auth.IsAuthenticated : false);
-        public string? UserId => _auth?.UserId;
-        public string? UserDisplayName => "OIEHOT"; // TODO: _auth?.UserDisplayName;
+        private const string LEADERBOARDS_COLLECTION_NAME = "leaderboards";
+        private const string USER_DISPLAY_NAME_KEY = "userDisplayName";
+        private const int MAX_QUERY_COUNT = 100;
+        private FirebaseAuthManager? _auth;
+        private FirebaseFirestoreManager? _db;
+        public bool IsInitialized => (_auth != null && _db != null && _auth.IsInitialized && _db.IsInitialized);
 
-        /// <summary>
-        /// 초기화 한다.
-        /// </summary>
-        /// <param name="authManager">UserId를 얻기 위해서 필요하다</param>
-        /// <returns>초기화 결과</returns>
-        public bool Initialize(IAuthManager authManager)
+        private static string GetTimestampKeyName(string leaderboardName)
         {
-            Log.Info("리더보드 초기화중...");
-            _auth = authManager;
-            _db = null;
-            _root = null;
-            
-            try
-            {
-                #if UNITY_EDITOR
-                    const string firebaseDatabaseUrl = "https://bigtree-56229591-default-rtdb.firebaseio.com";
-                    Log.Todo("에디터 환경에서 실행하면 google-services.json를 통해 실시간 데이터베이스 주소를 얻지 못하는 문제가 발생함.");
-                    Log.Todo($"다음 FirebaseDatabaseUrl을 사용하여 FirebaseDatabase 인스턴스를 얻음 ({firebaseDatabaseUrl})");
-                    _db = FirebaseDatabase.GetInstance(firebaseDatabaseUrl);
-                #else
-                    _db = FirebaseDatabase.DefaultInstance;
-                #endif
-            }
-            catch (Exception e)
-            {
-                Log.Exception(e);
-            }
-
-            if (_db == null)
-            {
-                Log.Warning("실시간 데이터베이스 인스턴스를 얻는데 실패함");
-                Log.Warning("리더보드 초기화 실패");
-                return false;
-            }
-
-            try
-            {
-                _root = _db.RootReference;
-            }
-            catch (Exception e)
-            {
-                Log.Exception(e);
-            }
-
-            if (_root == null)
-            {
-                Log.Warning("실시간 데이터베이스 루트 문서를 얻는데 실패함");
-                Log.Warning("리더보드 초기화 실패");
-                return false;
-            }
-            
-            Log.Info("리더보드 초기화 성공");
+            return $"{leaderboardName}Timestamp";
+        }
+        
+        private static bool IsValidKey(string key)
+        {
+            if (string.IsNullOrEmpty(key) == true) return false;
             return true;
         }
 
-        public async Task<bool> LogLeaderboardAsync(string leaderboardName, int count)
+        private static bool IsValidCount(int count)
+        {
+            return count is > 0 and <= MAX_QUERY_COUNT;
+        }
+        
+        /// <summary>
+        /// 리더보드 매니져를 초기화 한다.
+        /// </summary>
+        public bool Initialize(FirebaseAuthManager authManager, FirebaseFirestoreManager firestoreManager)
+        {
+            Log.Info("리더보드 초기화중...");
+
+            if (authManager == null)
+            {
+                Log.Warning("리더보드 초기화 실패 (인증 관리자가 비어 있음)");
+                return false;
+            }
+
+            if (firestoreManager == null)
+            {
+                Log.Warning("리더보드 초기화 실패 (데이터베이스 관리자가 비어 있음)");
+                return false;
+            }
+            
+            if (authManager.IsInitialized == false)
+            {
+                Log.Warning("리더보드 초기화 실패 (인증 관리자가 초기화 되지 않음)");
+                return false;
+            }
+
+            if (firestoreManager.IsInitialized == false)
+            {
+                Log.Warning("리더보드 초기화 실패 (데이터베이스 관리자가 초기화 되지 않음)");
+                return false;
+            }
+            
+            _auth = authManager;
+            _db = firestoreManager;
+            
+            Log.Info("리더보드 초기화 성공");
+            
+            return true;
+        }
+
+        /// <summary>
+        /// 리더보드의 값을 설정한다.
+        /// </summary>
+        public async Task<bool> SetLeaderboardLongAsync(string leaderboardName, long value)
         {
             if (IsInitialized == false)
             {
-                Log.Warning("초기화가 안되어 있어서 생략함.");
+                Log.Warning($"리더보드 설정 실패 (초기화 되지 않았음)");
                 return false;
             }
-
+            if (_auth!.IsAuthenticated == false)
+            {
+                Log.Warning($"리더보드 설정 실패 (인증 되지 않았음)");
+                return false;
+            }
             if (IsValidKey(leaderboardName) == false)
             {
-                Log.Warning($"잘못된 키 이름임 ({leaderboardName})");
+                Log.Warning($"리더보드 설정 실패 (올바르지 않은 리더보드 이름: {leaderboardName})");
                 return false;
             }
-                
-            Query query = _root!.Child(USERS).OrderByChild("northpole_highscore").LimitToLast(count);
-            // Task<DataSnapshot> dataSnapshot = await query.Reference.GetValueAsync();
-            DataSnapshot result = await query.GetValueAsync();
+
+            // 업데이트 할 데이터를 준비한다.
+            Dictionary<string,object> dict= new Dictionary<string,object>();
+            dict[USER_DISPLAY_NAME_KEY] = _auth!.UserDisplayName;
+            dict[leaderboardName] = value;
+            dict[GetTimestampKeyName(leaderboardName)] = DateTime.UtcNow;
             
-            foreach (DataSnapshot dataSnapshot in result.Children)
+            // 문서 업데이트
+            bool result = await _db!.SetDocumentMergeAsync(LEADERBOARDS_COLLECTION_NAME, _auth!.UserId!, dict);
+            
+            return result;
+        }
+
+        /// <summary>
+        /// 리더보드를 얻는다.
+        /// </summary>
+        public async Task<bool> GetLeaderboardAsync(string leaderboardName, int count)
+        {
+            if (IsInitialized == false)
             {
-                string userDisplayName = dataSnapshot.Key;
-                IDictionary dict = (IDictionary)dataSnapshot.Value;
-                Log.Info($"User: {userDisplayName}, {leaderboardName}: {dict[leaderboardName]}");
-                // JSON은 사전 형태이기 때문에 딕셔너리 형으로 변환
+                Log.Warning($"리더보드를 얻을 수 없음 (초기화 되지 않았음)");
+                return false;
+            }
+            if (_auth!.IsAuthenticated == false)
+            {
+                Log.Warning($"리더보드를 얻을 수 없음 (인증 되지 않았음)");
+                return false;
+            }
+            if (IsValidKey(leaderboardName) == false)
+            {
+                Log.Warning($"리더보드를 얻을 수 없음 (올바르지 않은 리더보드 이름: {leaderboardName})");
+                return false;
             }
 
-            return true;
-        }
-        
-        public async Task<bool> SetStringByDictionary(string leaderboardName, string value)
-        {
-            Debug.Assert(IsInitialized && IsAuthentiacted && IsValidKey(leaderboardName) && UserId != null);
+            if (IsValidCount(count) == false)
+            {
+                Log.Warning($"리더보드를 얻을 수 없음 (올바르지 않은 쿼리 카운트: {count})");
+                return false;
+            }
+
+            // 리더보드 컬렉션을 얻는다.
+            CollectionReference? collectionRef = _db!.GetCollectionReference(LEADERBOARDS_COLLECTION_NAME);
+            if (collectionRef == null)
+            {
+                Log.Warning("리더보드를 얻을 수 없음 (데이터베이스 컬렉션 레퍼런스가 없음)");
+                return false;
+            }
             
-            Dictionary<string, object> updates = new Dictionary<string, object>();
-            Dictionary<string, object> data = new Dictionary<string, object>();
-            
-            data[leaderboardName] = value;
-            updates[$"/users/{UserId}"] = data;
-        
+            // 쿼리를 얻는다.
+            Query query;
             try
             {
-                await _root.UpdateChildrenAsync(updates);
+                query = collectionRef.OrderByDescending(leaderboardName).Limit(count);
             }
             catch (Exception e)
             {
+                Log.Warning("리더보드를 얻을 수 없음 (데이터베이스 쿼리 중 예외가 발생함)");
                 Log.Exception(e);
                 return false;
             }
-        
-            return true;
-        }
-        
-        
-        public async Task<bool> SetString(string leaderboardName, string value)
-        {
-            Debug.Assert(IsInitialized && IsAuthentiacted && IsValidKey(leaderboardName) && UserId != null);
+            if (query == null)
+            {
+                Log.Warning("리더보드를 얻을 수 없음 (데이터베이스 쿼리 결과가 비어있음)");
+                return false;
+            }
 
+            // 쿼리로 부터 스냅샷을 얻는다
+            QuerySnapshot querySnapshot;
             try
             {
-                await _root.Child(USERS).Child(UserId).Child("leaderboardName").SetValueAsync(value);
+                querySnapshot = await query.GetSnapshotAsync();
             }
             catch (Exception e)
             {
+                Log.Warning("리더보드를 얻을 수 없음 (쿼리로 부터 스냅샷을 얻는 중 예외가 발생함)");
                 Log.Exception(e);
                 return false;
             }
-            return true;
-        }
+            if (querySnapshot == null)
+            {
+                Log.Warning("리더보드를 얻을 수 없음 (스냅샷이 비어있음)");
+                return false;
+            }
 
-        public async Task<bool> SetLong(string leaderboardName, long value)
-        {
-            Debug.Assert(IsInitialized && IsAuthentiacted && IsValidKey(leaderboardName) && UserId != null);
+            if (querySnapshot.Count <= 0)
+            {
+                Log.Warning("리더보드 내용이 없음");
+                return false;
+            }
 
+            // 스냅샷으로 부터 문서를 읽는다.
             try
             {
-                await _root.Child(USERS).Child(UserId).Child("leaderboardName").SetValueAsync(value);
+                Log.Todo("쿼리 스냅샷 문서를 리더보드 데이터 타입으로 변환하여 리턴할것");
+                foreach (DocumentSnapshot document in querySnapshot.Documents)
+                {
+                    Log.Info($"Document (Id: {document.Id})");
+                    Dictionary<string, object> dict = document.ToDictionary();
+                    foreach (KeyValuePair<string, object> item in dict)
+                    {
+                        Log.Info($"  - {item.Key}: {item.Value}");
+                    }
+                }
             }
             catch (Exception e)
             {
+                Log.Warning("리더보드를 얻을 수 없음 (스냅샷으로 부터 문서를 읽는 중 예외가 발생)");
                 Log.Exception(e);
                 return false;
             }
+
             return true;
         }
-
-        // public async Task<bool> SetRawJson(string key, string value)
-        // {
-        //     Debug.Assert(IsInitialized && IsAuthentiacted && IsValidKey(key) && UserId != null);
-        //
-        //     try
-        //     {
-        //         await _root!.Child(USERS).Child(UserId).Child(key).SetRawJsonValueAsync(value);
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         Log.Exception(e);
-        //         return false;
-        //     }
-        //
-        //     return true;
-        // }
-
-        public bool IsValidKey(string key)
-        {
-            return true;
-        }
-        
     }
 }

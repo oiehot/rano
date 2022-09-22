@@ -20,16 +20,16 @@ namespace Rano.Auth.Firebase
                 else return false;
             }
         }
-        
-        // TODO: UserDisplayName을 얻으려면?
-        public string? UserId
-        {
-            get
-            {
-                if (_auth != null && _auth.CurrentUser != null)  return _auth.CurrentUser.UserId;
-                else return null;
-            }
-        }
+        public string? UserId => IsAuthenticated ? _auth!.CurrentUser.UserId : null;
+
+        /// <summary>
+        /// 사용자의 표시 이름.
+        /// </summary>
+        /// <remarks>
+        /// 이름을 지정하지 않았거나 익명이면 "" 값이 리턴된다.
+        /// 인증이 안되어 있으면 "" 값이 리턴된다.
+        /// </remarks>
+        public string UserDisplayName => IsAuthenticated ? _auth!.CurrentUser.DisplayName : "";
 
         protected override void OnDisable()
         {
