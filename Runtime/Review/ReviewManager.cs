@@ -17,6 +17,16 @@ namespace Rano.Review
         public DateTime LastOpenReviewDateTime => _lastOpenReviewDateTime;
 
         /// <summary>
+        /// 리뷰 정책을 리셋한다.
+        /// </summary>
+        public void ResetReviewPolicy()
+        {
+            Log.Info("리뷰 제한정책 체크를 위한 변수들을 리셋합니다");
+            _openReviewCount = 0;
+            _lastOpenReviewDateTime = DateTime.MinValue;
+        }
+
+        /// <summary>
         /// 정책 준수 하에 리뷰 가능 여부를 리턴한다.
         /// </summary>
         public bool CanReview()
