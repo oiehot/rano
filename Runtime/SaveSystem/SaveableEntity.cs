@@ -15,18 +15,33 @@ namespace Rano.SaveSystem
         /// 배치시 로드 순서. 작을수록 더 먼저 로드된다.
         /// </summary>
         [SerializeField] private int _order = 0;
-        
-        public string Id
-        {
-            get => _id;
-            set => _id = value;
-        }
-        
+
+        public string Id => _id;
         public int Order => _order;
 
         void Reset()
         {
             GenerateId();
+        }
+
+        public bool Initialize(string id, int order=0)
+        {
+            if (string.IsNullOrEmpty(id) == true)
+            {
+                Log.Warning($"초기화 실패 (잘못된 Id: {id})");
+                return false;
+            }
+            
+            _id = id;
+            _order = order;
+
+            return true;
+        }
+        
+        public bool IsInitialized()
+        {
+            if (string.IsNullOrEmpty(_id) == true) return false;
+            return true;
         }
 
         // 실수로 Id를 바꿀 수 있기 때문에 해제함.

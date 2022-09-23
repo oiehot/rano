@@ -1,0 +1,18 @@
+﻿{
+  "name": "Rano.Review",
+  "rootNamespace": "",
+  "references": [
+    "Rano",
+    "Rano.SaveSystem"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

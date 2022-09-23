@@ -1,0 +1,21 @@
+{
+    "name": "Rano.Review.GooglePlayReview",
+    "rootNamespace": "",
+    "references": [
+        "Rano",
+        "Rano.Review",
+        "Google.Play.Common",
+        "Google.Play.Review"
+    ],
+    "includePlatforms": [
+        "Android"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
