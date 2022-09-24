@@ -1,0 +1,17 @@
+﻿{
+  "name": "Rano.Update.GoogleUpdate",
+  "rootNamespace": "",
+  "references": [
+    "Rano",
+    "Rano.Update"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

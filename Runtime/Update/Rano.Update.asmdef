@@ -1,0 +1,16 @@
+﻿{
+  "name": "Rano.Update",
+  "rootNamespace": "",
+  "references": [
+    "Rano"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
