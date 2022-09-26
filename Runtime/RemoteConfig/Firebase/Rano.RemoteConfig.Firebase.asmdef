@@ -1,0 +1,21 @@
+{
+    "name": "Rano.RemoteConfig.Firebase",
+    "rootNamespace": "",
+    "references": [
+        "Rano",
+        "Rano.RemoteConfig",
+        ""
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Firebase.RemoteConfig.dll",
+        "Unity.Tasks.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

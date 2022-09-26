@@ -1,0 +1,17 @@
+﻿{
+  "name": "Rano.RemoteConfig",
+  "rootNamespace": "",
+  "references": [
+    "Rano"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
