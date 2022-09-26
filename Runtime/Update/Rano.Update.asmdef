@@ -2,7 +2,8 @@
   "name": "Rano.Update",
   "rootNamespace": "",
   "references": [
-    "Rano"
+    "Rano",
+    "Rano.RemoteConfig"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

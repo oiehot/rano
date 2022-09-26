@@ -1,14 +1,16 @@
 ﻿{
-  "name": "Rano.Update.GoogleUpdate",
+  "name": "Rano.Review.AppstoreReview",
   "rootNamespace": "",
   "references": [
     "Rano",
-    "Rano.Update"
+    "Rano.Review"
   ],
-  "includePlatforms": [],
+  "includePlatforms": [
+    "iOS"
+  ],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
-  "overrideReferences": false,
+  "overrideReferences": true,
   "precompiledReferences": [],
   "autoReferenced": false,
   "defineConstraints": [],

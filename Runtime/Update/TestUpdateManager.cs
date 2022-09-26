@@ -1,59 +1,50 @@
 ﻿#nullable enable
 
 using System.Threading.Tasks;
-using UnityEngine;
 using Rano.App;
-using Rano.Math;
 
 namespace Rano.Update
 {
-    public sealed class TestUpdateManager : IUpdateManager
+    public sealed class TestUpdateManager : UpdateManager
     {
-        public bool IsInitialized => true;
-
-        public void Initialize()
+        protected override async Task<ECheckUpdateResult> GetUpdateStatusAsync()
         {
-            Log.Info("초기화 중... (Test)");
-            Log.Info("초기화 완료 (Test)");
-        }
-        
-        public async Task<UpdateInfo> GetUpdateInfoAsync()
-        {
-            SVersion currentVersion = new SVersion(Application.version);
+            Log.Info("TEST: 업데이트 검사 중...");
             
-            // 50% 확률로 현재 버젼에서 Minor 버젼을 1올린다.
-            if (RandomUtils.GetRandomBool() == true)  currentVersion.minor++;
-
-            UpdateInfo updateInfo = new UpdateInfo()
+            if (IsInitialized == false)
             {
-                latestVersion = currentVersion
+                Log.Warning("TEST: 업데이트 검사 실패 (초기화 되어있지 않음)");
+                return ECheckUpdateResult.Error;
+            }
+            
+            await Task.Delay(1000); // Fetch Simulator
+            await Task.Delay(10); // Activate Simulator
+
+            SVersion[] versions =
+            {
+                new SVersion("0.0.1"),
+                _currentVersion,
+                new SVersion("9.9.9")
             };
-
-            await Task.Delay(1000);
             
-            return updateInfo;
-        }
- 
-        public async Task<bool> UpdateAsync()
-        {
-            Log.Info("업데이트 준비 중... (Test)");
+            SVersion latestVersion =
+                Rano.Math.RandomUtils.GetRandomValueInArray<SVersion>(versions);
             
-            SVersion currentVersion = new SVersion(Application.version);
-            UpdateInfo updateInfo = await GetUpdateInfoAsync();
-            
-            if (updateInfo.IsUpdatable() == true)
+            if (_currentVersion < latestVersion)
             {
-                Log.Info($"업데이트 중... ({currentVersion} => {updateInfo.latestVersion}) (Test)");
-                await Task.Delay(RandomUtils.GetRandomInt(1000,3000));
-                Log.Info($"업데이트 성공 ({updateInfo.latestVersion}) (Test)");
+                Log.Important($"TEST: 업데이트가 필요합니다 ({_currentVersion} => {latestVersion})");
+                return ECheckUpdateResult.UpdateRequired;
             }
-            else
+            else if (_currentVersion == latestVersion)
             {
-                Log.Info($"이미 최신 버젼입니다 (ver:{updateInfo.latestVersion}) (Test)");
+                Log.Important($"TEST: 이미 최신 버전입니다 ({_currentVersion}) (Test)");
+                return ECheckUpdateResult.UpdateAlready;
             }
-            
-            Log.Info("업데이트 종료 (Test)");
-            return true;
+            else // if (_currentVersion > latestVersion)
+            {
+                Log.Warning($"TEST: 현재 버전이 RemoteConfig에 설정된 버전보다 최신입니다 (current:{_currentVersion}, latest:{latestVersion}) (Test)");
+                return ECheckUpdateResult.Error;
+            }
         }
     }
 }
