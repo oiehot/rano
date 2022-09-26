@@ -7,12 +7,20 @@ namespace Rano
     {
         public static string ToCommaString(this int value)
         {
-            return value.ToString("#,#", CultureInfo.InvariantCulture);
+            return $"{value:n0}";
+            // return value.ToString("#,#", CultureInfo.InvariantCulture);
         }
 
         public static string ToCommaString(this long value)
         {
-            return value.ToString("#,#", CultureInfo.InvariantCulture);
+            // return value.ToString("#,#", CultureInfo.InvariantCulture);
+            return $"{value:n0}";
+        }
+
+        public static string ToCommaString(this ulong value)
+        {
+            // return value.ToString("#,#", CultureInfo.InvariantCulture);
+            return $"{value:n0}";
         }
 
         public static string ToUnitString(this int value)
