@@ -47,13 +47,12 @@ namespace Rano.Update
             SVersion latestVersion = new SVersion(latestVersionStr);
             if (_currentVersion < latestVersion)
             {
-                Log.Important($"업데이트가 필요합니다 ({_currentVersion} => {latestVersion})");
-                Log.Todo("RequestUpdate");
+                Log.Info($"업데이트가 필요합니다 ({_currentVersion} => {latestVersion})");
                 return ECheckUpdateResult.UpdateRequired;
             }
             else if (_currentVersion == latestVersion)
             {
-                Log.Important($"이미 최신 버전입니다 ({_currentVersion})");
+                Log.Info($"이미 최신 버전입니다 ({_currentVersion})");
                 return ECheckUpdateResult.UpdateAlready;
             }
             else // if (_currentVersion > latestVersion)

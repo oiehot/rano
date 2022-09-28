@@ -1,5 +1,5 @@
 {
-    "name": "Rano.ScriptableObjectEventSystem",
+    "name": "Rano.EventSystem",
     "rootNamespace": "",
     "references": [
         "Rano"

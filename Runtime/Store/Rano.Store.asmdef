@@ -2,8 +2,7 @@
     "name": "Rano.Store",
     "rootNamespace": "",
     "references": [
-        "Rano",
-        "Rano.SaveSystem"
+        "Rano"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

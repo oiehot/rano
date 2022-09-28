@@ -1,11 +1,15 @@
-﻿using UnityEngine;
+﻿#if false
+
+#nullable enable
+
+using UnityEngine;
 using UnityEngine.Events;
 
-namespace Rano.ScriptableObjectEventSystem
+namespace Rano.EventSystem
 {
     /// <summary>
     /// 특정 이벤트에 등록하고
-    /// 이벤트가 발생하면 등록했던 메서드들을 실행한다.
+    /// 이벤트가 발생하면 등록한 메서드들을 실행한다.
     /// </summary>
     public class GameEventListener : MonoBehaviour
     {
@@ -31,3 +35,5 @@ namespace Rano.ScriptableObjectEventSystem
         }
     }
 }
+
+#endif

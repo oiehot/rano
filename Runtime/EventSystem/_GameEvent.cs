@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿#if false
+
+#nullable enable
+
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace Rano.ScriptableObjectEventSystem
+namespace Rano.EventSystem
 {
     /// <summary>
     /// 이벤트가 발생했을 때 호출 할 GameEventListener 들을 담아두고
@@ -32,3 +36,5 @@ namespace Rano.ScriptableObjectEventSystem
         }
     }
 }
+
+#endif

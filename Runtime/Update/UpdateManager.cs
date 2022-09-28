@@ -1,10 +1,13 @@
 ﻿#nullable enable
 
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using Rano.App;
 using Rano.RemoteConfig;
+using Rano.EventSystem;
+using Rano.Store;
 
 namespace Rano.Update
 {
@@ -17,31 +20,43 @@ namespace Rano.Update
     
     public abstract class UpdateManager : ManagerComponent
     {
+        private VoidEventChannelSO? _updateRequiredEventChannel;
         protected SVersion _currentVersion;
         protected IRemoteConfigManager? _remoteConfig;
         public bool IsInitialized => _remoteConfig != null && _remoteConfig.IsInitialized;
-        public Action OnUpdateRequired { get; set; }
-
+        
         protected override void OnEnable()
         {
             base.OnEnable();
-            Log.Todo("부팅시 혹은 주기적으로 CheckUpdate를 호출한다. UpdateUI는 DontDestroyGameObject여야 한다.");
+            StartCoroutine(nameof(UpdateCoroutine));
         }
         
         protected override void OnDisable()
         {
             base.OnDisable();
+            StopCoroutine(nameof(UpdateCoroutine));
+        }
+
+        private IEnumerator UpdateCoroutine()
+        {
+            Log.Todo("주기적으로 업데이트 체크를 하겠습니다");
+            while (true)
+            {
+                CheckUpdate();
+                yield return CoroutineYieldCache.WaitForSeconds(10.0f);
+            }
         }
         
         /// <summary>
         /// 초기화한다.
         /// </summary>
-        public void Initialize(IRemoteConfigManager remoteConfigManager)
+        public void Initialize(IRemoteConfigManager remoteConfigManager, VoidEventChannelSO updateRequiredEventChannel)
         {
             Log.Info("초기화 중...");
             
             _currentVersion = new SVersion(Application.version);
             _remoteConfig = remoteConfigManager;
+            _updateRequiredEventChannel = updateRequiredEventChannel;
             
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             Log.Info($"현재 버젼: {_currentVersion}");
@@ -64,7 +79,8 @@ namespace Rano.Update
             ECheckUpdateResult status = await GetUpdateStatusAsync();
             if (status == ECheckUpdateResult.UpdateRequired)
             {
-                OnUpdateRequired?.Invoke();
+                Debug.Assert(_updateRequiredEventChannel != null);
+                _updateRequiredEventChannel!.RaiseEvent();
             }
         }
 
@@ -73,7 +89,23 @@ namespace Rano.Update
         /// </summary>
         public void StartUpdate()
         {
-            Log.Todo("Start Update");
+            Log.Info("업데이트 시작");
+            
+            IAppStore store;
+#if UNITY_EDITOR
+            store = new Rano.Store.TestAppStore();
+#elif UNITY_ANDROID
+            store = new Rano.Store.GoogleAppStore();
+#elif UNITY_IOS
+            store = new Rano.Store.AppleAppStore();
+#else
+            Log.Warning("업데이트 실패 (지원하지 않는 플랫폼입니다)");
+            return;
+#endif
+            
+            string bundleId = Application.identifier;
+            string storeUrl = store.GetStoreUrl(bundleId);
+            Application.OpenURL(storeUrl);
         }
     }
 }

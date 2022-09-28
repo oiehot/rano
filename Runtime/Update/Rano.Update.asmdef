@@ -3,7 +3,9 @@
   "rootNamespace": "",
   "references": [
     "Rano",
-    "Rano.RemoteConfig"
+    "Rano.EventSystem",
+    "Rano.RemoteConfig",
+    "Rano.Store"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
