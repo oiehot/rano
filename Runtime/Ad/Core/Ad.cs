@@ -86,7 +86,7 @@ namespace Rano.Ad
                 // 두 캔버스의 렌더링 우선순위가 애매해져서 광고 위에 게임UI가 그려질 수 있다.
                 // 이런 문제점을 해결하기 위해서 미래 등록해둔 게임UI 캔버스들의 SortingOrder를
                 // 일괄적으로 아래로 내려줘서 전면광고가 가장 위에 그려질 수 있도록 수정한다.
-                _canvasSorter.MoveSortingOrder(-10);
+                _canvasSorter.MoveSortingOrder(-1000);
                 Log.Info($"{AdName} - 광고 시작");
                 OnAdOpening?.Invoke();
             }
@@ -97,7 +97,7 @@ namespace Rano.Ad
                 _adState = AdState.Closed;
                 Log.Info($"{AdName} - 광고 닫힘");
                 // 수정했던 모든 캔버스SortingOrder를 원래 위치로 돌려놓는다.
-                _canvasSorter.ResetSortingOrder();
+                _canvasSorter.RestoreSortingOrder();
                 OnAdClosed?.Invoke();
                 UnloadAd();
                 if (_autoReload == true)
