@@ -25,12 +25,13 @@ namespace Rano.Update
                 return ECheckUpdateResult.Error;
             }
             
-            // Fetch를 성공하지 못하면 false가 리턴된다.
-            await _remoteConfig!.FetchAsync();
-            
-            // Fetch를 하던 안 하던 Activate를 하여 최근에 Fetch된 데이터를 적용한다.
-            // 수정된게 없으면 false가 리턴된다.
-            await _remoteConfig!.ActivateAsync();
+                // TODO: 주기적 Fetch > Active
+                // // Fetch를 성공하지 못하면 false가 리턴된다.
+                // await _remoteConfig!.FetchAsync();
+                //
+                // // Fetch를 하던 안 하던 Activate를 하여 최근에 Fetch된 데이터를 적용한다.
+                // // 수정된게 없으면 false가 리턴된다.
+                // await _remoteConfig!.ActivateAsync();
 
             if (_remoteConfig!.TryGetString(Constants.VERSION, out string? latestVersionStr) == false)
             {

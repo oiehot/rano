@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using Rano.App;
@@ -18,34 +19,13 @@ namespace Rano.Update
         UpdateAlready
     }
     
-    public abstract class UpdateManager : ManagerComponent
+    public abstract class UpdateManager: ManagerComponent
     {
         private VoidEventChannelSO? _updateRequiredEventChannel;
-        protected SVersion _currentVersion;
         protected IRemoteConfigManager? _remoteConfig;
+        protected SVersion _currentVersion;
         public bool IsInitialized => _remoteConfig != null && _remoteConfig.IsInitialized;
-        
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            StartCoroutine(nameof(UpdateCoroutine));
-        }
-        
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            StopCoroutine(nameof(UpdateCoroutine));
-        }
 
-        private IEnumerator UpdateCoroutine()
-        {
-            Log.Todo("주기적으로 업데이트 체크를 하겠습니다");
-            while (true)
-            {
-                CheckUpdate();
-                yield return CoroutineYieldCache.WaitForSeconds(10.0f);
-            }
-        }
         
         /// <summary>
         /// 초기화한다.
@@ -53,28 +33,20 @@ namespace Rano.Update
         public void Initialize(IRemoteConfigManager remoteConfigManager, VoidEventChannelSO updateRequiredEventChannel)
         {
             Log.Info("초기화 중...");
-            
             _currentVersion = new SVersion(Application.version);
             _remoteConfig = remoteConfigManager;
             _updateRequiredEventChannel = updateRequiredEventChannel;
-            
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             Log.Info($"현재 버젼: {_currentVersion}");
 #endif
-            
             Log.Info("초기화 완료");
         }
-        
-        /// <summary>
-        /// 업데이트 상태를 알아낸다.
-        /// </summary>
-        protected abstract Task<ECheckUpdateResult> GetUpdateStatusAsync();
 
         /// <summary>
         /// 업데이트 상태를 체크하고
         /// 업데이트가 필요하면 이벤트를 발생시킨다.
         /// </summary>
-        public async void CheckUpdate()
+        public async Task<ECheckUpdateResult> CheckUpdate()
         {
             ECheckUpdateResult status = await GetUpdateStatusAsync();
             if (status == ECheckUpdateResult.UpdateRequired)
@@ -82,8 +54,14 @@ namespace Rano.Update
                 Debug.Assert(_updateRequiredEventChannel != null);
                 _updateRequiredEventChannel!.RaiseEvent();
             }
+            return status;
         }
-
+        
+        /// <summary>
+        /// 업데이트 상태를 알아낸다.
+        /// </summary>
+        protected abstract Task<ECheckUpdateResult> GetUpdateStatusAsync();
+        
         /// <summary>
         /// 업데이트를 시작한다.
         /// </summary>

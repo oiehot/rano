@@ -1,7 +1,9 @@
 ﻿#nullable enable
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Collections;
 using System.Collections.Generic;
 using Rano;
 using Firebase.RemoteConfig;
@@ -21,8 +23,65 @@ namespace Rano.RemoteConfig.Firebase
     /// <seaalso href="https://medium.com/harrythegreat/android-remote-config-%EC%9E%98-%ED%99%9C%EC%9A%A9%ED%95%98%EA%B8%B0-f8b04ef2645a" alt="FCM 사용 제안" />
     public sealed class FirebaseRemoteConfigManager : ManagerComponent, IRemoteConfigManager
     {
+        private const int AUTO_FETCH_PERIOD = 6000;
+        private CancellationTokenSource? _updateCancelTokenSource;
+        
         private FirebaseRemoteConfig? _remoteConfig;
         public bool IsInitialized => _remoteConfig != null;
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            if (IsInitialized) StartAutoFetchAsync();
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            StopAutoFetch();
+        }
+
+        private async void StartAutoFetchAsync()
+        {
+            _updateCancelTokenSource = new CancellationTokenSource();
+            CancellationToken token = _updateCancelTokenSource.Token;
+            
+            Log.Info($"자동 Fetch를 시작합니다 (period: {AUTO_FETCH_PERIOD}ms)");
+            
+            while (true)
+            {
+                if (token.IsCancellationRequested == true)
+                {
+                    break;
+                }
+                
+                bool fetchResult = await FetchAsync();
+                if (fetchResult == true)
+                {
+                    bool activateResult = await ActivateAsync();    
+                }
+                
+                await Task.Delay(AUTO_FETCH_PERIOD, token);
+            }
+        }
+        
+        private void StopAutoFetch()
+        {
+            if (_updateCancelTokenSource == null)
+            {
+                Log.Info("자동 Fetch 중지 실패 (시작되지 않았음)");
+                return;
+            }
+            
+            if (_updateCancelTokenSource.IsCancellationRequested == true)
+            {
+                Log.Info("자동 Fetch 중지 실패 (이미 취소했음)");
+                return;
+            }
+            
+            Log.Info("자동 Fetch를 취소합니다");
+            _updateCancelTokenSource.Cancel();
+        }
         
         /// <summary>
         /// 초기화

@@ -7,14 +7,15 @@ namespace Rano
     {
         public static IEnumerator ToCoroutine(this Task task)
             {
-                while (!task.IsCompleted)
+                while (task.IsCompleted == false)
                 {
                     yield return null;
                 }
-        
+                
                 if (task.IsFaulted)
                 {
-                    throw task.Exception;
+                    Log.Exception(task.Exception);
+                    yield break;
                 }
             }
     }
