@@ -6,7 +6,7 @@ using Rano.GoogleDoc;
 
 namespace Rano.Editor.GoogleDoc
 {
-    [CreateAssetMenu(fileName="GoogleSheetDownloadItem", menuName="Rano/Platform Services/GoogleSheet/GoogleSheet DownloadItem")]
+    [CreateAssetMenu(fileName="GoogleSheetDownloadItem", menuName="Rano/GoogleDoc/GoogleSheet Download Item")]
     public class GoogleSheetDownloadItemSO : ScriptableObject
     {
         [Header("Ids")]

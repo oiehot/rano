@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -62,22 +64,22 @@ namespace Rano.Addressable
         /// <remarks>
         /// 요청은 SpriteAtlas에셋의 이름을 사용한다. 어드레서블 키 값이 아님에 주의할것.
         /// </remarks>
-        /// <param name="name">SpriteAtlasManager가 요청할 때 사용하는 에셋의 이름. 어드레서블 키 값이 아니다.</param>
+        /// <param name="spriteAtlasName">SpriteAtlasManager가 요청할 때 사용하는 에셋의 이름. 어드레서블 키 값이 아니다.</param>
         /// <param name="callback">SpriteAtlasManager에 응답할 떄 사용. 얻은 SpriteAtlas를 매개변수로 담아 콜백하여 전달한다.</param>
-        private void HandleRequestAtlas(string name, System.Action<SpriteAtlas> callback)
+        private void HandleRequestAtlas(string spriteAtlasName, System.Action<SpriteAtlas> callback)
         {
             SpriteAtlas spriteAtlas;
 
-            if (TryGetLoadedSpriteAtlas(name, out spriteAtlas))
+            if (TryGetLoadedSpriteAtlas(spriteAtlasName, out spriteAtlas))
             {
-                Log.Info($"SpriteAtlas is requested. Sends the Loaded SpriteAtlas ({name})");
+                Log.Info($"SpriteAtlas is requested. Sends the Loaded SpriteAtlas ({spriteAtlasName})");
                 callback(spriteAtlas);
                 return;
             }
             else
             {
                 // 이 메시지가 출력되지 않게 하려면 SpriteAtlas를 미리 로드하면 된다.
-                Log.Info($"SpriteAtlas is requested. But SpriteAtlas is not Loaded. ({name})");
+                Log.Info($"SpriteAtlas is requested. But SpriteAtlas is not Loaded. ({spriteAtlasName})");
                 // _atlasRequests[name] = callback;
             }
         }
@@ -87,97 +89,96 @@ namespace Rano.Addressable
             Log.Info($"SpriteAtlas Registered ({spriteAtlas})");
         }
 
-#if false
-        /// <summary>
-        /// SpriteAtlasManager에 의해 요청된 모든 SpriteAtlas들을 로딩하고 콜백으로 전달한다.
-        /// </sumamry>
-        public async Task LoadAllRequestedSpriteAtlasAsync()
-        {
-            var tasks = new List<Task>();
-
-            Log.Info("Load All Requested SpriteAtlas Start");
-
-            foreach (var request in _atlasRequests)
-            {
-                var name = request.Key;
-                var callback = request.Value;
-
-                if (IsSpriteAtlasLoaded(name))
-                {
-                    throw new Exception();
-                }
-                var loadSpriteAtlas = Addressables.LoadAssetAsync<SpriteAtlas>(name);
-                loadSpriteAtlas.Completed += (handle) => {
-                    if (handle.Status == AsyncOperationStatus.Succeeded)
-                    {
-                        Log.Info($"SpriteAtlas Loaded ({name})");
-                        SpriteAtlas spriteAtlas = handle.Result;
-                        callback(spriteAtlas);
-                        _spriteAtlases[name] = spriteAtlas;
-                    }
-                };
-
-                tasks.Add(loadSpriteAtlas.Task); // AsyncOperationHandle 의 Task
-            }
-
-            // 모든 스프라이트 로딩작업이 완료될 때까지 대기.
-            await Task.WhenAll(tasks);
-
-            Log.Info($"All Requested SpriteAtlas Loaded");
-
-            _atlasRequests.Clear();
-        }
-#endif
-
         /// <summary>
         /// 어드레서블 SpriteAtlas 에셋을 비동기로 로드하여 캐싱한다.
         /// 로드되면 자동으로 SpriteAtlasManager.atlasRequested가 호출되어 전달된다.
         /// </summary>
-        public async Task LoadSpriteAtlasAsync(string spriteAtlasName)
+        public async Task<bool> LoadSpriteAtlasAsync(string spriteAtlasName)
         {
-            if (IsSpriteAtlasLoaded(spriteAtlasName))
+            if (IsSpriteAtlasLoaded(spriteAtlasName) == true)
             {
-                Log.Warning($"SpriteAtlas is already Loaded ({spriteAtlasName})");
-                return;
+                Log.Warning($"스프라이트 아틀라스가 이미 로드되어 있습니다 ({spriteAtlasName})");
+                return false;
             }
 
-            var handle = Addressables.LoadAssetAsync<SpriteAtlas>(spriteAtlasName);
-            await handle.Task;
-            if (handle.Status == AsyncOperationStatus.Succeeded)
+            AsyncOperationHandle<SpriteAtlas> handle;
+            try
             {
-                Log.Info($"SpriteAtlas Loaded ({spriteAtlasName})");
-                _spriteAtlases[spriteAtlasName] = handle.Result;
+                handle = Addressables.LoadAssetAsync<SpriteAtlas>(spriteAtlasName);
             }
+            catch (Exception e)
+            {
+                Log.Warning("스프라이트 아틀라스 로딩 실패 (예외 발생)");
+                Log.Exception(e);
+                return false;
+            }
+            
+            SpriteAtlas spriteAtlas = await handle.Task;
+
+            if (spriteAtlas == null)
+            {
+                Log.Warning("스프라이트 아틀라스 로딩 실패 (비어 있음)");
+                return false;
+            }
+
+            Log.Info($"스프라이트 아틀라스 로드 성공 ({spriteAtlasName})");
+            _spriteAtlases[spriteAtlasName] = spriteAtlas;
+
+            return true;
         }
 
-        /// <summary>
-        /// 어드레서블 SpriteAtlas 에셋을 동기로 로드하여 캐싱한다.
-        /// </summary>
-        public void LoadSpriteAtlas(string spriteAtlasName)
-        {
-            if (IsSpriteAtlasLoaded(spriteAtlasName))
-            {
-                Log.Warning($"SpriteAtlas is already Loaded ({spriteAtlasName})");
-                return;
-            }
+        // public bool LoadSpriteAtlas(string spriteAtlasName)
+        // {
+        //     if (IsSpriteAtlasLoaded(spriteAtlasName))
+        //     {
+        //         Log.Warning($"스프라이트 아틀라스가 이미 로드되어 있습니다 ({spriteAtlasName})");
+        //         return false;
+        //     }
+        //
+        //     AsyncOperationHandle<SpriteAtlas> handle;
+        //     try
+        //     {
+        //         handle = Addressables.LoadAssetAsync<SpriteAtlas>(spriteAtlasName);
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         Log.Warning("스프라이트 아틀라스 로딩 실패 (예외 발생)");
+        //         Log.Exception(e);
+        //         return false;
+        //     }
+        //
+        //     // 완료 될 때까지 대기
+        //     handle.WaitForCompletion();
+        //     
+        //     if (handle.Status != AsyncOperationStatus.Succeeded)
+        //     {
+        //         Log.Warning("스프라이트 아틀라스 로딩 실패 (비동기 작업 실패)");
+        //         return false;
+        //     }
+        //
+        //     SpriteAtlas spriteAtlas = handle.Result;
+        //     
+        //     if (spriteAtlas == null)
+        //     {
+        //         Log.Info($"스프라이트 아틀라스 로드 실패 (결과가 비어 있음)");
+        //         return false;
+        //     }
+        //     
+        //     Log.Info($"스프라이트 아틀라스 로드 성공 ({spriteAtlasName})");
+        //     _spriteAtlases[spriteAtlasName] = spriteAtlas;
+        //
+        //     return true;
+        // }
 
-            var handle = Addressables.LoadAssetAsync<SpriteAtlas>(spriteAtlasName);
-            handle.WaitForCompletion();
-            if (handle.Status == AsyncOperationStatus.Succeeded)
-            {
-                Log.Info($"SpriteAtlas Loaded ({spriteAtlasName})");
-                _spriteAtlases[spriteAtlasName] = handle.Result;
-            }
-        }
-
-        public void UnloadSpriteAtlas(string name)
+        public void UnloadSpriteAtlas(string spriteAtlasName)
         {
             SpriteAtlas spriteAtlas;
-            if (TryGetLoadedSpriteAtlas(name, out spriteAtlas))
+            
+            if (TryGetLoadedSpriteAtlas(spriteAtlasName, out spriteAtlas))
             {
-                Log.Info($"Unload SpriteAtlas ({name})");
+                Log.Info($"Unload SpriteAtlas ({spriteAtlasName})");
                 Addressables.Release(spriteAtlas);
-                _spriteAtlases.Remove(name);
+                _spriteAtlases.Remove(spriteAtlasName);
             }
         }
 
@@ -193,14 +194,14 @@ namespace Rano.Addressable
             // _atlasRequests.Clear();
         }
 
-        public bool TryGetLoadedSpriteAtlas(string name, out SpriteAtlas value)
+        public bool TryGetLoadedSpriteAtlas(string spriteAtlasName, out SpriteAtlas value)
         {
-            return _spriteAtlases.TryGetValue(name, out value);
+            return _spriteAtlases.TryGetValue(spriteAtlasName, out value);
         }
 
-        public bool IsSpriteAtlasLoaded(string name)
+        public bool IsSpriteAtlasLoaded(string spriteAtlasName)
         {
-            return _spriteAtlases.ContainsKey(name);
+            return _spriteAtlases.ContainsKey(spriteAtlasName);
         }    
     }
 }
