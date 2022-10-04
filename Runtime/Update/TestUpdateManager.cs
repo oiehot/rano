@@ -1,13 +1,12 @@
 ﻿#nullable enable
 
-using System.Threading.Tasks;
 using Rano.App;
 
 namespace Rano.Update
 {
     public sealed class TestUpdateManager : UpdateManager
     {
-        protected override async Task<ECheckUpdateResult> GetUpdateStatusAsync()
+        protected override ECheckUpdateResult GetUpdateStatus()
         {
             Log.Info("TEST: 업데이트 검사 중...");
             
@@ -16,9 +15,6 @@ namespace Rano.Update
                 Log.Warning("TEST: 업데이트 검사 실패 (초기화 되어있지 않음)");
                 return ECheckUpdateResult.Error;
             }
-            
-            await Task.Delay(1000); // Fetch Simulator
-            await Task.Delay(10); // Activate Simulator
 
             SVersion[] versions =
             {

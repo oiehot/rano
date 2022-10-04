@@ -15,7 +15,7 @@ namespace Rano.Update
         /// <summary>
         /// 업데이트 여부를 리턴한다.
         /// </summary>
-        protected override async Task<ECheckUpdateResult> GetUpdateStatusAsync()
+        protected override ECheckUpdateResult GetUpdateStatus()
         {
             Log.Info("업데이트 검사 중...");
             
@@ -24,14 +24,6 @@ namespace Rano.Update
                 Log.Warning("업데이트 검사 실패 (초기화 되어있지 않음)");
                 return ECheckUpdateResult.Error;
             }
-            
-                // TODO: 주기적 Fetch > Active
-                // // Fetch를 성공하지 못하면 false가 리턴된다.
-                // await _remoteConfig!.FetchAsync();
-                //
-                // // Fetch를 하던 안 하던 Activate를 하여 최근에 Fetch된 데이터를 적용한다.
-                // // 수정된게 없으면 false가 리턴된다.
-                // await _remoteConfig!.ActivateAsync();
 
             if (_remoteConfig!.TryGetString(Constants.VERSION, out string? latestVersionStr) == false)
             {
@@ -56,10 +48,10 @@ namespace Rano.Update
                 Log.Info($"이미 최신 버전입니다 ({_currentVersion})");
                 return ECheckUpdateResult.UpdateAlready;
             }
-            else // if (_currentVersion > latestVersion)
+            else
             {
-                Log.Warning($"현재 버전이 RemoteConfig에 설정된 버전보다 최신입니다 (current:{_currentVersion}, latest:{latestVersion})");
-                return ECheckUpdateResult.Error;
+                Log.Info($"현재 버전이 RemoteConfig에 설정된 버전보다 최신입니다 (current:{_currentVersion}, latest:{latestVersion})");
+                return ECheckUpdateResult.UpdateAlready;
             }
         }
     }

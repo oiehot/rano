@@ -46,9 +46,9 @@ namespace Rano.Update
         /// 업데이트 상태를 체크하고
         /// 업데이트가 필요하면 이벤트를 발생시킨다.
         /// </summary>
-        public async Task<ECheckUpdateResult> CheckUpdate()
+        public ECheckUpdateResult CheckUpdate()
         {
-            ECheckUpdateResult status = await GetUpdateStatusAsync();
+            ECheckUpdateResult status = GetUpdateStatus();
             if (status == ECheckUpdateResult.UpdateRequired)
             {
                 Debug.Assert(_updateRequiredEventChannel != null);
@@ -60,7 +60,7 @@ namespace Rano.Update
         /// <summary>
         /// 업데이트 상태를 알아낸다.
         /// </summary>
-        protected abstract Task<ECheckUpdateResult> GetUpdateStatusAsync();
+        protected abstract ECheckUpdateResult GetUpdateStatus();
         
         /// <summary>
         /// 업데이트를 시작한다.

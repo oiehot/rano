@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using UnityEngine;
 
 namespace Rano
 {
@@ -73,6 +75,11 @@ namespace Rano
             #else
                 return text;
             #endif
+        }
+
+        private static string WithThreadSignature(string text)
+        {
+            return $"[t:{Thread.CurrentThread.ManagedThreadId}] {text}";
         }
         
         private static string GetTitleColor(ELogType logType)
@@ -156,21 +163,23 @@ namespace Rano
             if (caller) callerText = WithColorTag($"{ToShortFilepath(filePath)}.{member}[{line}]: ", GetCallerColor(logType));
             else callerText = "";
             
-            string resultText = WithSizeTag($"{logTypeText} {callerText}{logText}", FONT_SIZE);
+            string sizedText = WithSizeTag($"{logTypeText} {callerText}{logText}", FONT_SIZE);
+            
+            sizedText = WithThreadSignature(sizedText);
 
             switch (logType)
             {
                 case ELogType.Info:
-                    UnityEngine.Debug.Log(resultText);
+                    UnityEngine.Debug.Log(sizedText);
                     break;
                 case ELogType.Warning:
-                    UnityEngine.Debug.LogWarning(resultText);
+                    UnityEngine.Debug.LogWarning(sizedText);
                     break;
                 case ELogType.Error:
-                    UnityEngine.Debug.LogError(resultText);
+                    UnityEngine.Debug.LogError(sizedText);
                     break;
                 default:
-                    UnityEngine.Debug.Log(resultText);
+                    UnityEngine.Debug.Log(sizedText);
                     break;
             }
         }

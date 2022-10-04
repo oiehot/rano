@@ -1,11 +1,8 @@
 ﻿#nullable enable
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Collections;
 using System.Collections.Generic;
-using Rano;
 using Firebase.RemoteConfig;
 
 namespace Rano.RemoteConfig.Firebase
@@ -21,68 +18,11 @@ namespace Rano.RemoteConfig.Firebase
     /// <seealso href="https://jslee-tech.tistory.com/23" alt="실행 타이밍 전략"/>
     /// <seealso href="https://fsd-jinss.tistory.com/152" alt="실시간 값이 필요하면 RealtimeDatabase를 사용 할 것은 추천"/>
     /// <seaalso href="https://medium.com/harrythegreat/android-remote-config-%EC%9E%98-%ED%99%9C%EC%9A%A9%ED%95%98%EA%B8%B0-f8b04ef2645a" alt="FCM 사용 제안" />
-    public sealed class FirebaseRemoteConfigManager : ManagerComponent, IRemoteConfigManager
+    public sealed partial class FirebaseRemoteConfigManager : ManagerComponent, IRemoteConfigManager
     {
-        private const int AUTO_FETCH_PERIOD = 6000;
-        private CancellationTokenSource? _updateCancelTokenSource;
-        
         private FirebaseRemoteConfig? _remoteConfig;
         public bool IsInitialized => _remoteConfig != null;
 
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            if (IsInitialized) StartAutoFetchAsync();
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            StopAutoFetch();
-        }
-
-        private async void StartAutoFetchAsync()
-        {
-            _updateCancelTokenSource = new CancellationTokenSource();
-            CancellationToken token = _updateCancelTokenSource.Token;
-            
-            Log.Info($"자동 Fetch를 시작합니다 (period: {AUTO_FETCH_PERIOD}ms)");
-            
-            while (true)
-            {
-                if (token.IsCancellationRequested == true)
-                {
-                    break;
-                }
-                
-                bool fetchResult = await FetchAsync();
-                if (fetchResult == true)
-                {
-                    bool activateResult = await ActivateAsync();    
-                }
-                
-                await Task.Delay(AUTO_FETCH_PERIOD, token);
-            }
-        }
-        
-        private void StopAutoFetch()
-        {
-            if (_updateCancelTokenSource == null)
-            {
-                Log.Info("자동 Fetch 중지 실패 (시작되지 않았음)");
-                return;
-            }
-            
-            if (_updateCancelTokenSource.IsCancellationRequested == true)
-            {
-                Log.Info("자동 Fetch 중지 실패 (이미 취소했음)");
-                return;
-            }
-            
-            Log.Info("자동 Fetch를 취소합니다");
-            _updateCancelTokenSource.Cancel();
-        }
-        
         /// <summary>
         /// 초기화
         /// </summary>
@@ -94,48 +34,74 @@ namespace Rano.RemoteConfig.Firebase
             
             _remoteConfig = FirebaseRemoteConfig.DefaultInstance;
 
-            // 디버용 설정
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            ConfigSettings configSettings = new ConfigSettings
-            {
-                FetchTimeoutInMilliseconds = 3 * 1000, // default: 30,000 (30 seconds)
-                MinimumFetchInternalInMilliseconds = 0 // default: 43,200,000 = 12*60*60*1000 (12hours)
-            };
-            
-            Log.Info("설정:");
-            Log.Info($"  Fetch 타임아웃 (ms): {configSettings.FetchTimeoutInMilliseconds.ToCommaString()}");
-            Log.Info($"  최소 Fetch 간격 (ms): {configSettings.MinimumFetchInternalInMilliseconds.ToCommaString()}");
-            
-            Log.Info("설정 적용 중...");
-            try
-            {
-                await _remoteConfig.SetConfigSettingsAsync(configSettings);
-            }
-            catch (Exception e)
-            {
-                Log.Warning("설정 적용 실패 (예외 발생)");
-                Log.Exception(e);
-            }
-            Log.Info("설정 적용 완료");
+#if (UNITY_EDITOR || DEVELOPMENT_BUILD)
+            await ApplyDevelopmentSettings();
 #endif
 
-            // 기본값 설정
+            // 데이터 기본값 설정
             if (defaults != null)
             {
-                Log.Info("기본값 적용 중...");
+                Log.Info("기본 데이터 적용 중...");
                 try
                 {
                     await _remoteConfig.SetDefaultsAsync(defaults);
                 }
                 catch (Exception e)
                 {
-                    Log.Warning("기본값 적용 실패 (예외 발생)");
+                    Log.Warning("기본 데이터 적용 실패 (예외 발생)");
                     Log.Exception(e);
                 }
             }
-            
+
             Log.Info("초기화 완료");
+            
+            Log.Info("최근 Fetch된 데이터 중 미반영된 데이터가 있으면 적용합니다.");
+            await ActivateAsync();
+            
+            // 위 코드로 인해서 최근에 받았던 데이터가 적용된 상태다.
+            // 하지만 이 데이터가 최신 데이터가 아닐수도 있으므로,
+            // 자동 Fetch를 시작하고 Fetch가 가능한 상황이면 바로 Fetch받는다.
+            Log.Info("최근 데이터는 적용 되었지만 서버 설정이 업데이트 되었을 수도 있습니다");
+            Log.Info("따라서 주기적으로 최신 데이터를 얻기 위해 자동Fetch를 시작하고, 필요시 최신 데이터를 Fetch받습니다");
+            Log.Info("최신 데이터를 Fetch 받는데 성공하면 즉시 적용(활성화, Activation) 됩니다.");
+            StartAutoFetchAsync();
         }
+
+        
+#if (UNITY_EDITOR || DEVELOPMENT_BUILD)
+        private async Task ApplyDevelopmentSettings()
+        {
+            if (IsInitialized == false)
+            {
+                Log.Warning("개발자 설정 적용 실패 (초기화가 안되어 있음)");
+                return;
+            }
+            
+            Log.Info("개발용 설정 적용 중...");
+            
+            ConfigSettings configSettings = new ConfigSettings
+            {
+                FetchTimeoutInMilliseconds = 3 * 1000, // default: 30,000 (30 seconds)
+                // MinimumFetchInternalInMilliseconds = 0 // default: 43,200,000 = 12*60*60*1000 (12hours)
+                MinimumFetchInternalInMilliseconds = 5 * 60 * 1000
+            };
+            
+            Log.Info("개발용 설정값:");
+            Log.Info($"  Fetch 타임아웃 (ms): {configSettings.FetchTimeoutInMilliseconds.ToCommaString()}");
+            Log.Info($"  최소 Fetch 간격 (ms): {configSettings.MinimumFetchInternalInMilliseconds.ToCommaString()}");
+
+            try
+            {
+                await _remoteConfig!.SetConfigSettingsAsync(configSettings);
+            }
+            catch (Exception e)
+            {
+                Log.Warning("개발용 설정 적용 실패 (예외 발생)");
+                Log.Exception(e);
+            }
+            Log.Info("개발용 설정 적용 완료");
+        }
+#endif
 
         /// <summary>
         /// 데이터 가져오기
@@ -152,7 +118,10 @@ namespace Rano.RemoteConfig.Firebase
             }
 
             // Fetch 실행
-            
+#if UNITY_EDITOR
+            Log.Warning("유니티 에디터 환경에서는 MinimumFetchInternalInMilliseconds 값이 너무 낮게 설정되어 있으면 Fetch가 실패합니다");
+            Log.Warning("정확한 테스트를 위해서 Android나 iOS 플랫픔으로 빌드해서 테스트하시기 바랍니다");
+#endif
             try
             {
                 await _remoteConfig!.FetchAsync();    
@@ -173,8 +142,8 @@ namespace Rano.RemoteConfig.Firebase
                 return false;
             }
             
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Log.Info("FetchResult:");
+#if (UNITY_EDITOR || DEVELOPMENT_BUILD)
+            Log.Info("데이터 가져오기 결과:");
             Log.Info($"    FetchTime(LocalTime): {info.FetchTime.ToLocalTime()}");
             Log.Info($"    ThrottledEndTime(LocalTime): {info.ThrottledEndTime.ToLocalTime()}");            
             Log.Info($"    LastFetchStatus: {info.LastFetchStatus}");
@@ -286,7 +255,7 @@ namespace Rano.RemoteConfig.Firebase
         {
             return TryGet<bool>(key, out value, (k) => _remoteConfig!.GetValue(k).BooleanValue);
         }
-
+        
         public void LogStatus()
         {
             if (IsInitialized == false)
