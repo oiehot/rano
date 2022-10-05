@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if false
+using System;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
@@ -77,3 +78,4 @@ namespace Rano.Editor.GoogleDoc
         }
     }
 }
+#endif

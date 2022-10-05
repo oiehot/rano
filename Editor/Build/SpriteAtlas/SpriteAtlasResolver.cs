@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#if false
+
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.U2D;
 using UnityEditor;
@@ -82,3 +84,5 @@ namespace Rano.Editor.Build
         }
     }
 }
+
+#endif

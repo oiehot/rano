@@ -1,3 +1,5 @@
+#nullable enable
+
 using UnityEditor.Build.Reporting;
 
 namespace Rano.Editor.Build

@@ -1,4 +1,6 @@
-﻿namespace Rano.Editor.Build
+﻿#nullable enable
+
+namespace Rano.Editor.Build
 {
     public interface IPostprocessAddressableBuild
     {

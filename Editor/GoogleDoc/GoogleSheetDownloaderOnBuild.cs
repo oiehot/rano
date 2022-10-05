@@ -1,4 +1,5 @@
-﻿using UnityEditor.Build;
+﻿#if false
+using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
 namespace Rano.Editor.GoogleDoc
@@ -13,3 +14,4 @@ namespace Rano.Editor.GoogleDoc
         }
     }
 }
+#endif

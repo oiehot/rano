@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Globalization;
@@ -36,7 +38,7 @@ namespace Rano.Encoding
     /// <summary>
     /// 헤더 이름에 자료형이 써진 TypeCsv 텍스트를 파싱하여 리스트로 만들어준다.
     /// </summary>
-    public sealed class TypeCsvParser
+    public static class TypeCsvParser
     {
         private static string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))";
         private static string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r";
@@ -46,7 +48,7 @@ namespace Rano.Encoding
 
         public static List<Dictionary<string, object>> Parse(CsvText csvText)
         {
-            var rows = new List<Dictionary<string, object>>();
+            List<Dictionary<string,object>> rows = new List<Dictionary<string, object>>();
 
             // 줄들을 읽는다.
             var lines = Regex.Split(csvText.Text, LINE_SPLIT_RE);
@@ -73,17 +75,18 @@ namespace Rano.Encoding
                     // 헤더명에서 데이터 타입을 얻는다.
                     var headerTokens = headerFullname.Split(HEADER_TRIM_CHARS, StringSplitOptions.RemoveEmptyEntries);
                     string headerName = headerTokens[0];
-
-
+                    
                     if (headerTokens.Length != 2)
                     {
-                        throw new Exception($"열({headerName}) 에 자료형이 정상적으로 지정되지 않았음.");
+                        Log.Warning($"열({headerName}) 에 자료형이 정상적으로 지정되지 않았음");
+                        continue;
                     }
 
                     string headerTypeName = headerTokens[1].ToLower();
                     if (headerTypeName == "")
                     {
-                        throw new Exception($"열({headerName}) 에 자료형이 비어있음.");
+                        Log.Warning($"열({headerName}) 에 자료형이 비어있음");
+                        continue;
                     }
 
                     string value = rowValues[j];
@@ -140,7 +143,8 @@ namespace Rano.Encoding
                             UnityEngine.Color color;
                             if (!UnityEngine.ColorUtility.TryParseHtmlString(value, out color))
                             {
-                                throw new Exception($"컬러값의 파싱에 실패 ({value})");
+                                Log.Warning($"컬러값의 파싱에 실패 ({value})");
+                                continue;
                             }
                             finalValue = color;
                             break;
@@ -151,7 +155,8 @@ namespace Rano.Encoding
                             break;
 
                         default:
-                            throw new Exception($"열에 잘못된 자료형이 지정됨 ({headerTypeName})");
+                            Log.Warning($"열에 잘못된 자료형이 지정됨 ({headerTypeName})");
+                            continue;
                     }
 
                     row[headerName] = finalValue;
@@ -161,69 +166,6 @@ namespace Rano.Encoding
                 rows.Add(row);
             }
             return rows;
-        }
-    }
-
-    /// <summary>
-    /// Csv 텍스트를 파싱하여 리스트로 만들어준다.
-    /// </summary>
-    /// <remarks>
-    /// Copied from:
-    ///   https://bravenewmethod.com/2014/09/13/lightweight-csv-reader-for-unity/#comment-7111
-    ///   https://github.com/tikonen/blog/tree/master/csvreader
-    /// </remarks>
-    public sealed class CsvParser
-    {
-        private static string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))";
-        private static string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r";
-        private static char[] TRIM_CHARS = { '\"' };
-
-        public static List<Dictionary<string, object>> Parse(CsvText csvText)
-        {
-            var list = new List<Dictionary<string, object>>();
-
-            var lines = Regex.Split(csvText.Text, LINE_SPLIT_RE);
-            if (lines.Length <= 1) return list;
-
-            var header = Regex.Split(lines[0], SPLIT_RE);
-            for (var i = 1; i < lines.Length; i++)
-            {
-                var values = Regex.Split(lines[i], SPLIT_RE);
-                if (values.Length == 0 || values[0] == "") continue;
-
-                var entry = new Dictionary<string, object>();
-                for (var j = 0; j < header.Length && j < values.Length; j++)
-                {
-                    string value = values[j];
-                    value = value.TrimStart(TRIM_CHARS).TrimEnd(TRIM_CHARS);
-                    value = value.Replace("\\n", "\n"); // TODO: 줄넘김 허용?
-                    value = value.Replace("\\t", "\t"); // TODO: 탭 허용?
-                    value = value.Replace("\\", "");
-                    object finalvalue = value;
-
-                    int n;
-                    float f;
-                    bool b;
-
-                    // TODO: long Casting Problem
-                    if (int.TryParse(value, out n))
-                    {
-                        finalvalue = n;
-                    }
-                    else if (float.TryParse(value, out f))
-                    {
-                        finalvalue = f;
-                    }
-                    else if (bool.TryParse(value, out b))
-                    {
-                        finalvalue = b;
-                    }
-
-                    entry[header[j]] = finalvalue;
-                }
-                list.Add(entry);
-            }
-            return list;
         }
     }
 }
