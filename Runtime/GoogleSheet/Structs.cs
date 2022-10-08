@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 
 namespace Rano.GoogleSheet
@@ -15,18 +17,17 @@ namespace Rano.GoogleSheet
         public string gid;
         public string range;
 
-        public string CsvExportUrl => GetExportUrl(EGoogleSheetExportFormat.CSV);
-        public string TsvExportUrl => GetExportUrl(EGoogleSheetExportFormat.TSV);
+        public string? CsvExportUrl => GetExportUrl(EGoogleSheetExportFormat.CSV);
+        public string? TsvExportUrl => GetExportUrl(EGoogleSheetExportFormat.TSV);
         
         /// <summary>
         /// 추출 URL을 얻는다.
         /// </summary>
-        /// <remarks>
-        /// https://docs.google.com/spreadsheets/d/{{ID}}/export?format=tsv&range=A14:D23
-        /// https://docs.google.com/spreadsheets/d/{{ID}}/gviz/tq?tqx=out:csv&sheet=ItemDatas/// 
-        /// </remarks>
-        public string GetExportUrl(EGoogleSheetExportFormat format)
-        {            
+        public string? GetExportUrl(EGoogleSheetExportFormat format)
+        {
+            if (string.IsNullOrEmpty(id)) return null;
+            if (string.IsNullOrEmpty(gid)) return null;
+            
             string url;
             url = $"https://docs.google.com/spreadsheets/d/{id}/export?";
             url += $"gid={gid}";

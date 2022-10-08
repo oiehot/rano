@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
-using JetBrains.Annotations;
 using Object = UnityEngine.Object;
 
 namespace Rano.Editor
@@ -113,6 +112,6 @@ namespace Rano.Editor
                 .Where( asset => asset != null )
                 .ToList();
             return assets;
-        }  
+        }
     }
 }

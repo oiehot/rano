@@ -7,19 +7,19 @@ using System.Globalization;
 
 namespace Rano.Encoding
 {
-    public struct CsvText
+    public struct SCsvText
     {
         public string Text { get; }
-        public CsvText(string text)
+        public SCsvText(string text)
         {
             Text = text;
         }
     }
 
-    public struct CsvLineText
+    public struct CCsvLineText
     {
         public string Text { get; }
-        public CsvLineText(string text)
+        public CCsvLineText(string text)
         {
             Text = text;
         }
@@ -27,12 +27,12 @@ namespace Rano.Encoding
 
     public interface ICsvImportable
     {
-        void ImportCsv(CsvText csv);
+        void ImportCsv(SCsvText csv);
     }
 
     public interface ICsvExportable
     {
-        CsvText ExportCsv();
+        SCsvText ExportCsv();
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ namespace Rano.Encoding
         private static char[] HEADER_TRIM_CHARS = { ' ', ':', '\u0020' };
         private static NumberStyles NUMBER_STYLE = NumberStyles.AllowThousands | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign;
 
-        public static List<Dictionary<string, object>> Parse(CsvText csvText)
+        public static List<Dictionary<string, object>> Parse(SCsvText csvText)
         {
             List<Dictionary<string,object>> rows = new List<Dictionary<string, object>>();
 

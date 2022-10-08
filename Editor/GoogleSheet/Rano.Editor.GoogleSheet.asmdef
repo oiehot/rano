@@ -3,8 +3,9 @@
     "rootNamespace": "",
     "references": [
         "Rano",
-        "Rano.GoogleSheet",
-        "Rano.Editor"
+        "Rano.Editor",
+        "Rano.Network",
+        "Rano.GoogleSheet"
     ],
     "includePlatforms": [
         "Editor"
