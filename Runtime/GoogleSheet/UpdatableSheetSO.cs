@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -17,7 +18,16 @@ namespace Rano.GoogleSheet
             set => _items = value;
         }
 
+        public int Length => _items.Length;
+        public T GetByIndex(int index) => _items[index];
+        
+        /// <summary>
+        /// 주어진 index가 1이라면 0 인덱스 항목을 리턴한다.
+        /// </summary>
+        public T GetByOneStartIndex(int index) => _items[index - 1];
+
 #if UNITY_EDITOR
+        protected abstract string Name { get; }
         protected abstract string ID { get; }
         protected abstract string Gid{ get; }
         protected abstract string Range { get; }
@@ -27,7 +37,7 @@ namespace Rano.GoogleSheet
         /// </summary>
         public async Task<bool> UpdateFromGoogleSheetAsync()
         {
-            Log.Info("구글 시트 스크립터블 오브젝트 업데이트 중...");
+            Log.Info($"구글 시트 스크립터블 오브젝트 업데이트 중... ({Name})");
             SGoogleSheetId googleSheetId = new SGoogleSheetId
             {
                 id = ID,
@@ -56,7 +66,17 @@ namespace Rano.GoogleSheet
 
             Log.Info("파싱된 데이터로 스크립터블 오브젝트 업데이트 중...");
 
-            bool updateResult = await UpdateFromRowsAsync(rows);
+            bool updateResult;
+            try
+            {
+                updateResult = await UpdateFromRowsAsync(rows);
+            }
+            catch (Exception e)
+            {
+                Log.Warning("구글 시트 스크립터블 오브젝트 업데이트 실패 (예외 발생)");
+                Log.Exception(e);
+                return false;
+            }
             if (updateResult)
             {
                 Log.Info("구글 시트 스크립터블 오브젝트 업데이트 성공");
