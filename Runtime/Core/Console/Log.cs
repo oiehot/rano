@@ -165,7 +165,7 @@ namespace Rano
             
             string sizedText = WithSizeTag($"{logTypeText} {callerText}{logText}", FONT_SIZE);
             
-            sizedText = WithThreadSignature(sizedText);
+            // sizedText = WithThreadSignature(sizedText);
 
             switch (logType)
             {

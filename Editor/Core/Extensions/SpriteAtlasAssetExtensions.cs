@@ -9,6 +9,7 @@ namespace Rano.Editor
         /// 스프라이트 아틀라스 에셋에서 Include In Build 값을 얻는다.
         /// 참고: https://forum.unity.com/threads/solved-including-spriteatlases-dependent-on-platform.508110/
         /// </summary>
+        [Obsolete("SpriteAtlas Extensions의 IsIncludeInBuild 메서드를 대신 사용 할 것.")]
         public static bool GetIncludeInBuild(this SpriteAtlas spriteAtlasAsset)
         {
             var obj = new UnityEditor.SerializedObject(spriteAtlasAsset);

@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using Rano.Encoding;
 
 namespace Rano.IO
 {
@@ -57,7 +59,7 @@ namespace Rano.IO
         {
             return PlayerPrefs.GetString(key);
         }
-
+        
         public static void SetBool(string key, bool b)
         {
             int i = b ? 1 : 0;
@@ -71,33 +73,64 @@ namespace Rano.IO
             return i != 0 ? true : false;
         }
 
-#if false
-        public static void SetToBinary<T>(string key, T value)
+        public static void SetObject(string key, object obj)
         {
-            var binaryFormatter = new BinaryFormatter(); // System.Runtime.Serialization.Formatters.Binary
-            var memoryStream = new MemoryStream(); // System.IO
-            
-            // value를 바이트 배열로 변환해서 메모리에 저장한다.
-            binaryFormatter.Serialize(memoryStream, value);
-            
-            // System.Convert
-            // UnityEngine.PlayerPrefs
-            PlayerPrefs.SetString(key, Convert.ToBase64String(memoryStream.GetBuffer()) );
-            
-            // TODO: PlayerPrefs.세이브()
+            string? jsonString = Json.ConvertObjectToString(obj);
+            if (jsonString == null)
+            {
+                Log.Warning($"저장 할 데이터를 Json으로 직렬화 하는데 실패함");
+                return;
+            }
+            PlayerPrefs.SetString(key, jsonString);
         }
         
-        public static T GetFromBinary<T>(string key)
+        public static object? GetObject(string key)
         {
-            var data = PlayerPrefs.GetString(key);
-            if (!string.IsNullOrEmpty(data))
+            string? jsonString = PlayerPrefs.GetString(key, null);
+            if (string.IsNullOrEmpty(jsonString))
             {
-                var binaryFormatter = new BinaryFormatter();
-                var memoryStream = new MemoryStream( Convert.FromBase64String(data) );
-                return (T)binaryFormatter.Deserialize(memoryStream);
+                return null;
             }
-            return default(T); // replace from return null;
+
+            object? result = Json.ConvertStringToObject(jsonString);
+            if (result == null)
+            {
+                Log.Warning("로드 실패 (Json 문자열을 역직렬화 하는데 실패)");
+            }
+            return result;
         }
-#endif
+
+        // ByBinary
+        // public static void SetToBinary<T>(string key, T value)
+        // {
+        //     var binaryFormatter = new BinaryFormatter(); // System.Runtime.Serialization.Formatters.Binary
+        //     var memoryStream = new MemoryStream(); // System.IO
+        //     
+        //     // value를 바이트 배열로 변환해서 메모리에 저장한다.
+        //     binaryFormatter.Serialize(memoryStream, value);
+        //     
+        //     // System.Convert
+        //     // UnityEngine.PlayerPrefs
+        //     PlayerPrefs.SetString(key, Convert.ToBase64String(memoryStream.GetBuffer()) );
+        //     
+        //     // TODO: PlayerPrefs.세이브()
+        // }
+        //
+        // public static T GetFromBinary<T>(string key)
+        // {
+        //     var data = PlayerPrefs.GetString(key);
+        //     if (!string.IsNullOrEmpty(data))
+        //     {
+        //         var binaryFormatter = new BinaryFormatter();
+        //         var memoryStream = new MemoryStream( Convert.FromBase64String(data) );
+        //         return (T)binaryFormatter.Deserialize(memoryStream);
+        //     }
+        //     return default(T); // replace from return null;
+        // }
+
+        public static void DeleteKey(string key)
+        {
+            PlayerPrefs.DeleteKey(key);
+        }
     }
 }

@@ -1,0 +1,19 @@
+﻿{
+  "name": "Rano.Editor.Resolver",
+  "rootNamespace": "",
+  "references": [
+    "Rano",
+    "Rano.Editor"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

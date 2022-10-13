@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
-namespace Rano.Editor.Build
+namespace Rano.Editor.Resolver
 {
 	/// <summary>
 	/// 모든 스프라이트 아틀라스의 IncludeInBuild를 체크하고, 켜져(On) 있으면 빌드를 중단한다.

@@ -9,7 +9,7 @@ using UnityEditor.Build.Reporting;
 using UnityEditor.U2D;
 using UnityEngine;
 
-namespace Rano.Editor.Build
+namespace Rano.Editor.Resolver
 {
     /// <summary>
     /// 빌드시 모든 SpriteAtlas 에셋의 IncludeInBuild를 꺼두고 완료되면 원상복구한다.
@@ -22,7 +22,7 @@ namespace Rano.Editor.Build
     /// IncludeInBuild가 켜져 있어야 UseAssetDatabase 실행모드에서 문제없이 테스트 할 수 있었다.
     /// 하지만 IncludeInBuild가 켜져 있으면 불필요하게 빌드에 포함되므로, 빌드시에만 꺼둘 필요가 있다.
     /// </remarks> 
-    public class SpriteAtlasResolver : IPreprocessBuildWithReport, IPostprocessBuildWithReport
+    public class SpriteAtlasBuildResolver : IPreprocessBuildWithReport, IPostprocessBuildWithReport
     {
         /// <summary>
         /// 빌드시 모든 SpriteAtlas에셋들에 설정될 IncludeInBuild값.
