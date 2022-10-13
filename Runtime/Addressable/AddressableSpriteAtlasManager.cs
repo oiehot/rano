@@ -72,21 +72,21 @@ namespace Rano.Addressable
 
             if (TryGetLoadedSpriteAtlas(spriteAtlasName, out spriteAtlas))
             {
-                Log.Info($"SpriteAtlas is requested. Sends the Loaded SpriteAtlas ({spriteAtlasName})");
+                Log.Info($"스프라이트 아틀라스를 요청 받아 로드되어 있는 스프라이트 아틀라스를 전달합니다 ({spriteAtlasName})");
                 callback(spriteAtlas);
                 return;
             }
             else
             {
                 // 이 메시지가 출력되지 않게 하려면 SpriteAtlas를 미리 로드하면 된다.
-                Log.Info($"SpriteAtlas is requested. But SpriteAtlas is not Loaded. ({spriteAtlasName})");
+                Log.Info($"스프라이트 아틀라스를 요청 받았으나, 로드되어 있지 않아 전달하지 못했습니다 ({spriteAtlasName})");
                 // _atlasRequests[name] = callback;
             }
         }
 
         private void HandleAtlasRegistered(SpriteAtlas spriteAtlas)
         {
-            Log.Info($"SpriteAtlas Registered ({spriteAtlas})");
+            Log.Info($"스프라이트 아틀라스 등록됨 ({spriteAtlas})");
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace Rano.Addressable
             
             if (TryGetLoadedSpriteAtlas(spriteAtlasName, out spriteAtlas))
             {
-                Log.Info($"Unload SpriteAtlas ({spriteAtlasName})");
+                Log.Info($"스프라이트 아틀라스 언로드 중... ({spriteAtlasName})");
                 Addressables.Release(spriteAtlas);
                 _spriteAtlases.Remove(spriteAtlasName);
             }
@@ -184,10 +184,10 @@ namespace Rano.Addressable
 
         public void UnloadAllSpriteAtlas()
         {
-            Log.Info("Unload All SpriteAtlas");
+            Log.Info("모든 스프라이트 아틀라스 언로드 중...");
             foreach (var kv in _spriteAtlases)
             {
-                Log.Info($"Unload SpriteAtlas ({kv.Key})");
+                Log.Info($"스프라이트 아틀라스 언로드 중... ({kv.Key})");
                 Addressables.Release(kv.Value);
             }
             _spriteAtlases.Clear();

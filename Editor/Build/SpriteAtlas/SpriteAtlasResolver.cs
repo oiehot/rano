@@ -19,7 +19,7 @@ namespace Rano.Editor.Build
     /// SpriteAtlasManager가 스프라이트를 찾을 수가 없어 Request를 해야함에도, 시도하지 않아
     /// 스프라이트가 로드되지 않은채 빈 상자로 나온다.
     /// 
-    /// IncludeInBuild가 켜져 있어야 UserAssetDatabase 실행모드에서 문제없이 테스트 할 수 있었다.
+    /// IncludeInBuild가 켜져 있어야 UseAssetDatabase 실행모드에서 문제없이 테스트 할 수 있었다.
     /// 하지만 IncludeInBuild가 켜져 있으면 불필요하게 빌드에 포함되므로, 빌드시에만 꺼둘 필요가 있다.
     /// </remarks> 
     public class SpriteAtlasResolver : IPreprocessBuildWithReport, IPostprocessBuildWithReport

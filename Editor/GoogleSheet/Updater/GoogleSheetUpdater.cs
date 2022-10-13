@@ -76,6 +76,9 @@ namespace Rano.Editor.GoogleSheet
                     Log.Warning($"구글 시트 업데이트 실패 ({assetPath})");
                     return false;
                 }
+                
+                // 업데이트 된 스크립터블 오브젝트를 저장하기 위해 Dirty 표기를 한다.
+                EditorUtility.SetDirty(asset);
             }
             
             Log.Important("모든 구글 시트 업데이트 완료");
