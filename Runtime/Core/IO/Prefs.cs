@@ -1,4 +1,5 @@
-using System;
+#nullable enable
+
 using UnityEngine;
 using Rano.Encoding;
 
@@ -35,7 +36,7 @@ namespace Rano.IO
             PlayerPrefs.SetInt(key, value);
         }
 
-        public static int GetInt(string key, int defaultValue = 0)
+        public static int GetInt(string key, int defaultValue=0)
         {
             return PlayerPrefs.GetInt(key, defaultValue);
         }
@@ -45,7 +46,7 @@ namespace Rano.IO
             PlayerPrefs.SetFloat(key, value);
         }
 
-        public static float GetFloat(string key, float defaultValue = 0.0f)
+        public static float GetFloat(string key, float defaultValue=0.0f)
         {
             return PlayerPrefs.GetFloat(key, defaultValue);
         }
@@ -55,9 +56,9 @@ namespace Rano.IO
             PlayerPrefs.SetString(key, value);
         }
 
-        public static string GetString(string key, string defaultValue = null)
+        public static string GetString(string key, string? defaultValue=null)
         {
-            return PlayerPrefs.GetString(key);
+            return PlayerPrefs.GetString(key, defaultValue);
         }
         
         public static void SetBool(string key, bool b)
@@ -70,7 +71,7 @@ namespace Rano.IO
         {
             int defaultInt = defaultValue ? 1 : 0;
             int i = PlayerPrefs.GetInt(key, defaultInt);
-            return i != 0 ? true : false;
+            return i != 0;
         }
 
         public static void SetObject(string key, object obj)
