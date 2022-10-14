@@ -8,11 +8,11 @@ namespace Rano.Update
     {
         protected override ECheckUpdateResult GetUpdateStatus()
         {
-            Log.Info("TEST: 업데이트 검사 중...");
+            Log.Info("업데이트 검사 중... (TEST MODE)");
             
             if (IsInitialized == false)
             {
-                Log.Warning("TEST: 업데이트 검사 실패 (초기화 되어있지 않음)");
+                Log.Warning("업데이트 검사 실패 (초기화 되어있지 않음) (TEST MODE)");
                 return ECheckUpdateResult.Error;
             }
 
@@ -28,17 +28,17 @@ namespace Rano.Update
             
             if (_currentVersion < latestVersion)
             {
-                Log.Important($"TEST: 업데이트가 필요합니다 ({_currentVersion} => {latestVersion})");
+                Log.Important($"업데이트가 필요합니다 ({_currentVersion} => {latestVersion}) (TEST MODE)");
                 return ECheckUpdateResult.UpdateRequired;
             }
             else if (_currentVersion == latestVersion)
             {
-                Log.Important($"TEST: 이미 최신 버전입니다 ({_currentVersion}) (Test)");
+                Log.Important($"이미 최신 버전입니다 ({_currentVersion}) (TEST MODE)");
                 return ECheckUpdateResult.UpdateAlready;
             }
             else // if (_currentVersion > latestVersion)
             {
-                Log.Warning($"TEST: 현재 버전이 RemoteConfig에 설정된 버전보다 최신입니다 (current:{_currentVersion}, latest:{latestVersion}) (Test)");
+                Log.Warning($"현재 버전이 RemoteConfig에 설정된 버전보다 최신입니다 (current:{_currentVersion}, latest:{latestVersion}) (TEST MODE)");
                 return ECheckUpdateResult.Error;
             }
         }

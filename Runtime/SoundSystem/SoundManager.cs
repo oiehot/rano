@@ -53,7 +53,7 @@ namespace Rano.SoundSystem
             _audioListener = UnityEngine.Object.FindObjectOfType<AudioListener>();
             if (_audioListener == null)
             {
-                Log.Warning($"{nameof(AudioListener)} 컴포넌트를 찾을 수 없어 생성합니다.");
+                Log.Info($"현재 씬에서 {nameof(AudioListener)} 컴포넌트를 찾을 수 없습니다. 새로 생성합니다.");
                 _audioListener = gameObject.AddComponent<AudioListener>();
             }
             
