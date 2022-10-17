@@ -81,14 +81,16 @@ namespace Rano.Database.CloudSync
             Log.Info(Constants.SYNCING);
             _state = EState.Syncing;
             
-            // 로컬 업데이트 날짜를 얻는다.
+            // 로컬 저장 날짜를 얻는다.
             DateTime localDateTime = _local.LastModifiedDateTime;
-            Log.Info($"로컬 데이터베이스 마지막 수정시간 ({localDateTime.ToLocalTime()})");
+            Log.Info($"로컬 데이터베이스 마지막 수정 날짜: {localDateTime} (UTC)");
+            Log.Info($"로컬 데이터베이스 마지막 수정 날짜: {localDateTime.ToLocalTime()} (LocalTime)");
             
-            // 클라우드 업데이트 날짜를 얻는다.
+            // 클라우드 저장 날짜를 얻는다.
             DateTime? cloudDateTime = await _cloud!.GetLastModifiedDateTimeAsync(_auth.UserId);
             if (cloudDateTime == null) cloudDateTime = DateTime.MinValue;
-            Log.Info($"클라우드 데이터베이스 마지막 수정시간 ({cloudDateTime.Value.ToLocalTime()})");
+            Log.Info($"클라우드 데이터베이스 마지막 수정 날짜: {cloudDateTime.Value} (UTC)");
+            Log.Info($"클라우드 데이터베이스 마지막 수정 날짜: {cloudDateTime.Value.ToLocalTime()} (LocalTime)");
             
             // 어떤게 더 최신 데이터인지 파악한 뒤 싱크한다.
             // 로컬 데이터가 더 최신인 경우:
@@ -148,26 +150,28 @@ namespace Rano.Database.CloudSync
             byte[]? bytes = _local.GetArchive();
             if (bytes == null) return false;
             
-            // 수정날짜 DateTime을 준비한다.
-            DateTime utcDateTime;
+            // Firestore:
+            //   users/{user_id}/lastModifiedTimestamp (Firestore.Timestamp)
+            //   users/{user_id}/saveData (BLOB)
+            // LocalDatabase:
+            //   @System
+            //     lastModifiedDateTime (DateTime)
+            //
+            // 로컬 데이터베이스의 수정 날짜는 바이너리 세이브 데이터 안의 @System.lastModifiedDateTime에 기록된다.
+            // 세이브 데이터는 압축되어 바이너리로 데이터베이스에 보관되기 때문에 수정된 날짜를 쉽게 얻을 수 없다.
+            // 성능과 편의를 위해 동일한 수정날짜 값을 users/{user_id}/lastModifiedTimestamp에 기록한다.
+            //
+            // 로컬 데이터베이스의 수정 시간으로 데이터베이스에 기록 할 Timestamp 값을 얻는다.
+            DateTime localDateTime;
+            Timestamp localTimestamp;
             try
             {
-                utcDateTime = _local.LastModifiedDateTime.ToUniversalTime();
+                localDateTime = _local.LastModifiedDateTime.ToUniversalTime();
+                localTimestamp = Timestamp.FromDateTime(localDateTime);
             }
             catch (Exception e)
             {
-                Log.Exception(e);
-                return false;
-            }
-            
-            // 수정날짜 Timestamp를 준비한다.
-            Timestamp timestamp;
-            try
-            {
-                timestamp = Timestamp.FromDateTime(utcDateTime);
-            }
-            catch (Exception e)
-            {
+                Log.Warning("로컬 데이터 저장 날짜를 Timestamp로 변환하는데 실패 (예외 발생)");
                 Log.Exception(e);
                 return false;
             }
@@ -176,7 +180,7 @@ namespace Rano.Database.CloudSync
             Dictionary<string, object> uploadDict = new Dictionary<string, object>
             {
                 [Constants.SAVE_DATA_KEY] = bytes,
-                [Constants.LAST_MODIFIED_TIMESTAMP_KEY] = timestamp
+                [Constants.LAST_MODIFIED_TIMESTAMP_KEY] = localTimestamp
             };
 
             // 클라우드에 데이터를 넣는다.
@@ -198,9 +202,9 @@ namespace Rano.Database.CloudSync
             
             Log.Info($"클라우드 데이터를 로컬로 가져옵니다");
             
-            // 클라우드 업데이트 날짜를 얻는다.
-            DateTime? cloudDateTime = await _cloud.GetLastModifiedDateTimeAsync(userId);
-            if (cloudDateTime == null) cloudDateTime = DateTime.MinValue;
+            // TODO: 필요한가? (클라우드 업데이트 날짜를 얻는다)
+            // DateTime? cloudDateTime = await _cloud.GetLastModifiedDateTimeAsync(userId);
+            // if (cloudDateTime == null) cloudDateTime = DateTime.MinValue;
             
             // 클라우드에 저장된 문서 데이터를 얻는다.
             Dictionary<string, object>? cloudDict = await _cloud.ReadDocumentAsync(Constants.USERS_COLLECTION_NAME, userId);
@@ -230,8 +234,8 @@ namespace Rano.Database.CloudSync
             bool loadResult = _local.LoadFromArchive(bytes);
             if (loadResult == false) return false;
             
-            // 로컬 업데이트 날짜를 클라우드와 동일하게 맞춘다.
-            _local.LastModifiedDateTime = cloudDateTime.Value;
+            // TODO: 필요한가? (로컬 업데이트 날짜를 클라우드와 동일하게 맞춘다.)
+            // _local.LastModifiedDateTime = cloudDateTime.Value;
             
             return true;            
         }

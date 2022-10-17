@@ -9,15 +9,16 @@ using Rano.IO;
 namespace Rano.Database
 {
     [Serializable]
-    public struct LocalDatabaseData
+    public struct SLocalDatabaseData
     {
-        public int serializationVersion;
+        public string appId;
+        public string appVersion;
+        public string appPlatform;
         public DateTime lastModifiedDateTime;
     }
     
     public sealed partial class LocalDatabase : ILocalDatabase
     {
-        private const int SERIALIZATION_VERSION = 1;
         private const string SYSTEM_DATA_KEY = "@System";
         
         private enum EState
@@ -32,6 +33,7 @@ namespace Rano.Database
         private DateTime _lastModifiedDateTime;
         
         public bool IsInitialized => _state >= EState.Ready;
+
         public DateTime LastModifiedDateTime
         {
             get => _lastModifiedDateTime;
@@ -60,7 +62,6 @@ namespace Rano.Database
             _state = EState.None;
             _dict = new Dictionary<string, object>();
             _savePath = $"{Application.persistentDataPath}/save";
-            
             Initialize();
         }
         
@@ -111,7 +112,19 @@ namespace Rano.Database
         
         public bool Load()
         {
-            return LoadFromFile(_savePath);
+            Log.Info($"로드 중... ({_savePath})");
+            if (LoadFromFile(_savePath))
+            {
+                Log.Info($"로드된 세이브 파일의 마지막 수정 시간: {_lastModifiedDateTime} (UTC)");
+                Log.Info($"로드된 세이브 파일의 마지막 수정 시간: {_lastModifiedDateTime.ToLocalTime()} (LocalTime)");
+                Log.Info("로드 성공");
+                return true;
+            }
+            else
+            {
+                Log.Warning("로그 실패");
+                return false;
+            }
         }
 
         public bool Save()
@@ -126,17 +139,20 @@ namespace Rano.Database
         
         private object CaptureSystemData()
         {
-            var state = new LocalDatabaseData
+            var state = new SLocalDatabaseData
             {
-                lastModifiedDateTime = _lastModifiedDateTime,
-                serializationVersion = SERIALIZATION_VERSION
+                appId = Application.identifier,
+                appVersion = Application.version,
+                appPlatform = Application.platform.ToString(),
+                lastModifiedDateTime = _lastModifiedDateTime
+                // lastSavedDateTime = _lastSavedDateTime
             };
             return state;
         }
         
         private void RestoreSystemData(object state)
         {
-            LocalDatabaseData data = (LocalDatabaseData)state;
+            SLocalDatabaseData data = (SLocalDatabaseData)state;
             _lastModifiedDateTime = data.lastModifiedDateTime;
         }
 
@@ -224,6 +240,7 @@ namespace Rano.Database
         {
             Log.Info($"{nameof(LocalDatabase)}");
             Log.Info($"  LastModifiedDate(UTC): {_lastModifiedDateTime}");
+            Log.Info($"  LastModifiedDate(Local): {_lastModifiedDateTime.ToLocalTime()}");
             Log.Info($"  SavePath: {_savePath}");           
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             Log.Info($"  ResetOnStart Key: {_resetOnStartPref.Key}");

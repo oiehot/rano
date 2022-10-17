@@ -12,9 +12,15 @@ namespace Rano.Database
 {
     public sealed partial class LocalDatabase : ILocalDatabase
     {
+        /// <summary>
+        /// 내부 사전 데이터를 Json으로 변환하고 압축 및 암호화 처리된 바이너리로 리턴한다.
+        /// </summary>
+        /// <remarks>
+        /// (1) 사전 > Json 문자열 > (2) 바이너리 > (3) 압축 > (4) 암호화
+        /// </remarks>
         public byte[]? GetArchive()
         {
-            // 1) Dictionary => JsonString
+            // (1) Dictionary => JsonString
             Dictionary<string,object> dict = GetDictionaryArchive();
             string? jsonString = Json.ConvertObjectToString(dict);
             if (jsonString == null)
@@ -23,8 +29,7 @@ namespace Rano.Database
                 return null;
             }
             
-            // 2) JsonString => Bytes
-            Log.Todo("이진으로 변환시 압축 및 보안처리가 필요함");
+            // (2) JsonString => Bytes
             byte[]? bytes;
             try
             {
@@ -38,7 +43,7 @@ namespace Rano.Database
             }
             Log.Info($"세이브 데이터 바이트 직렬화 성공 ({bytes.Length} bytes)");
             
-            // 3) Bytes => CompressedBytes
+            // (3) Bytes => CompressedBytes
             byte[]? compressedBytes = GZip.Compress(bytes);
             if (compressedBytes != null)
             {
@@ -50,25 +55,26 @@ namespace Rano.Database
                 return null;
             }
             
-            // 4) CompressedBytes => EncryptedBytes
+            // (4) CompressedBytes => EncryptedBytes
             Log.Todo("CompressedBytes => EncryptedBytes");
 
             return compressedBytes;
         }
 
+        /// <summary>
+        /// 압축 및 암호화 처리된 Json 바이너리를 역순으로 해체하여 내부 사전으로 로드한다.
+        /// </summary>
+        /// <remarks>
+        /// (1) 암호해제 > (2)압축해제 > (3) 바이너리 > Json 문자열로 변환 > (4) 사전으로 역직렬화
+        /// </remarks>
         public bool LoadFromArchive(byte[] archiveBytes)
         {
-            string? jsonString;
-            Dictionary<string,object>? dict;
-            
-            Log.Info($"로드 중...");
-            
-            // 1) ArchiveBytes == EncryptedBytes => CompressedBytes
+            // (1) ArchiveBytes == EncryptedBytes => CompressedBytes
             byte[]? compressedBytes = archiveBytes;
             Log.Todo("세이브 데이터 복호화가 필요함");
             // Log.Info($"세이브 데이터 복호화 성공 ({compressedBytes.Length} bytes)");
             
-            // 2) CompressedBytes => Bytes
+            // (2) CompressedBytes => Bytes
             
             Log.Info($"세이브 데이터 압축해제 중...");
             byte[]? bytes = GZip.Decompress(compressedBytes);
@@ -82,10 +88,10 @@ namespace Rano.Database
                 return false;
             }
             
-            // 3) Bytes => JsonString
+            // (3) Bytes => JsonString
+            string? jsonString;
             try
             {
-                Log.Todo("이진에서 JsonString으로 변환시 압축 및 보안처리 해제가 필요함");
                 jsonString = System.Text.Encoding.UTF8.GetString(bytes);
             }
             catch (Exception e)
@@ -95,8 +101,8 @@ namespace Rano.Database
                 return false;
             }
 
-            // jsonString을 Dictionary로 역직렬화한다.
-            dict = Json.ConvertStringToObject<Dictionary<string, object>>(jsonString);
+            // (4) JsonString을 Dictionary로 역직렬화한다.
+            Dictionary<string,object>? dict = Json.ConvertStringToObject<Dictionary<string, object>>(jsonString);
             if (dict == null)
             {
                 Log.Warning("로드 실패 (Json 문자열을 사전으로 역직렬화 하는데 실패)");
@@ -112,8 +118,6 @@ namespace Rano.Database
             {
                 RestoreSystemData(systemData);
             }
-            
-            Log.Info($"로드 성공");
             return true;
         }
 
@@ -136,7 +140,11 @@ namespace Rano.Database
             }
             
             // 임시파일을 정식파일로 이동.
-            LocalFile.Move(tmpPath, filePath, true);
+            if (LocalFile.Move(tmpPath, filePath, true) == false)
+            {
+                Log.Warning($"임시 파일 이동 실패 ({tmpPath} => {filePath})");
+                return false;
+            }
 
             Log.Info($"저장 완료 ({filePath}, {bytes.Length} bytes)");
             return true;
