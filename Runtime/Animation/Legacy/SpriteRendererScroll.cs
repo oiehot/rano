@@ -1,3 +1,5 @@
+#nullable enable
+
 using UnityEngine;
     
 namespace Rano.Animation
@@ -5,53 +7,46 @@ namespace Rano.Animation
     [RequireComponent(typeof(SpriteRenderer))]
     public class SpriteRendererScroll : MonoBehaviour
     {
-        // TODO: Must required
+        private SpriteRenderer? _spriteRenderer;
+        private Vector3 startPosition;
+        private float _spriteWidth;
+        private float _spriteHeight;
+        private float _minX;
+        private bool _isRun;
+        
         public float speed;
-            
-        SpriteRenderer spriteRenderer;
-        GameObject o2;
-        Vector3 startPosition;
-        bool run;   
-        float spriteWidth;
-        float spriteHeight;
-        float minX;
         
         void Awake()
         {  
-            spriteRenderer = GetComponent<SpriteRenderer>();
-            // TEST: Old
-            // spriteWidth = spriteRenderer.size.x;
-            // spriteHeight = spriteRenderer.size.y;
-            
-            // New
-            spriteWidth = spriteRenderer.bounds.max.x - spriteRenderer.bounds.min.x;
-            spriteHeight = spriteRenderer.bounds.max.y - spriteRenderer.bounds.min.y;
+            _spriteRenderer = GetComponent<SpriteRenderer>();
+            Bounds bounds = _spriteRenderer.bounds;
+            _spriteWidth = bounds.max.x - bounds.min.x;
+            _spriteHeight = bounds.max.y - bounds.min.y;
         }
         
         void Start()
         {
             startPosition = transform.position;
-            minX = startPosition.x - spriteWidth;
+            _minX = startPosition.x - _spriteWidth;
             Run();
         }
         
-        // TODO: Run() Stop() 을 가지는 Interface정의
         public void Run()
         {
-            run = true;
+            _isRun = true;
         }
         
         public void Stop()
         {
-            run = false;
+            _isRun = false;
         }
         
         void Update()
         {
-            if (run)
+            if (_isRun)
             {
                 transform.Translate(Vector3.left * speed * Time.deltaTime);
-                if (transform.position.x < minX)
+                if (transform.position.x < _minX)
                 {
                     transform.position = startPosition;
                 }

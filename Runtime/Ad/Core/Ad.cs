@@ -9,7 +9,7 @@ namespace Rano.Ad
     /// 우리는 이 문제를 핸들러에서는 플래그를 세우고 메인스레드에서 작동되는 Update에서 사용자 이벤트 함수를 호출하는 식으로 해결했다.
     /// 다음 글을 참고할것: https://ads-developers.googleblog.com/2016/04/handling-android-ad-events-in-unity.html
     /// </summary>
-    // TODO: 에드몹스레드에서 실행되는 콜백에서 UniTask 등을 이용하여 유니티스레드에서 자동으로 메서드를 실행하도록 수정. 업데이트에서 반복적으로 플래그를 체크할 필요는 없음.
+    // TODO: 에드몹스레드에서 실행되는 콜백에서 UniTask 등을 이용하여 유니티스레드에서 자동으로 메서드를 실행하도록 수정 할 것. 업데이트에서 반복적으로 플래그를 체크할 필요는 없음.
     [RequireComponent(typeof(CanvasSorter))]
     public abstract class Ad : MonoBehaviour
     {

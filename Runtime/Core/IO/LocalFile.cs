@@ -70,7 +70,7 @@ namespace Rano.IO
             return str;
         }
 
-        public static void Move(string srcPath, string destPath, bool force)
+        public static bool Move(string srcPath, string destPath, bool force)
         {
             bool exists;
             try
@@ -80,10 +80,13 @@ namespace Rano.IO
             catch (Exception e)
             {
                 Log.Exception(e);
-                return;
+                return false;
             }
-            
-            if (force == false && exists) return;
+
+            if (force == false && exists)
+            {
+                return false;
+            }
 
             try
             {
@@ -92,7 +95,7 @@ namespace Rano.IO
             catch (Exception e)
             {
                 Log.Exception(e);
-                return;
+                return false;
             }
 
             try
@@ -102,7 +105,10 @@ namespace Rano.IO
             catch (Exception e)
             {
                 Log.Exception(e);
+                return false;
             }
+
+            return true;
         }
     }
 }
