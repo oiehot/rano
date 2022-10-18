@@ -184,8 +184,7 @@ namespace Rano
             }
         }
         
-        #region Logging Methods for Debug
-        
+        // TODO: 유니티 에디터 혹은 개발 빌드에서만 filePath, line, member 매개변수가 있도록 수정할것. (성능 향상) 
         public static void Info(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
             #if (ENABLE_LOG || UNITY_EDITOR || DEVELOPMENT_BUILD)
@@ -234,7 +233,5 @@ namespace Rano
                 UnityEngine.Debug.LogException(e);
             #endif
         }
-        
-        #endregion
     }
 }

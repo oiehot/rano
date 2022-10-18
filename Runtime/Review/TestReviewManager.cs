@@ -12,7 +12,7 @@ namespace Rano.Review
     {
         private bool _initialized = false;
         public override bool IsInitialized => _initialized;
-        
+
         public override bool Initialize()
         {
             Log.Info("초기화 중... (Test)");
@@ -27,6 +27,18 @@ namespace Rano.Review
             await Task.Delay(3000);
             Log.Info("리뷰 요청 완료 (Test)");            
             return true;
+        }
+        
+        public override string GetWebPageUrl(string id)
+        {
+            id = Rano.Network.URLHelper.EscapeURL(id);
+            return $"https://play.google.com/store/apps/details?id={id}";
+        }
+        
+        public override string GetAppStoreUrl(string id)
+        {
+            id = Rano.Network.URLHelper.EscapeURL(id);
+            return $"https://play.google.com/store/apps/details?id={id}";
         }
     }
 }

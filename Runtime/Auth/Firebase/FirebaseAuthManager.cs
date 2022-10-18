@@ -20,7 +20,7 @@ namespace Rano.Auth.Firebase
                 else return false;
             }
         }
-        public string? UserId => IsAuthenticated ? _auth!.CurrentUser.UserId : null;
+        public string? UserId => IsAuthenticated ? _auth!.CurrentUser.UserId : null; // TODO: UserId => UserID
 
         /// <summary>
         /// 사용자의 표시 이름.

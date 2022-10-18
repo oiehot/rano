@@ -39,9 +39,7 @@ namespace Rano.Editor.Build
             LastVersion = CurrentVersion;
         }
 
-        /// <todo>
-        /// 자동 빌드 버젼 증가 속성에 따라 메뉴 활성화 여부 결정
-        /// </todo>
+        /// TODO: 자동 빌드 버젼 증가 속성에 따라 메뉴 활성화 여부 결정
         [MenuItem(AUTO_INCREASE_MENU_NAME, true, PRIORITY+1)]
         private static bool SetAutoIncreaseValidate()
         {

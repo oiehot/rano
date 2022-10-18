@@ -119,8 +119,8 @@ namespace Rano.RemoteConfig.Firebase
 
             // Fetch 실행
 #if UNITY_EDITOR
-            Log.Warning("유니티 에디터 환경에서는 MinimumFetchInternalInMilliseconds 값이 너무 낮게 설정되어 있으면 Fetch가 실패합니다");
-            Log.Warning("정확한 테스트를 위해서 Android나 iOS 플랫픔으로 빌드해서 테스트하시기 바랍니다");
+            Log.Info("유니티 에디터 환경에서는 MinimumFetchInternalInMilliseconds 값이 너무 낮게 설정되어 있으면 Fetch가 실패합니다");
+            Log.Info("정확한 테스트를 위해서 Android나 iOS 플랫픔으로 빌드해서 테스트하시기 바랍니다");
 #endif
             try
             {
@@ -275,6 +275,7 @@ namespace Rano.RemoteConfig.Firebase
             if (_remoteConfig!.Info != null)
             {
                 Log.Info("  Info:");
+                // TODO: FetchTime을 엑세스 하는 중 예외가 발생함을 확인함 (in android build)
                 Log.Info($"    FetchTime(LocalTime): {_remoteConfig!.Info.FetchTime.ToLocalTime()}");
                 Log.Info($"    ThrottledEndTime(LocalTime): {_remoteConfig!.Info.ThrottledEndTime.ToLocalTime()}");
                 Log.Info($"    LastFetchStatus: {_remoteConfig!.Info.LastFetchStatus}");

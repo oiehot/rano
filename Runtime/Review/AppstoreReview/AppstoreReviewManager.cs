@@ -32,5 +32,18 @@ namespace Rano.Review.AppstoreReview
             Log.Info("리뷰 요청 완료");
             return true;
         }
+        
+        public override string GetWebPageUrl(string id)
+        {
+            id = Rano.Network.URLHelper.EscapeURL(id);
+            return $"http://itunes.apple.com/lookup?bundleId={id}";
+        }
+        
+        public override string GetAppStoreUrl(string id)
+        {
+            // TODO: Application.identifier (ex: org.threesixfivesanta.bigtree)로 하면 경고 출력. 숫자여야만 한다.
+            id = Rano.Network.URLHelper.EscapeURL(id);
+            return $"itms-apps://itunes.apple.com/app/id{id}";
+        }
     }
 }

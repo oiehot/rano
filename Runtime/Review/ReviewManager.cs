@@ -2,6 +2,7 @@
 
 using System;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Rano.Review
 {
@@ -9,13 +10,13 @@ namespace Rano.Review
     {
         private int _openReviewCount = 0;
         private DateTime _lastOpenReviewDateTime;
-        // iOS 정책상 1년에 3회까지만 리뷰요청을 할 수 있으므로 122일 단위시간을 사용 (1년의 1/3)
+        // TODO: 이 값을 Initialize나 ConfigSO에서 설정할 수 있도록 할것, iOS 정책상 1년에 3회까지만 리뷰요청을 할 수 있으므로 122일 단위시간을 사용 (1년의 1/3)
         private TimeSpan _openReviewTimeSpan = new TimeSpan(days: 122, hours: 0, minutes: 0, seconds: 0);
         
         public int OpenReviewCount => _openReviewCount;
         public bool HasReviewOpened => (_openReviewCount > 0);
         public DateTime LastOpenReviewDateTime => _lastOpenReviewDateTime;
-
+        
         /// <summary>
         /// 리뷰 정책을 리셋한다.
         /// </summary>
@@ -75,5 +76,27 @@ namespace Rano.Review
         /// 실제 플랫폼 리뷰를 요청한다.
         /// </summary>
         public abstract Task<bool> RequestReviewInternalAsync();
+        
+        /// <summary>
+        /// 특정 앱의 웹 페이지 주소를 얻는다.
+        /// </summary>
+        /// <remarks>URL을 리턴하므로 Escape처리를 확실해 해줘야 한다.</remarks>
+        public abstract string GetWebPageUrl(string id);
+        
+        /// <summary>
+        /// 특정 앱의 앱 스토어 주소를 얻는다.
+        /// </summary>
+        /// <remarks>URL을 리턴하므로 Escape처리를 확실해 해줘야 한다.</remarks>
+        public abstract string GetAppStoreUrl(string id);
+
+        public void OpenWebPage(string id)
+        {
+            Application.OpenURL(GetWebPageUrl(id));
+        }
+
+        public void OpenAppStore(string id)
+        {
+            Application.OpenURL(GetAppStoreUrl(id));
+        }
     }
 }

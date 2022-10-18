@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Rano.Auth;
 using Firebase.Firestore;
+using UnityEngine;
 
 namespace Rano.Database.CloudSync
 {
@@ -37,8 +38,12 @@ namespace Rano.Database.CloudSync
         /// <returns>초기화 결과</returns>
         public bool Initialize(ILocalDatabase localDatabase, ICloudDatabase cloudDatabase, IAuthManager authManager)
         {
+            Debug.Assert(localDatabase != null);
+            Debug.Assert(cloudDatabase != null);
+            Debug.Assert(authManager != null);
+            
             Log.Info(Constants.INITIALIZING);
-
+            
             if (localDatabase.IsInitialized == false)
             {
                 Log.Warning(Constants.LOCAL_DATABASE_NOT_INITIALIZED);
@@ -73,10 +78,17 @@ namespace Rano.Database.CloudSync
         /// <remarks>더 최신인 데이터를 원본으로 사용한다.</remarks>
         public async Task<bool> SyncAsync()
         {
-            Log.Todo("동기화 실패 메시지 띄우기(원인으로)");
-            if (_local == null || _cloud == null || _auth == null) return false;
-            if (_auth.UserId == null) return false;
-            if (_state != EState.Ready) return false;
+            if (IsInitialized == false)
+            {
+                Log.Warning("동기화 실패 (초기화가 안되어 있음)");
+                return false;
+            }
+
+            if (_auth!.IsAuthenticated == false)
+            {
+                Log.Warning("동기화 실패 (인증이 안되어 있음)");
+                return false;
+            }
             
             Log.Info(Constants.SYNCING);
             _state = EState.Syncing;
@@ -180,7 +192,10 @@ namespace Rano.Database.CloudSync
             Dictionary<string, object> uploadDict = new Dictionary<string, object>
             {
                 [Constants.SAVE_DATA_KEY] = bytes,
-                [Constants.LAST_MODIFIED_TIMESTAMP_KEY] = localTimestamp
+                [Constants.LAST_MODIFIED_TIMESTAMP_KEY] = localTimestamp,
+                // [Constants.APP_ID_KEY] = Application.identifier,
+                [Constants.APP_VERSION_KEY] = Application.version,
+                // [Constants.APP_PLATFORM_KEY] = Application.platform.ToString(),
             };
 
             // 클라우드에 데이터를 넣는다.

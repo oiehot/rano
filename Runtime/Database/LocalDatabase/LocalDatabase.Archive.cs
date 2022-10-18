@@ -56,7 +56,7 @@ namespace Rano.Database
             }
             
             // (4) CompressedBytes => EncryptedBytes
-            Log.Todo("CompressedBytes => EncryptedBytes");
+            // TODO: CompressedBytes => EncryptedBytes
 
             return compressedBytes;
         }
@@ -71,11 +71,9 @@ namespace Rano.Database
         {
             // (1) ArchiveBytes == EncryptedBytes => CompressedBytes
             byte[]? compressedBytes = archiveBytes;
-            Log.Todo("세이브 데이터 복호화가 필요함");
-            // Log.Info($"세이브 데이터 복호화 성공 ({compressedBytes.Length} bytes)");
+            // TODO: 세이브 데이터 복호화가 필요함.
             
             // (2) CompressedBytes => Bytes
-            
             Log.Info($"세이브 데이터 압축해제 중...");
             byte[]? bytes = GZip.Decompress(compressedBytes);
             if (bytes != null)
@@ -123,9 +121,10 @@ namespace Rano.Database
 
         private bool SaveAsFile(string filePath)
         {
-            Log.Info($"저장 중... ({filePath})");
-            Log.Todo("파일스트림을 이용해서 저장해야함.");
+            // TODO: 파일스트림을 이용해서 저장해야함.
             
+            Log.Info($"저장 중... ({filePath})");
+
             string tmpPath = $"{filePath}.tmp";
             byte[]? bytes = GetArchive();
             if (bytes == null)

@@ -35,7 +35,7 @@ namespace Rano.Review.GooglePlayReview
             Log.Info("초기화 완료");
             return true;
         }
-
+        
         public override async Task<bool> RequestReviewInternalAsync()
         {
             Coroutine coroutine = StartCoroutine(nameof(RequestReviewCoroutine));
@@ -165,6 +165,20 @@ namespace Rano.Review.GooglePlayReview
             // 흐름이 완료되었습니다.
             // API는 사용자가 검토했는지 여부 또는 검토 대화 상자가 표시되었는지 여부를 나타내지 않습니다.
             // 따라서 결과에 관계없이 앱 흐름을 계속합니다.
+        }
+        
+        public override string GetWebPageUrl(string id)
+        {
+            // https://play.google.com/store/apps/details?id=com.oiehot.afo2
+            // https://play.google.com/store/apps/details?id=com.oiehot.afo2&hl=en_US&gl=US
+            id = Rano.Network.URLHelper.EscapeURL(id);
+            return $"https://play.google.com/store/apps/details?id={id}";
+        }
+        
+        public override string GetAppStoreUrl(string id)
+        {
+            id = Rano.Network.URLHelper.EscapeURL(id);
+            return $"market://details?id={id}";
         }
     }
 }

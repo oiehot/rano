@@ -28,5 +28,17 @@ namespace Rano.Review
             await Task.Delay(0);
             return false;
         }
+        
+        public override string GetWebPageUrl(string id)
+        {
+            id = Rano.Network.URLHelper.EscapeURL(id);
+            return $"https://play.google.com/store/apps/details?id={id}";
+        }
+        
+        public override string GetAppStoreUrl(string id)
+        {
+            id = Rano.Network.URLHelper.EscapeURL(id);
+            return $"https://play.google.com/store/apps/details?id={id}";
+        }
     }
 }

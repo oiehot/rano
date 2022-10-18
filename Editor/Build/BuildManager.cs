@@ -29,7 +29,7 @@ namespace Rano.Editor.Build
 
         #region ToggleDevelopmentBuild
 
-        /// <todo>자동 빌드 버젼 증가 속성에 따라 메뉴 활성화 여부 결정</todo>
+        /// TODO: 자동 빌드 버젼 증가 속성에 따라 메뉴 활성화 여부 결정.
         [MenuItem(DevelopmentBuildName, true)]
         private static bool SetDevelopmentBuildValidate()
         {

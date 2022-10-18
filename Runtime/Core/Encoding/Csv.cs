@@ -101,8 +101,8 @@ namespace Rano.Encoding
                     switch (seriesTypeName)
                     {
                         case "list[str]":
-                            Log.Todo("헤더의 파싱이 매 행마다 이뤄지고 있어 성능이 떨어집니다. 추후에 개선이 필요합니다");
-                            Log.Todo("성능이 떨어지는 임시 코드입니다");
+                            // TODO: 헤더의 파싱이 매 행마다 이뤄지고 있어 성능이 떨어집니다. 추후에 개선이 필요합니다.
+                            // TODO: 성능이 떨어지는 임시 코드입니다.
                             var valueTokens = value.Split(new char[] { ' ', ',', '[', ']' });
                             List<string> tmp = new List<string>();
                             foreach (var valueToken in valueTokens)

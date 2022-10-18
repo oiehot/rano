@@ -189,7 +189,7 @@ namespace Rano.Leaderboard
             // 스냅샷으로 부터 문서를 읽는다.
             try
             {
-                Log.Todo("쿼리 스냅샷 문서를 리더보드 데이터 타입으로 변환하여 리턴할것");
+                // TODO: 쿼리 스냅샷 문서를 리더보드 데이터 타입으로 변환하여 리턴할것.
                 foreach (DocumentSnapshot document in querySnapshot.Documents)
                 {
                     Log.Info($"Document (Id: {document.Id})");
