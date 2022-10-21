@@ -10,6 +10,10 @@ namespace Rano.Auth.Firebase
     {
         private FirebaseAuth? _auth;
         private FirebaseUser? _user;
+        
+        public Action OnSignIn { get; set; }
+        public Action OnSignOut { get; set; }
+        
         public FirebaseAuth? Auth => _auth;
         public bool IsInitialized => _auth != null;
         public bool IsAuthenticated
@@ -20,7 +24,7 @@ namespace Rano.Auth.Firebase
                 else return false;
             }
         }
-        public string? UserId => IsAuthenticated ? _auth!.CurrentUser.UserId : null; // TODO: UserId => UserID
+        public string? UserID => IsAuthenticated ? _auth!.CurrentUser.UserId : null; // TODO: UserId => UserID
 
         /// <summary>
         /// 사용자의 표시 이름.
@@ -79,11 +83,13 @@ namespace Rano.Auth.Firebase
                 bool signedIn = (_user != _auth.CurrentUser) && (_auth.CurrentUser != null);
                 if (!signedIn && _user != null)
                 {
+                    OnSignOut?.Invoke();
                     Log.Important(Constants.SIGNED_OUT);
                 }
                 _user = _auth.CurrentUser;
                 if (signedIn)
                 {
+                    OnSignIn?.Invoke();
                     Log.Important($"{Constants.SIGNED_IN} (Id:{_user!.UserId})");
                 }
             }

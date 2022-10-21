@@ -80,7 +80,6 @@ namespace Rano.Update
             Log.Warning("업데이트 실패 (지원하지 않는 플랫폼입니다)");
             return;
 #endif
-            
             string bundleId = Application.identifier;
             string storeUrl = store.GetStoreUrl(bundleId);
             Application.OpenURL(storeUrl);

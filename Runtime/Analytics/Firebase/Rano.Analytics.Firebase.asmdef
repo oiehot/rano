@@ -1,17 +1,17 @@
 {
-    "name": "Rano.RemoteConfig.Firebase",
+    "name": "Rano.Analytics.Firebase",
     "rootNamespace": "",
     "references": [
         "Rano",
-        "Rano.RemoteConfig"
+        "Rano.Analytics",
+        "Rano.Auth"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "Firebase.RemoteConfig.dll",
-        "Unity.Tasks.dll"
+        "Firebase.Analytics.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

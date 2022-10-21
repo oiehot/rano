@@ -104,7 +104,7 @@ namespace Rano.Leaderboard
             dict[GetTimestampKeyName(leaderboardName)] = DateTime.UtcNow;
             
             // 문서 업데이트
-            bool result = await _db!.SetDocumentMergeAsync(LEADERBOARDS_COLLECTION_NAME, _auth!.UserId!, dict);
+            bool result = await _db!.SetDocumentMergeAsync(LEADERBOARDS_COLLECTION_NAME, _auth!.UserID!, dict);
             
             return result;
         }

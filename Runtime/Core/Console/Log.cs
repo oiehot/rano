@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace Rano
@@ -184,54 +185,46 @@ namespace Rano
             }
         }
         
-        // TODO: 유니티 에디터 혹은 개발 빌드에서만 filePath, line, member 매개변수가 있도록 수정할것. (성능 향상) 
+        [Conditional("ENABLE_LOG"), Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
         public static void Info(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            #if (ENABLE_LOG || UNITY_EDITOR || DEVELOPMENT_BUILD)
-                Print(ELogType.Info, text, caller, filePath, line, member);
-            #endif
+            Print(ELogType.Info, text, caller, filePath, line, member);
         }
         
+        [Conditional("ENABLE_LOG"), Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
         public static void Warning(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            #if (ENABLE_LOG || UNITY_EDITOR || DEVELOPMENT_BUILD)
-                Print(ELogType.Warning, text, caller, filePath, line, member);
-            #endif
+            Print(ELogType.Warning, text, caller, filePath, line, member);
         }
         
+        [Conditional("ENABLE_LOG"), Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
         public static void Error(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        {
-            #if (ENABLE_LOG || UNITY_EDITOR || DEVELOPMENT_BUILD)        
-                Print(ELogType.Error, text, caller, filePath, line, member);
-            #endif
+        {        
+            Print(ELogType.Error, text, caller, filePath, line, member);
         }
         
+        [Conditional("ENABLE_LOG"), Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
         public static void Sys(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        {
-            #if (ENABLE_LOG || UNITY_EDITOR || DEVELOPMENT_BUILD)  
-                Print(ELogType.System, text, caller, filePath, line, member);
-            #endif
+        {  
+            Print(ELogType.System, text, caller, filePath, line, member);
         }
 
+        [Conditional("ENABLE_LOG"), Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
         public static void Important(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
         {
-            #if (ENABLE_LOG || UNITY_EDITOR || DEVELOPMENT_BUILD)
-                Print(ELogType.Important, text, caller, filePath, line, member);
-            #endif
+            Print(ELogType.Important, text, caller, filePath, line, member);
         }
 
+        [Conditional("ENABLE_LOG"), Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
         public static void Todo(string text, bool caller=true, [CallerFilePath] string filePath = "", [CallerLineNumber] int line = 0, [CallerMemberName] string member = "")
-        {
-            #if (ENABLE_LOG || UNITY_EDITOR || DEVELOPMENT_BUILD)  
-                Print(ELogType.Todo, text, caller, filePath, line, member);
-            #endif
+        {  
+            Print(ELogType.Todo, text, caller, filePath, line, member);
         }
 
+        [Conditional("ENABLE_LOG"), Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
         public static void Exception(Exception e)
-        {
-            #if (ENABLE_LOG || UNITY_EDITOR || DEVELOPMENT_BUILD)  
-                UnityEngine.Debug.LogException(e);
-            #endif
+        {  
+            UnityEngine.Debug.LogException(e);
         }
     }
 }

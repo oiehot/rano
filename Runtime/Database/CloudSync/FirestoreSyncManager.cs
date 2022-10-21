@@ -99,7 +99,7 @@ namespace Rano.Database.CloudSync
             Log.Info($"로컬 데이터베이스 마지막 수정 날짜: {localDateTime.ToLocalTime()} (LocalTime)");
             
             // 클라우드 저장 날짜를 얻는다.
-            DateTime? cloudDateTime = await _cloud!.GetLastModifiedDateTimeAsync(_auth.UserId);
+            DateTime? cloudDateTime = await _cloud!.GetLastModifiedDateTimeAsync(_auth.UserID);
             if (cloudDateTime == null) cloudDateTime = DateTime.MinValue;
             Log.Info($"클라우드 데이터베이스 마지막 수정 날짜: {cloudDateTime.Value} (UTC)");
             Log.Info($"클라우드 데이터베이스 마지막 수정 날짜: {cloudDateTime.Value.ToLocalTime()} (LocalTime)");
@@ -154,7 +154,7 @@ namespace Rano.Database.CloudSync
         public async Task<bool> SyncLocalToCloudAsync()
         {
             if (_local == null || _cloud == null || _auth == null) return false;
-            if (_auth.UserId == null) return false;
+            if (_auth.UserID == null) return false;
             
             Log.Info($"로컬 데이터를 클라우드로 올립니다");
             
@@ -200,7 +200,7 @@ namespace Rano.Database.CloudSync
 
             // 클라우드에 데이터를 넣는다.
             bool setResult = await _cloud.SetDocumentOverwriteAsync(
-                Constants.USERS_COLLECTION_NAME, _auth.UserId, uploadDict);
+                Constants.USERS_COLLECTION_NAME, _auth.UserID, uploadDict);
             if (setResult == false) return false;
             
             return true;
@@ -212,8 +212,8 @@ namespace Rano.Database.CloudSync
         private async Task<bool> SyncCloudToLocalAsync()
         {
             if (_local == null || _cloud == null || _auth == null) return false;
-            if (_auth.UserId == null) return false;
-            string userId = _auth.UserId;
+            if (_auth.UserID == null) return false;
+            string userId = _auth.UserID;
             
             Log.Info($"클라우드 데이터를 로컬로 가져옵니다");
             
