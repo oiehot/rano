@@ -48,7 +48,7 @@ namespace Rano.UGS
             }
             catch (Exception e)
             {
-                Log.Warning($"UGS 초기화 중 예외 발생");
+                Log.Warning($"UGS 초기화 실패 (예외 발생)");
                 Log.Exception(e);
                 return;
             }

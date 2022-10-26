@@ -51,7 +51,7 @@ namespace Rano.Ad.Admob
             }
         }
 
-        protected override void LoadAdClient()
+        protected override void LoadAdInternal()
         {
             // RewardedAd는 일회용 객체다.
             // 보상형 광고가 표시된 후에는 이 객체를 사용해 다른 광고를 로드할 수 없다.
@@ -68,7 +68,7 @@ namespace Rano.Ad.Admob
             _ad.LoadAd(request);
         }
 
-        protected override void UnloadAdClient()
+        protected override void UnloadAdInternal()
         {
             if (_ad == null)
             {
@@ -77,7 +77,7 @@ namespace Rano.Ad.Admob
             }
         }
 
-        protected override void ShowClientAd()
+        protected override void ShowAdInternal()
         {
             _ad.Show();
         }

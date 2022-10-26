@@ -6,7 +6,7 @@ namespace Rano.Ad.Admob
     {
         private InterstitialAd _ad;
         
-        protected override void LoadAdClient()
+        protected override void LoadAdInternal()
         {
             _ad = new InterstitialAd(AdUnitId);
             _ad.OnAdLoaded += HandleAdLoaded;
@@ -19,7 +19,7 @@ namespace Rano.Ad.Admob
             _ad.LoadAd(request);
         }
 
-        protected override void UnloadAdClient()
+        protected override void UnloadAdInternal()
         {
             if (_ad == null)
             {
@@ -28,7 +28,7 @@ namespace Rano.Ad.Admob
             }
         }
 
-        protected override void ShowClientAd()
+        protected override void ShowAdInternal()
         {
             _ad.Show();
         }

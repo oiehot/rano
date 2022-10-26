@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -16,21 +17,31 @@ namespace Rano.Ad
         private readonly object _lockObject = new object();
         private CanvasSorter _canvasSorter;
         
-        private AdState _adState;
-        private int _adLoadCount;
+        private EAdState _state;
+        private int _loadCount;
         private bool _adLoadedFlag;
         private bool _adOpeningFlag;
         private bool _adClosedFlag;
         private bool _adFailedToLoadFlag;
         private bool _adFailedToShowFlag;
 
-        [Header("Ad Settings")]
         [SerializeField] private AdSO _adInfo;
 
+        /// <summary>
+        /// OnEnable시 광고를 자동으로 로드하기
+        /// </summary>
+        [SerializeField] private bool _autoLoadOnEnable = true; //
         
-        [Header("Settings")]
-        [FormerlySerializedAs("_autoLoadOnAwake")] [SerializeField] private bool _autoLoadOnEnable = true;
-        [SerializeField] private bool _autoReload = true;
+        /// <summary>
+        /// 플레이 타임 중간 중간에 광고 로드를 시도한다.
+        /// </summary>
+        /// <remarks>OnEnable시에 플래그가 켜져 있으면 시작되고 OnDisable시에 꺼진다.</remarks>
+        [SerializeField] private bool _autoLoadOnUpdate = true;
+        
+        /// <summary>
+        /// 광고가 닫히면 곧바로 새로 로드하기.
+        /// </summary>
+        [FormerlySerializedAs("_autoReload")] [SerializeField] private bool _autoReloadOnAdClosed = true;
 
         protected object LockObject => _lockObject;
         public Action OnAdLoading { get; set; }
@@ -39,11 +50,21 @@ namespace Rano.Ad
         public Action OnAdClosed { get; set; }
         public Action OnAdFailedToLoad { get; set; }
         public Action OnAdFailedToShow { get; set; }
+        public Action<EAdState> OnStateChanged { get; set; }
         public string AdName => _adInfo.adName;
         public string AdUnitId => _adInfo.UnitId;
-        public AdState State => _adState;
-        public bool IsAvailable => _adState == AdState.Available;
-        public bool IsLoading => _adState == AdState.Loading;
+        public EAdState State
+        {
+            get => _state;
+            private set
+            {
+                _state = value;
+                OnStateChanged?.Invoke(_state);
+            }
+        }
+
+        public bool IsLoading => State == EAdState.Loading;
+        public bool IsLoaded => State == EAdState.Loaded;
 
         protected virtual void Awake()
         {
@@ -52,19 +73,39 @@ namespace Rano.Ad
 
         protected virtual void OnEnable()
         {
-            if (_autoLoadOnEnable == true)
+            if (_autoLoadOnEnable)
             {
-                Log.Info($"{AdName} - AutoLoadOnEnable 플래그가 켜져있어 자동으로 광고를 로드합니다.");
+                Log.Info($"{AdName} - AutoLoadOnEnable 플래그가 켜져 있습니다. 광고를 로드합니다.");
                 LoadAd();
             }
+
+            if (_autoLoadOnUpdate)
+            {
+                Log.Info($"{AdName} - AutoLoadOnUpdate 플래그가 켜져 있습니다. 주기적으로 광고상태를 체크하고 로드를 시도합니다");
+            }
+            StartCoroutine(nameof(UpdateCoroutine));
         }
 
         protected virtual void OnDisable()
         {
             UnloadAd();
+            StopCoroutine(nameof(UpdateCoroutine));
+        }
+        
+        private IEnumerator UpdateCoroutine()
+        {
+            while (true)
+            {
+                if (_autoLoadOnUpdate && State != EAdState.Loading && State != EAdState.Loaded)
+                {
+                    Log.Info($"{AdName} - 광고가 로드되어 있지 않아 로드를 시도합니다 (AutoLoadOnUpdate 플래그에 의한 작동)");
+                    LoadAd();
+                }
+                yield return CoroutineYieldCache.WaitForSeconds(10.0f);
+            }
         }
 
-        /// <<summary>
+        /// <summary>
         /// Admob스레드에서 호출된 콜백에서 켜진 플래그를 체크하여 매칭되는 함수를 메인스레드에서 실행한다.
         /// </summary>
         protected virtual void Update()
@@ -72,7 +113,7 @@ namespace Rano.Ad
             if (_adLoadedFlag)
             {
                 _adLoadedFlag = false;
-                _adState = AdState.Available;
+                State = EAdState.Loaded;
                 Log.Info($"{AdName} - 광고 로드 완료");
                 OnAdLoaded?.Invoke();
             }
@@ -80,7 +121,7 @@ namespace Rano.Ad
             if (_adOpeningFlag)
             {
                 _adOpeningFlag = false;
-                _adState = AdState.Opening;
+                State = EAdState.Opening;
                 // 전면보상광고 캔버스의 기본 SortingOrder 값은 0이다.
                 // 게임에서 사용하는 캔버스의 기본 SortingOrder 값도 0이므로
                 // 두 캔버스의 렌더링 우선순위가 애매해져서 광고 위에 게임UI가 그려질 수 있다.
@@ -94,13 +135,13 @@ namespace Rano.Ad
             if (_adClosedFlag)
             {
                 _adClosedFlag = false;
-                _adState = AdState.Closed;
+                State = EAdState.Closed;
                 Log.Info($"{AdName} - 광고 닫힘");
                 // 수정했던 모든 캔버스SortingOrder를 원래 위치로 돌려놓는다.
                 _canvasSorter.RestoreSortingOrder();
                 OnAdClosed?.Invoke();
                 UnloadAd();
-                if (_autoReload == true)
+                if (_autoReloadOnAdClosed)
                 {
                     Log.Info($"{AdName} - AutoReload 플래그가 켜져있어 광고가 닫힘과 동시에 새 광고를 로드합니다.");
                     LoadAd();
@@ -110,7 +151,7 @@ namespace Rano.Ad
             if (_adFailedToLoadFlag)
             {
                 _adFailedToLoadFlag = false;
-                _adState = AdState.NotLoaded;
+                State = EAdState.LoadFailed;
                 Log.Warning($"{AdName} - 광고 로드 실패");
                 OnAdFailedToLoad?.Invoke();
             }
@@ -118,6 +159,7 @@ namespace Rano.Ad
             if (_adFailedToShowFlag)
             {
                 _adFailedToShowFlag = false;
+                State = EAdState.ShowFailed;
                 Log.Warning($"{AdName} - 광고 출력 실패");
                 OnAdFailedToShow?.Invoke();
             }
@@ -129,7 +171,7 @@ namespace Rano.Ad
         {
             lock (_lockObject)
             {
-                _adLoadCount++;
+                _loadCount++;
                 _adLoadedFlag = true;
             }
         }
@@ -167,15 +209,15 @@ namespace Rano.Ad
         {
             _adClosedFlag = true;
         }
-        
+
         public void LoadAd()
         {
             switch (State)
             {
-                case AdState.Loading:
+                case EAdState.Loading:
                     Log.Info($"{AdName} - 광고가 로딩중이므로 새로 로드하지 않습니다.");
                     return;
-                case AdState.Available:
+                case EAdState.Loaded:
                     Log.Info($"{AdName} - 광고가 이미 로드되어 있어서 새로 로드하지 않습니다.");
                     return;
             }
@@ -185,9 +227,9 @@ namespace Rano.Ad
 #else
             Log.Info($"{AdName} -  광고 로드 시작");
 #endif
-            _adState = AdState.Loading;
+            State = EAdState.Loading;
             OnAdLoading?.Invoke();
-            LoadAdClient();
+            LoadAdInternal();
         }
 
         /// <summary>
@@ -196,9 +238,9 @@ namespace Rano.Ad
         public void ShowAd()
         {
             Log.Info($"{AdName} - 광고 출력.");
-            if (IsAvailable)
+            if (IsLoaded)
             {
-                ShowClientAd();
+                ShowAdInternal();
             }
             else
             {
@@ -210,12 +252,12 @@ namespace Rano.Ad
         private void UnloadAd()
         {
             Log.Info($"{AdName} - 광고 언로딩");
-            UnloadAdClient();
-            _adState = AdState.NotLoaded;
+            UnloadAdInternal();
+            State = EAdState.NotLoaded;
         }
         
-        protected abstract void LoadAdClient();
-        protected abstract void UnloadAdClient();
-        protected abstract void ShowClientAd();
+        protected abstract void LoadAdInternal();
+        protected abstract void UnloadAdInternal();
+        protected abstract void ShowAdInternal();
     }
 }

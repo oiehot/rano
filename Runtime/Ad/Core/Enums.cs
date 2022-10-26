@@ -1,14 +1,15 @@
-﻿namespace Rano.Ad
+﻿#nullable enable
+
+namespace Rano.Ad
 {
-    public enum AdVendor
+    public enum EAdVendor
     {
         None,
         Admob
     }
 
-    public enum AdType
+    public enum EAdType
     {
-        None,
         AppOpen,
         Banner,
         Interstitial,
@@ -19,14 +20,14 @@
         NativeAdvancedMovie
     }
     
-    public enum AdState
+    public enum EAdState
     {
-        None,
         NotLoaded,
         Loading,
-        Available,
+        Loaded,
         Opening,
         Closed,
-        Unknown
+        LoadFailed,
+        ShowFailed
     }
 }
