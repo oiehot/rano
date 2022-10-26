@@ -75,13 +75,13 @@ namespace Rano.Ad
         {
             if (_autoLoadOnEnable)
             {
-                Log.Info($"{AdName} - AutoLoadOnEnable 플래그가 켜져 있습니다. 광고를 로드합니다.");
+                Log.Info($"{AdName} - AutoLoadOnEnable 켜짐");
                 LoadAd();
             }
-
+            
             if (_autoLoadOnUpdate)
             {
-                Log.Info($"{AdName} - AutoLoadOnUpdate 플래그가 켜져 있습니다. 주기적으로 광고상태를 체크하고 로드를 시도합니다");
+                Log.Info($"{AdName} - AutoLoadOnUpdate 켜짐");
             }
             StartCoroutine(nameof(UpdateCoroutine));
         }

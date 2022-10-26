@@ -22,6 +22,18 @@ namespace Rano.RemoteConfig.Firebase
     {
         private FirebaseRemoteConfig? _remoteConfig;
         public bool IsInitialized => _remoteConfig != null;
+        
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            if (IsInitialized) StartAutoFetchAsync();
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            StopAutoFetch();
+        }
 
         /// <summary>
         /// 초기화
