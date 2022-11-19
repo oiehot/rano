@@ -4,7 +4,9 @@
     "references": [
         "Rano",
         "Rano.SaveSystem",
-        "DOTween.Modules"
+        "DOTween.Modules",
+        "Unity.Addressables",
+        "Unity.ResourceManager"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

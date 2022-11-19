@@ -1,5 +1,3 @@
-#if false
-
 using UnityEngine;
 
 namespace Rano.Pattern
@@ -110,5 +108,3 @@ namespace Rano.Pattern
         }
     }
 }
-
-#endif

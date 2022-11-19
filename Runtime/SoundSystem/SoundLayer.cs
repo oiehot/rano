@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using DG.Tweening;
 using Rano.SaveSystem;
@@ -34,9 +35,12 @@ namespace Rano.SoundSystem
             get => _targetVolume;
             set => _targetVolume = value;
         }
-        
+
+        private bool _latestPlayState = false;
         public bool IsPlaying => _audioSource.isPlaying;
         public bool IsMute => _isMute;
+        
+        public Action OnPlayFinished { get; set; }
         
         void Awake()
         {
@@ -51,18 +55,44 @@ namespace Rano.SoundSystem
             _audioSource.loop = false;
         }
 
+        void OnEnable()
+        {
+            StartCoroutine(nameof(UpdateCoroutine));
+        }
+
+        void OnDisable()
+        {
+            StopCoroutine(nameof(UpdateCoroutine));
+        }
+
+        private IEnumerator UpdateCoroutine()
+        {
+            while (true)
+            {
+                if (_latestPlayState == true && IsPlaying == false)
+                {
+                    OnPlayFinished?.Invoke();
+                    _latestPlayState = false;
+                }
+                yield return null;
+            }
+        }
+
         public void Play(AudioClip audioClip, bool loop=false)
         {
             if (audioClip == null) return;
             _audioSource.clip = audioClip;
             _audioSource.loop = loop;
             _audioSource.Play();
+
+            _latestPlayState = true; // TODO: 여기 들어가는게 맞는가?
         }
 
         public void PlayOneShot(AudioClip audioClip, float volume = 1.0f)
         {
             if (!audioClip) return;
             _audioSource.PlayOneShot(audioClip, volume);
+            _latestPlayState = true; // TODO: 여기 들어가는게 맞는가?
         }
 
         public void Stop(float fadeDuration=0.25f)
@@ -72,6 +102,7 @@ namespace Rano.SoundSystem
                 .OnComplete(() =>
                 {
                     _audioSource.Stop();
+                    _latestPlayState = false; // TODO: 여기 들어가는게 맞는가?
                 });
         }
 
@@ -83,6 +114,7 @@ namespace Rano.SoundSystem
                 .OnComplete(() =>
                 {
                     _audioSource.Pause();
+                    _latestPlayState = false; // TODO: 여기 들어가는게 맞는가?
                 });
         }
 
@@ -90,6 +122,7 @@ namespace Rano.SoundSystem
         {
             Log.Info($"Resume SoundLayer ({Name})");
             _audioSource.UnPause();
+            _latestPlayState = true; // TODO: 여기 들어가는게 맞는가?
             _audioSource.DOFade(_targetVolume, fadeDuration);
         }
 

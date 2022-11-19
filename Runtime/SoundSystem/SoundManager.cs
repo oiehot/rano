@@ -32,7 +32,7 @@ namespace Rano.SoundSystem
         public Dictionary<String, SoundLayerData> soundLayers;
     }
 
-    public sealed class SoundManager : ManagerComponent, ISaveLoadable
+    public sealed partial class SoundManager : ManagerComponent, ISaveLoadable
     {
         private const float DEFAULT_MASTER_VOLUME = 1.0f;
         private SoundLayer[] _soundLayers;
