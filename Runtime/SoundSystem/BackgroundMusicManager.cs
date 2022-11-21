@@ -14,35 +14,34 @@ using System.Linq;
 namespace Rano.SoundSystem
 {
     public sealed class PlayItem
-    {
-        public AudioClip? audioClip;
-        public bool isPlayed;
+    {   
+        public AudioClip? AudioClip { get; set; }
+        public bool IsPlayed { get; set; }
 
         public PlayItem(AudioClip audioClip)
         {
-            this.audioClip = audioClip;
-            this.isPlayed = false;
+            this.AudioClip = audioClip;
+            this.IsPlayed = false;
         }
     }
     
     public sealed class BackgroundMusicManager : MonoSingleton<BackgroundMusicManager>
-    {
+    {   
         private int _playIntervalMilliseconds = 5000;
         private SoundManager _soundManager;
         private SoundLayer _soundLayer;
         
         private PlayItem[] _playItems = Array.Empty<PlayItem>();
-        private PlayItem[] _unplayedItems => _playItems.Where(item => item.isPlayed == false).ToArray();
+        private PlayItem[] _unplayedItems => _playItems.Where(item => item.IsPlayed == false).ToArray();
         
         private int _currentIndex;
-
-        private bool _shuffleMode = false;
-        private bool repeatMode = true;
+        private bool _isShuffleMode = true;
+        private bool _isRepeatMode = true;
         
         public int MusicCount => _playItems.Length;
-        public bool IsShuffleMode => _shuffleMode;
-        public bool IsRepeatMode => repeatMode;
-
+        public bool IsLoaded => _playItems.Length > 0;
+        public bool IsShuffleMode => _isShuffleMode;
+        public bool IsRepeatMode => _isRepeatMode;
         public bool IsPlaying => _soundLayer.IsPlaying;
         public bool IsAllMusicPlayed
         {
@@ -50,7 +49,7 @@ namespace Rano.SoundSystem
             {
                 for (int i = 0; i < _playItems.Length; i++)
                 {
-                    if (_playItems[i].isPlayed == false) return false;
+                    if (_playItems[i].IsPlayed == false) return false;
                 }
                 return true;
             }
@@ -84,11 +83,39 @@ namespace Rano.SoundSystem
             }
         }
 
+        private int GetRandomIndex_InPlayList()
+        {
+            return RandomUtils.GetRandomInt(0, _playItems.Length);
+        }
+
+        /// <summary>
+        /// 플레이 되지 않은 곡 중 하나의 인덱스를 리턴한다.
+        /// </summary>
+        private (bool result, int index) GetRandomIndex_InUnplayedList()
+        {
+            List<int> unplayedItemIndexes = new List<int>();
+            
+            for (int i=0; i<_playItems.Length; i++)
+            {
+                if (_playItems[i].IsPlayed == false)
+                {
+                    unplayedItemIndexes.Add(i);
+                }
+            }
+
+            if (unplayedItemIndexes.Count <= 0) return (false, 0);
+            
+            int randomIndex = RandomUtils.GetRandomInt(0, unplayedItemIndexes.Count);
+            int itemIndex = unplayedItemIndexes[randomIndex];
+
+            return (true, itemIndex);
+        }
+        
         public async Task LoadAsync(PlaylistSO playList)
         {
             Log.Info($"플레이 리스트 로딩 시작 ({playList})");
-            // TODO: IsLoaded() => Unload()
-            Unload();
+            
+            if (IsLoaded) Unload();
             
             _playItems = new PlayItem[playList.tracks.Length];
             
@@ -119,14 +146,15 @@ namespace Rano.SoundSystem
             
             for (int i=0; i<_playItems.Length; i++)
             {
-                AudioClip? audioClip = _playItems[i].audioClip;
+                AudioClip? audioClip = _playItems[i].AudioClip;
                 if (audioClip == null) continue;
                 
                 Addressables.Release<AudioClip>(audioClip);
                 
-                _playItems[i].audioClip = null;
-                _playItems[i].isPlayed = false;
+                _playItems[i].AudioClip = null;
+                _playItems[i].IsPlayed = false;
             }
+            
             _playItems = Array.Empty<PlayItem>();
             
             Log.Info($"언로딩 완료");
@@ -136,54 +164,35 @@ namespace Rano.SoundSystem
         {
             foreach (PlayItem musicItem in _playItems)
             {
-                musicItem.isPlayed = false;
+                musicItem.IsPlayed = false;
             }
         }
 
         [ContextMenu("Play")]
-        public void Play()
+        public async void Play()
         {
-            if (_playItems.Length <= 0)
+            if (MusicCount <= 0)
             {
                 Log.Info("플레이 할 음악이 없음");
                 return;
             }
             
+            // 이전에 있는 플레이를 먼저 중지한다. (페이드에 시간이 걸림)
+            await StopAsync();
+
+            // 플레이 상태 체크를 리셋한다.
             ResetPlayState();
             
-            int index = _shuffleMode ? RandomUtils.GetRandomInt(0,_playItems.Length) : 0;
-            PlayByIndex(index);
-        }
-
-        private bool PlayByIndex(int index)
-        {
-            if (index < 0 || index >= _playItems.Length) return false;
-            
-            PlayItem playItem = _playItems[index];
-            AudioClip? audioClip = playItem.audioClip;
-            if (audioClip == null)
-            {
-                Log.Warning($"음악 플레이 실패 (오디오 클립이 없음, index: {index})");
-                return false;
-            }
-            
-            Log.Info($"음악 플레이 시작 (index: {index})");
-            _soundLayer.PlayOneShot(audioClip);
-            playItem.isPlayed = true;
-            
-            _currentIndex = index;
-            return true;
+            // 음악 플레이
+            PlayByIndex(IsShuffleMode ? GetRandomIndex_InPlayList() : 0);
         }
 
         [ContextMenu("Play Next")]
-        public void PlayNext()
+        public async void PlayNext()
         {
             int index = 0;
-
-            if (IsPlaying)
-            {
-                _soundLayer.Stop();
-            }
+            
+            await StopAsync();
 
             if (IsShuffleMode)
             {
@@ -193,6 +202,7 @@ namespace Rano.SoundSystem
                     {
                         Log.Info("반복 모드가 켜져 있어 처음부터 다시 재생합니다");
                         ResetPlayState();
+                        index = GetRandomIndex_InPlayList();
                     }
                     else
                     {
@@ -200,57 +210,81 @@ namespace Rano.SoundSystem
                         return;
                     }
                 }
-                // TODO: 인덱스 일치 필요
-                // TODO: 인덱스 일치 필요
-                // TODO: 인덱스 일치 필요
-                index = RandomUtils.GetRandomInt(0, _unplayedItems.Length);
+                else
+                {
+                    (bool result, int index) resultTuple = GetRandomIndex_InUnplayedList();
+                    Debug.Assert(resultTuple.result == true);
+                    if (resultTuple.result == true)
+                    {
+                        index = resultTuple.index;
+                    }
+                }
             }
             else
             {
-                if (IsRepeatMode)
+                int nextIndex = _currentIndex + 1;
+                if (nextIndex >= MusicCount)
                 {
-                    int nextIndex = _currentIndex + 1;
-                    if (nextIndex >= MusicCount) nextIndex = 0;
-                    index = nextIndex;
+                    if (IsRepeatMode)
+                    {
+                        nextIndex = 0;
+                    }
+                    else
+                    {
+                        Log.Info("모든 곡이 플레이되었습니다");
+                        index = 0;
+                        return;
+                    }
                 }
-                else
-                {
-                    Log.Info("모든 곡이 플레이되었습니다");
-                    return;
-                }
+                index = nextIndex;
             }
             
-            Log.Info("다음 곡으로 넘어갑니다");
             PlayByIndex(index);
         }
 
-        private async void OnPlayFinished()
+        private bool PlayByIndex(int index)
         {
-            Log.Info("음악 한 곡이 종료됨");
+            if (index < 0 || index >= _playItems.Length) return false;
+            Debug.Assert(_soundLayer.IsPlaying == false);
             
-            await Task.Delay(_playIntervalMilliseconds); // 잠시 무음 상태
+            PlayItem playItem = _playItems[index];
+            AudioClip? audioClip = playItem.AudioClip;
             
-            Log.Info("다음 곡으로 넘어갑니다");
+            if (audioClip == null)
+            {
+                Log.Warning($"음악 플레이 실패 (오디오 클립이 없음, index: {index})");
+                return false;
+            }
             
-            PlayNext();
+            Log.Info($"음악 플레이 시작 (index: {index})");
+            _soundLayer.PlayOneShot(audioClip);
+            
+            playItem.IsPlayed = true;
+            _currentIndex = index;
+            return true;
         }
 
-        [ContextMenu("Pause")]
         public void Pause()
         {
             _soundLayer.Pause();
         }
 
-        [ContextMenu("Resume")]
         public void Resume()
         {
             _soundLayer.Resume();
         }
 
         [ContextMenu("Stop")]
-        public void Stop()
+        public async Task StopAsync()
         {
-            _soundLayer.Stop();
+            await _soundLayer.StopAsync();
+        }
+
+        private async void OnPlayFinished()
+        {
+            Log.Info("음악 한 곡이 종료됨");
+            await Task.Delay(_playIntervalMilliseconds); // 잠시 무음 상태
+            PlayNext();
         }
     }
 }

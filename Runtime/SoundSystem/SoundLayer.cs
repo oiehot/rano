@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using System.Collections;
 using UnityEngine;
 using DG.Tweening;
@@ -84,8 +85,7 @@ namespace Rano.SoundSystem
             _audioSource.clip = audioClip;
             _audioSource.loop = loop;
             _audioSource.Play();
-
-            _latestPlayState = true; // TODO: 여기 들어가는게 맞는가?
+            _latestPlayState = true;
         }
 
         public void PlayOneShot(AudioClip audioClip, float volume = 1.0f)
@@ -95,16 +95,41 @@ namespace Rano.SoundSystem
             _latestPlayState = true; // TODO: 여기 들어가는게 맞는가?
         }
 
-        public void Stop(float fadeDuration=0.25f)
+        // public void Stop(float fadeDuration=0.25f)
+        // {
+        //     float previousVolume = _audioSource.volume;
+        //     Log.Info($"Stop SoundLayer ({Name})");
+        //     _audioSource.DOFade(0f, fadeDuration)
+        //         .OnComplete(() =>
+        //         {
+        //             _audioSource.Stop();
+        //             _audioSource.volume = previousVolume; // 볼륨 복구
+        //             _latestPlayState = false; // TODO: 여기 들어가는게 맞는가?
+        //         });
+        // }
+        
+        public async Task StopAsync(float fadeDuration=0.25f)
         {
+            if (_audioSource.isPlaying == false)
+            {
+                return;
+            }
+                
             Log.Info($"Stop SoundLayer ({Name})");
-            _audioSource.DOFade(0f, fadeDuration)
-                .OnComplete(() =>
-                {
-                    _audioSource.Stop();
-                    _latestPlayState = false; // TODO: 여기 들어가는게 맞는가?
-                });
-        }
+            
+            float previousVolume = _audioSource.volume;
+
+            // 볼륨이 0이 될 때까지 대기
+            await _audioSource.DOFade(0f, fadeDuration).AsyncWaitForCompletion();
+
+            // 볼륨이 0이 되면 플레이를 종료한다.
+            _audioSource.Stop();
+            
+            // 0으로 된 볼륨을 복구한다.
+            _audioSource.volume = previousVolume;
+            
+            _latestPlayState = false;
+        }        
 
         public void Pause(float fadeDuration=0.25f)
         {

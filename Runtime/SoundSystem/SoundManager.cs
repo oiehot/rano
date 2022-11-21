@@ -119,7 +119,7 @@ namespace Rano.SoundSystem
 
         public void Stop(ESoundLayerType soundLayerType)
         {
-            GetSoundLayer(soundLayerType)?.Stop();
+            GetSoundLayer(soundLayerType)?.StopAsync();
         }
         
         #region Method for All SoundLayers
@@ -128,7 +128,7 @@ namespace Rano.SoundSystem
         {
             foreach(SoundLayer soundLayer in _soundLayers)
             {
-                soundLayer.Stop();
+                _ = soundLayer.StopAsync();
             }
         }
 
