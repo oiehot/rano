@@ -1,6 +1,5 @@
-﻿#if false
-
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEditor;
 
 namespace Rano.Editor
 {
@@ -9,7 +8,7 @@ namespace Rano.Editor
     // ref: https://forum.unity.com/threads/psb-asset-inspector-window-is-breaking.1334079/
     public static class FixPSDImporter
     {
-        [UnityEditor.InitializeOnLoadMethod]
+        [MenuItem("Tools/Reset PSDImporter FoldOut", false)]
         public static void ResetPSDImporterFoldout()
         {
             Debug.Log("ResetPSDImporterFoldout: Start"); 
@@ -18,5 +17,3 @@ namespace Rano.Editor
         }
     }
 }
-
-#endif
