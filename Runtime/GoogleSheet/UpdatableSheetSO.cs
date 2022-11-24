@@ -20,11 +20,18 @@ namespace Rano.GoogleSheet
 
         public int Length => _items.Length;
         public T GetByIndex(int index) => _items[index];
-        
+
         /// <summary>
         /// 주어진 index가 1이라면 0 인덱스 항목을 리턴한다.
         /// </summary>
-        public T GetByOneStartIndex(int index) => _items[index - 1];
+        public T GetByOneStartIndex(int index)
+        {
+            if (index <= 0 || index > _items.Length)
+            {
+                throw new Exception($"인덱스 에러 ({index}/{_items.Length})");
+            }
+            return _items[index - 1];
+        }
 
 #if UNITY_EDITOR
         protected abstract string Name { get; }
