@@ -9,6 +9,7 @@ namespace Rano.Database
     {
         public bool IsInitialized { get; }
         public DateTime LastModifiedDateTime { get; set; }
+        public void Initialize();
         public bool Load();
         public bool LoadFromArchive(byte[] bytes);
         public bool Save();
@@ -22,9 +23,5 @@ namespace Rano.Database
         public Dictionary<string, object>? GetDictionary(string key); // TODO: 옵셔널 처리, 구현체들
         public void SetDictionary(string key, Dictionary<string, object> value);        
         public bool HasKey(string key);
-        
-#if UNITY_EDITOR || DEVELOPMENT_BUILD        
-        public bool UseResetOnStart { get; set; }
-#endif        
     }
 }

@@ -40,59 +40,31 @@ namespace Rano.Database
             set => _lastModifiedDateTime = value;
         }
 
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-        private readonly PrefsBool _resetOnStartPref = new PrefsBool($"{nameof(LocalDatabase)}.ResetOnStart");
-        public bool UseResetOnStart
-        {
-            get
-            {
-                return _resetOnStartPref.Value;
-            }
-            set
-            {
-                string status = value ? "Enable" : "Disable";
-                Log.Info($"{status} {nameof(UseResetOnStart)}");
-                _resetOnStartPref.Value = value;
-            }
-        }
-#endif
-
         public LocalDatabase()
         {
             _state = EState.None;
             _dict = new Dictionary<string, object>();
             _savePath = $"{Application.persistentDataPath}/save";
-            Initialize();
         }
         
-        private void Initialize()
+        public void Initialize()
         {
-            Log.Sys($"{typeof(LocalDatabase).ToString()}: Initializing...", caller: false);
-            Log.Info($"  SavePath: {_savePath}");
+            if (_state != EState.None)
+            {
+                Log.Warning($"이미 초기화되어 있습니다");
+                return;
+            }
+            
+            Log.Sys($"{typeof(LocalDatabase).ToString()}: 초기화 중...", caller: false);
+            Log.Info($"  저장 경로: {_savePath}");
             
             _state = EState.Initializing;
             _dict.Clear();
             
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            bool useLoad = true;
-            
-            if (UseResetOnStart)
-            {
-                Log.Important($"ResetOnStart 플래그가 켜져있어 로드하지 않고 시작합니다.");
-                useLoad = false;
-            }
-            
-            if (useLoad)
-            {
-                // 로드 실패시 기본값 사용.
-                if (Load() == false)
-                {
-                    _dict.Clear();
-                }
-            }
+#if DISABLE_LOCAL_DB_LOAD
+            Log.Important($"로드 생략 (DISABLE_LOCAL_DB_LOAD)");
             _state = EState.Ready;
-#else 
-            // 로드 실패시 기본값 사용.
+#else
             if (Load() == false)
             {
                 _dict.Clear();
@@ -241,11 +213,7 @@ namespace Rano.Database
             Log.Info($"{nameof(LocalDatabase)}");
             Log.Info($"  LastModifiedDate(UTC): {_lastModifiedDateTime}");
             Log.Info($"  LastModifiedDate(Local): {_lastModifiedDateTime.ToLocalTime()}");
-            Log.Info($"  SavePath: {_savePath}");           
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Log.Info($"  ResetOnStart Key: {_resetOnStartPref.Key}");
-            Log.Info($"  {nameof(UseResetOnStart)}: {UseResetOnStart}");
-#endif
+            Log.Info($"  SavePath: {_savePath}");
         }
     }
 }
