@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Rano.EventSystem
 {
