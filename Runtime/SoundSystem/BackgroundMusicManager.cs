@@ -25,7 +25,7 @@ namespace Rano.SoundSystem
         }
     }
     
-    public sealed class BackgroundMusicManager : MonoSingleton<BackgroundMusicManager>
+    public sealed class BackgroundMusicManager : ManagerComponent
     {   
         private int _playIntervalMilliseconds = 5000;
         private SoundManager _soundManager;
