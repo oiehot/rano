@@ -100,7 +100,7 @@ namespace Rano.RemoteConfig.Firebase
             {
                 info = _remoteConfig!.Info;
             }
-            catch (Exception e)
+            catch
             {
                 // ConfigInfo를 얻는 중 예외가 발생하면 한번도 Fetch되지 않은 상황이라고 판단한다.
                 // 이 경우는 Fetch할 수 있다.
@@ -117,7 +117,7 @@ namespace Rano.RemoteConfig.Firebase
             {
                 latestFetchDateTime = info.FetchTime.ToUniversalTime(); // UTC
             }
-            catch (Exception e)
+            catch
             {
                 // 마지막 Fetch시간을 얻는 중 예외가 발생하면 한번도 Fetch되지 않은 상황이라고 판단한다.
                 return true;
@@ -127,7 +127,7 @@ namespace Rano.RemoteConfig.Firebase
             {
                 minimumFetchInterval = new TimeSpan(0, 0, 0, 0, milliseconds: (int)_remoteConfig!.ConfigSettings.MinimumFetchInternalInMilliseconds);
             }
-            catch (Exception e)
+            catch
             {
                 // 최소 Fetch간격을 얻는 중 에외가 발생하면 한번도 Fetch되지 않은 상황이라고 판단한다.
                 return true;
