@@ -76,15 +76,23 @@ namespace Rano.Editor.Build
             // 빌드 아웃풋 경로 설정 (파일 경로)
             _options.locationPathName = GetOutputPath();
 
+            // TODO: GlobalPreferences 또는 AddressableAssetSettings를 통해
+            // TODO: 플레이어 빌드 시 어드레서블을 빌드할 수 설정할 수 있다.
+            // TODO: 따라서 이 옵션은 필요 없어짐. 추후 제거할것.
             // 어드레서블 빌드
-            Log.Important($"Building Addressable Assets...");
-            PreprocessAddressableBuild();
-            UnityEditor.AddressableAssets.Settings.AddressableAssetSettings.BuildPlayerContent(out var addrBuildResult);
-            if (string.IsNullOrEmpty(addrBuildResult.Error) == false)
-            {
-                throw new BuildFailedException($"어드러세블 빌드에 실패했습니다 ({addrBuildResult.Error})");
-            }
-            PostprocessAddressableBuild();
+            // if (BuildManager.IsAdressableBuild)
+            // {
+            //     Log.Important($"Building Addressable Assets...");
+            //     PreprocessAddressableBuild();
+            //     UnityEditor.AddressableAssets.Settings.AddressableAssetSettings.BuildPlayerContent(
+            //         out var addrBuildResult);
+            //     if (string.IsNullOrEmpty(addrBuildResult.Error) == false)
+            //     {
+            //         throw new BuildFailedException($"어드러세블 빌드에 실패했습니다 ({addrBuildResult.Error})");
+            //     }
+            //
+            //     PostprocessAddressableBuild();
+            // }
 
             // 빌드 시작 전 로그
             string buildVersionStr = VersionManager.GetCurrentVersion().ToString();

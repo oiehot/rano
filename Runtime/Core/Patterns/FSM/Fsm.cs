@@ -14,11 +14,11 @@ namespace Rano.Pattern
         private Coroutine _runningCoroutineHandle;
         private Coroutine _stateCoroutineHandle;
 
-        public bool isRunning {get; private set;}
-        public T current {get; private set;}
-        public T next {get; set;} // 이 값을 설정하면 곧 상태가 바뀐다.
+        public bool IsRunning {get; private set;}
+        public T Current {get; private set;}
+        public T Next {get; set;} // 이 값을 설정하면 곧 상태가 바뀐다.
 
-        public bool shouldChange => !EqualityComparer<T>.Default.Equals(current, next);
+        public bool shouldChange => !EqualityComparer<T>.Default.Equals(Current, Next);
 
         public Fsm(MonoBehaviour mono)
         {
@@ -27,7 +27,7 @@ namespace Rano.Pattern
                 throw new ArgumentNullException();
             }
             _mono = mono;
-            isRunning = false;
+            IsRunning = false;
 
             // T의 모든 요소들을 키로 하여 null 값으로 _states 초기화.
             // 추후 _states 에 키로 등록되어있는 것만 RegisterStateCoroutine 가능하다.
@@ -60,7 +60,7 @@ namespace Rano.Pattern
 
         public void Run(T initialState)
         {
-            if (isRunning)
+            if (IsRunning)
             {
                 Log.Warning("Already started.");
                 return;
@@ -71,9 +71,9 @@ namespace Rano.Pattern
                 throw new InvalidStateException();
             }
 
-            isRunning = true;
-            current = initialState;
-            next = current;
+            IsRunning = true;
+            Current = initialState;
+            Next = Current;
 
             StopCoroutine(ref _runningCoroutineHandle);
             _runningCoroutineHandle = _mono.StartCoroutine(RunningCoroutine());
@@ -83,14 +83,14 @@ namespace Rano.Pattern
         {
             StopCoroutine(ref _stateCoroutineHandle);
             StopCoroutine(ref _runningCoroutineHandle);
-            isRunning = false;
+            IsRunning = false;
         }
 
         private IEnumerator RunningCoroutine()
         {
-            while (isRunning)
+            while (IsRunning)
             {
-                var func = _states[current];
+                var func = _states[Current];
 
                 if (!ReferenceEquals(func, null))
                 {
@@ -100,7 +100,7 @@ namespace Rano.Pattern
                 }
 
                 // 다음 상태가 설정될 때까지 대기
-                while (isRunning && current.Equals(next))
+                while (IsRunning && Current.Equals(Next))
                 {
                     yield return null;
                 }
@@ -108,8 +108,8 @@ namespace Rano.Pattern
                 // 상태 코루틴 중지
                 StopCoroutine(ref _stateCoroutineHandle);
                 
-                current = next;
-                next = current;
+                Current = Next;
+                Next = Current;
             }
         }
 

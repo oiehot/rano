@@ -114,7 +114,7 @@ namespace Rano.Editor.Resolver
                 {
                     spriteAtlas = AssetDatabase.LoadAssetAtPath(spriteAtlasAssetPath, typeof(SpriteAtlas)) as SpriteAtlas;
                 }
-                catch (Exception e)
+                catch
                 {
                     Log.Warning($"스프라이트 아틀라스를 얻을 수 없음 ({spriteAtlasAssetPath}, 예외 발생)");
                     continue;

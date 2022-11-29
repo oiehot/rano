@@ -70,7 +70,7 @@ namespace Rano.Editor
         /// </summary>
         /// <remarks>동일 타입의 스크립터블 오브젝트가 있으면 예외가 발생합니다</remarks>
         /// <returns>찾을 수 없으면 null이 리턴됩니다.</returns>
-        public static T GetScriptableObject<T>() where T : ScriptableObject
+        public static T? GetScriptableObject<T>() where T : ScriptableObject
         {
             var scriptableObjectName = typeof(T).FullName;
             var guids = AssetDatabase.FindAssets($"t:{scriptableObjectName}");

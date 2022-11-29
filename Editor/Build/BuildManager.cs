@@ -7,10 +7,10 @@ namespace Rano.Editor.Build
     {
         private const int PRIORITY = 200;
         public const string DevelopmentBuildName = "Build/Development Build";
-        public const string AddressableBuildName = "Build/Adressable Build";
+        // public const string AddressableBuildName = "Build/Adressable Build";
         public const string AutoRunBuildName = "Build/Auto Run";
         public static bool IsDevelopmentBuild { get; private set; }
-        public static bool IsAdressableBuild { get; private set; }
+        // public static bool IsAdressableBuild { get; private set; }
         public static bool IsAutoRun { get; private set; }
         public static string BuildPath { get; private set; }
 
@@ -23,7 +23,7 @@ namespace Rano.Editor.Build
 
             // TODO: Remove space and convert slash to dot
             IsDevelopmentBuild = EditorPrefs.GetBool(DevelopmentBuildName, true);
-            IsAdressableBuild = EditorPrefs.GetBool(AddressableBuildName, true);
+            // IsAdressableBuild = EditorPrefs.GetBool(AddressableBuildName, true);
             IsAutoRun = EditorPrefs.GetBool(AutoRunBuildName, false);
         }
 
@@ -46,26 +46,29 @@ namespace Rano.Editor.Build
         }
 
         #endregion
-
-        #region ToggleAddressableBuild
-
-        [MenuItem(AddressableBuildName, true)]
-        private static bool SetAddressableBuildValidate()
-        {
-            Menu.SetChecked(AddressableBuildName, IsAdressableBuild);
-            return true;
-        }
-
-        /// <summary>자동 빌드 버젼 증가 체크</summary>
-        [MenuItem(AddressableBuildName, false, PRIORITY+2)]
-        private static void SetAddressableBuild()
-        {
-            IsAdressableBuild = !IsAdressableBuild;
-            EditorPrefs.SetBool(AddressableBuildName, IsAdressableBuild);
-            Log.Info($"AddressableBuild: {IsAdressableBuild}");
-        }
-
-        #endregion
+        
+        // TODO: GlobalPreferences 또는 AddressableAssetSettings를 통해
+        // TODO: 플레이어 빌드 시 어드레서블을 빌드할 수 설정할 수 있다.
+        // TODO: 따라서 이 옵션은 필요 없어짐. 추후 제거할것.
+        // #region ToggleAddressableBuild
+        //
+        // [MenuItem(AddressableBuildName, true)]
+        // private static bool SetAddressableBuildValidate()
+        // {
+        //     Menu.SetChecked(AddressableBuildName, IsAdressableBuild);
+        //     return true;
+        // }
+        //
+        // /// <summary>자동 빌드 버젼 증가 체크</summary>
+        // [MenuItem(AddressableBuildName, false, PRIORITY+2)]
+        // private static void SetAddressableBuild()
+        // {
+        //     IsAdressableBuild = !IsAdressableBuild;
+        //     EditorPrefs.SetBool(AddressableBuildName, IsAdressableBuild);
+        //     Log.Info($"AddressableBuild: {IsAdressableBuild}");
+        // }
+        //
+        // #endregion
 
         #region AutoRun
 
