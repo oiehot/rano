@@ -43,7 +43,7 @@ namespace Rano
         /// <returns>찾은 컴포넌트</returns>
         public static T GetOrAddComponent<T>(this GameObject gameObject) where T : Component
         {
-            if (gameObject.TryGetComponent<T>(out var component) == true)
+            if (gameObject.TryGetComponent<T>(out var component))
             {
                 return component;
             }

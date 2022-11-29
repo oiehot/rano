@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Rano.Ad
@@ -12,6 +13,7 @@ namespace Rano.Ad
         public string iosUnitId;
         public string androidUnitId;
 
+        [CanBeNull]
         public string UnitId 
         {
             get

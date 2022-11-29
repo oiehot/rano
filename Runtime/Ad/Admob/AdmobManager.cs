@@ -4,11 +4,6 @@ namespace Rano.Ad.Admob
 {
     public class AdmobManager : ManagerComponent, IAdManager
     {
-        protected override void Awake()
-        {
-            base.Awake();
-        }
-
         public void Initialize()
         {
             Log.Info($"AdmobManager Initalize Start");

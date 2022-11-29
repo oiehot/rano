@@ -32,9 +32,9 @@ namespace Rano.Ad
             Log.Info($"모든 캔버스들의 SortingOrder를 {offset} 만큼 이동");
             foreach (Canvas canvas in _canvases)
             {
-                // 옮기기 전 값을 기억한다.
-                _savedSortingOrders[canvas] = canvas.sortingOrder;
-                canvas.sortingOrder += offset;
+                var beforeSortingOrder = canvas.sortingOrder;
+                _savedSortingOrders[canvas] = beforeSortingOrder; // 옮기기 전 값을 기억한다.
+                canvas.sortingOrder = beforeSortingOrder + offset;
             }
         }
 
