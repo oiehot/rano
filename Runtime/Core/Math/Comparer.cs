@@ -5,13 +5,13 @@ namespace Rano.Math
 {
     public class FloatComparer : IEqualityComparer<float>
     {
-        private readonly int roundDigits = 2;
-        private readonly MidpointRounding roundingMethod = System.MidpointRounding.ToEven;
+        private const int ROUND_DIGITS = 2;
+        private const MidpointRounding ROUNDING_METHOD = MidpointRounding.ToEven;
 
         public bool Equals(float x, float y)
         {
-            if (System.Math.Round(x, roundDigits, roundingMethod) ==
-                System.Math.Round(y, roundDigits, roundingMethod))
+            if (System.Math.Round(x, ROUND_DIGITS, ROUNDING_METHOD) ==
+                System.Math.Round(y, ROUND_DIGITS, ROUNDING_METHOD))
             {
                 return true;
             }
@@ -23,7 +23,7 @@ namespace Rano.Math
 
         public int GetHashCode(float f)
         {
-            return System.Math.Round(f, roundDigits, roundingMethod).GetHashCode();
+            return System.Math.Round(f, ROUND_DIGITS, ROUNDING_METHOD).GetHashCode();
         }
     }
 }

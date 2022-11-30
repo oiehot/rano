@@ -28,7 +28,7 @@ namespace Rano.Leaderboard
         
         private static bool IsValidKey(string key)
         {
-            if (string.IsNullOrEmpty(key) == true) return false;
+            if (string.IsNullOrEmpty(key)) return false;
             return true;
         }
 

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,24 +6,25 @@ namespace Rano.Animation
     [RequireComponent(typeof(RawImage))]
     public class RawImageScroll : MonoBehaviour
     {
-        RawImage rawImage;
-        public float speedX = 0.1f;
-        public float speedY = 0.0f;
-        private float currentOffsetX;
-        private float currentOffsetY;
+        private RawImage _rawImage;
+        private float _currentOffsetX;
+        private float _currentOffsetY;
+        
+        [SerializeField] private float _speedX = 0.1f;
+        [SerializeField] private float _speedY;
         
         void Awake()
         {
-            this.rawImage = GetComponent<RawImage>();
-            this.currentOffsetX = this.rawImage.uvRect.x;
-            this.currentOffsetY = this.rawImage.uvRect.y;
+            _rawImage = GetComponent<RawImage>();
+            _currentOffsetX = _rawImage.uvRect.x;
+            _currentOffsetY = _rawImage.uvRect.y;
         }
         
         void Update()
         {
-            this.currentOffsetX += speedX * Time.deltaTime;
-            this.currentOffsetY += speedY * Time.deltaTime;
-            this.rawImage.uvRect = new Rect(currentOffsetX, currentOffsetY, 1.0f, 1.0f);
+            _currentOffsetX += _speedX * Time.deltaTime;
+            _currentOffsetY += _speedY * Time.deltaTime;
+            _rawImage.uvRect = new Rect(_currentOffsetX, _currentOffsetY, 1.0f, 1.0f);
         }
     }
 }

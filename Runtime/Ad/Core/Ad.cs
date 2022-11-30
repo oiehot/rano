@@ -12,7 +12,7 @@ namespace Rano.Ad
     /// </summary>
     // TODO: 에드몹스레드에서 실행되는 콜백에서 UniTask 등을 이용하여 유니티스레드에서 자동으로 메서드를 실행하도록 수정 할 것. 업데이트에서 반복적으로 플래그를 체크할 필요는 없음.
     [RequireComponent(typeof(CanvasSorter))]
-    public abstract class Ad : MonoBehaviour
+    public abstract class Ad : MonoBehaviour, IAd
     {
         private readonly object _lockObject = new object();
         private CanvasSorter _canvasSorter;
@@ -44,18 +44,13 @@ namespace Rano.Ad
         [FormerlySerializedAs("_autoReload")] [SerializeField] private bool _autoReloadOnAdClosed = true;
 
         protected object LockObject => _lockObject;
-        public Action OnAdLoading { get; set; }
-        public Action OnAdLoaded { get; set; }
-        public Action OnAdOpening { get; set; }
-        public Action OnAdClosed { get; set; }
-        public Action OnAdFailedToLoad { get; set; }
-        public Action OnAdFailedToShow { get; set; }
-        public Action<EAdState> OnStateChanged { get; set; }
         public string AdName => _adInfo.adName;
         public string AdUnitId => _adInfo.UnitId;
+        
         public EAdState State
         {
             get => _state;
+            
             private set
             {
                 _state = value;
@@ -65,6 +60,15 @@ namespace Rano.Ad
 
         public bool IsLoading => State == EAdState.Loading;
         public bool IsLoaded => State == EAdState.Loaded;
+        public int LoadCount => _loadCount;
+        
+        public event Action OnAdLoading;
+        public event Action OnAdLoaded;
+        public event Action OnAdOpening;
+        public event Action OnAdClosed;
+        public event Action OnAdFailedToLoad;
+        public event Action OnAdFailedToShow;
+        public event Action<EAdState> OnStateChanged;
 
         protected virtual void Awake()
         {

@@ -6,16 +6,16 @@ namespace Rano.Editor.Build
 {
     public class VersionEditor : EditorWindow
     {
-        private string version;
+        private string _version;
 
         public void SetVersion(string version)
         {
-            this.version = version;
+            _version = version;
         }
 
         public void SetVersion(SVersion version)
         {
-            this.version = version.ToString();
+            _version = version.ToString();
         }
 
         void OnGUI()
@@ -23,11 +23,11 @@ namespace Rano.Editor.Build
             GUILayout.Space(10);
             EditorGUILayout.LabelField("Change the version and click Update.", EditorStyles.wordWrappedLabel);
             GUILayout.Space(10);
-            version = EditorGUILayout.TextField("Version: ", version);
+            _version = EditorGUILayout.TextField("Version: ", _version);
             GUILayout.Space(60);
             EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button("Update")) {
-                    SVersion v = new SVersion(version);
+                    SVersion v = new SVersion(_version);
                     VersionManager.ApplyVersion(v);
                     Close();
                 }

@@ -13,7 +13,7 @@ namespace Rano.Database.FirebaseFirestore
         private FirebaseAuth? _auth;
         private Firebase.Firestore.FirebaseFirestore? _db;
         public bool IsInitialized => _db != null;
-        private string? UserId
+        private string? UserID
         {
             get
             {
@@ -325,7 +325,7 @@ namespace Rano.Database.FirebaseFirestore
         /// <returns>결과</returns>
         public bool IsValidCollectionName(string collectionName)
         {
-            if (String.IsNullOrEmpty(collectionName) == true) return false;
+            if (String.IsNullOrEmpty(collectionName)) return false;
             return true;
         }
 
@@ -336,7 +336,7 @@ namespace Rano.Database.FirebaseFirestore
         /// <returns>결과</returns>
         public bool IsValidDocumentName(string documentName)
         {
-            if (String.IsNullOrEmpty(documentName) == true) return false;
+            if (String.IsNullOrEmpty(documentName)) return false;
             return true;
         }
 

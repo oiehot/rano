@@ -3,16 +3,15 @@
 using System;
 using System.Threading.Tasks;
 using Firebase.Auth;
-
 namespace Rano.Auth.Firebase
 {   
     public sealed class FirebaseAuthManager : ManagerComponent, IAuthManager
     {
         private FirebaseAuth? _auth;
         private FirebaseUser? _user;
-        
-        public Action OnSignIn { get; set; }
-        public Action OnSignOut { get; set; }
+
+        public event Action? OnSignIn;
+        public event Action? OnSignOut;
         
         public FirebaseAuth? Auth => _auth;
         public bool IsInitialized => _auth != null;
@@ -70,7 +69,7 @@ namespace Rano.Auth.Firebase
             return true;
         }
         
-        private void HandleAuthStateChanged(object sender, System.EventArgs? eventArgs)
+        private void HandleAuthStateChanged(object sender, EventArgs? eventArgs)
         {
             if (_auth == null)
             {
@@ -108,7 +107,7 @@ namespace Rano.Auth.Firebase
             }
             try
             {
-                FirebaseUser user = await _auth.SignInWithCredentialAsync(credential);
+                _ = await _auth.SignInWithCredentialAsync(credential);
             }
             catch (Exception e)
             {
@@ -139,7 +138,7 @@ namespace Rano.Auth.Firebase
             }
             try
             {
-                FirebaseUser user = await _auth.CurrentUser.LinkWithCredentialAsync(credential);
+                _ = await _auth.CurrentUser.LinkWithCredentialAsync(credential);
             }
             catch (Exception e)
             {
@@ -165,7 +164,7 @@ namespace Rano.Auth.Firebase
             }
             try
             {
-                FirebaseUser user = await _auth.CurrentUser.UnlinkAsync(providerStr);
+                _ = await _auth.CurrentUser.UnlinkAsync(providerStr);
             }
             catch (Exception e)
             {

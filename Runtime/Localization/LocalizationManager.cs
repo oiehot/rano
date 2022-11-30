@@ -1,19 +1,17 @@
 ﻿#nullable enable
 
 using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 using System.Linq;
 using System.Globalization;
-using UnityEngine.SocialPlatforms;
 
 namespace Rano.Localization
 {
     public sealed class LocalizationManager : ManagerComponent
     {
-        public Action<CultureInfo> OnLocaleChanged { get; set; }
+        public event Action<CultureInfo>? OnLocaleChanged;
 
         public CultureInfo CurrentCultureInfo => LocalizationSettings.SelectedLocale.Identifier.CultureInfo;
         public string CurrentLocaleCode => LocalizationSettings.SelectedLocale.Identifier.CultureInfo.Name;

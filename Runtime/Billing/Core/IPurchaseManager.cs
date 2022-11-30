@@ -7,16 +7,16 @@ namespace Rano.Billing
         bool IsInitialized { get; }
         
         InAppProductSO[] RawProducts { get; set; }
-        Action<InAppProduct[]> onInitialized { get; set; }
-        Action onInitializeFailed { get; set; }
-        Action<InAppProduct[]> onUpdateSuccess { get; set; }
-        Action onUpdateFailed { get; set; }
-        Action<string> onPurchaseComplete { get; set; }
-        Action<string, string> onPurchaseFailed { get; set; }
-        Action<InAppProduct> onValidatePurchaseSuccess { get; set; }
-        Action<string> onValidatePurchaseFailed { get; set; }
-        Action onRestoreAllPurchasesComplete { get; set; }
-        Action onRestoreAllPurchasesFailed { get; set; }
+        public event Action<InAppProduct[]> onInitialized;
+        public event Action onInitializeFailed;
+        public event Action<InAppProduct[]> onUpdateSuccess;
+        public event Action onUpdateFailed;
+        public event Action<string> onPurchaseComplete;
+        public event Action<string, string> onPurchaseFailed;
+        public event Action<InAppProduct> onValidatePurchaseSuccess;
+        public event Action<string> onValidatePurchaseFailed;
+        public event Action onRestoreAllPurchasesComplete;
+        public event Action onRestoreAllPurchasesFailed;
 
         void Initialize();
         void UpdateProducts();

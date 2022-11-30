@@ -13,12 +13,12 @@ namespace Rano.Tests
         public void VersionStruct_Test()
         {
             SVersion v = new SVersion("1.2.3");
-            Assert.AreEqual(v.major, 1);
-            Assert.AreEqual(v.minor, 2);
-            Assert.AreEqual(v.build, 3);
-            Assert.AreEqual(v.buildVersionCode, 12003);
+            Assert.AreEqual(v.Major, 1);
+            Assert.AreEqual(v.Minor, 2);
+            Assert.AreEqual(v.Build, 3);
+            Assert.AreEqual(v.BuildVersionCode, 12003);
             Assert.AreEqual(v.ToString(), "1.2.3");            
-            Assert.AreEqual(v.fullVersion, "1.2.3 (12003)");
+            Assert.AreEqual(v.FullVersionString, "1.2.3 (12003)");
             Assert.AreEqual(v.GetHashCode(), 12003);
 
             Assert.IsTrue(v == new SVersion("1.2.3"));

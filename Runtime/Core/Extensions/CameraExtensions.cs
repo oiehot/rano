@@ -25,7 +25,7 @@ namespace Rano
         /// </summary>
         public static float GetScreenAspect(this Camera camera)
         {
-            return (float)Screen.width / (float)Screen.height;
+            return Screen.width / (float)Screen.height;
         }
 
         /// <summary>

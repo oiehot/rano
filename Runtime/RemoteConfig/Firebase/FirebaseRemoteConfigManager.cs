@@ -214,7 +214,7 @@ namespace Rano.RemoteConfig.Firebase
                 return false;
             }
 
-            if (result == true)
+            if (result)
             {
                 Log.Info("데이터 활성화 성공");
             }

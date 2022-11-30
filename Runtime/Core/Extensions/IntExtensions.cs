@@ -4,7 +4,7 @@
     {
         public static bool ToBool(this int i)
         {
-            return i != 0 ? true : false;
+            return i != 0;
         }
     }
 }

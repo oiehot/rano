@@ -7,15 +7,15 @@ namespace Rano.Editor.Build
     {
         public static string[] GetEnableScenes()
         {
-            List<string> EditorScenes = new List<string>();
+            List<string> result = new List<string>();
 
             foreach (EditorBuildSettingsScene scene in EditorBuildSettings.scenes)
             {
                 if (!scene.enabled) continue;
-                EditorScenes.Add(scene.path);
+                result.Add(scene.path);
             }
 
-            return EditorScenes.ToArray();
+            return result.ToArray();
         }
     }
 }

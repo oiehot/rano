@@ -1,19 +1,21 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 
 namespace Rano.Billing
 {
     public interface IPurchaseHistory
     {
-        Dictionary<string, InAppProduct> Products { get; }
-        Action OnInitialized { get; set; }
-        Action OnUpdated { get; set; }
-        void SetValidate(string productId, bool value);
-        bool IsPurchased(InAppProduct product);
-        bool IsPurchased(string productId);
-        void ClearHistory();
-        void LogStatus();
-        void LogProduct(string productId);
-        void LogProducts();
+        public Dictionary<string, InAppProduct> Products { get; }
+        public event Action OnInitialized;
+        public event Action OnUpdated;
+        public void SetValidate(string productId, bool value);
+        public bool IsPurchased(InAppProduct product);
+        public bool IsPurchased(string productId);
+        public void ClearHistory();
+        public void LogStatus();
+        public void LogProduct(string productId);
+        public void LogProducts();
     }
 }

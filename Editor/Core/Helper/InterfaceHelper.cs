@@ -18,9 +18,9 @@ namespace Rano.Editor
             foreach (Type type in types)
             {
                 MethodInfo method = type.GetMethod(methodName);
-                var _this = Activator.CreateInstance(type, null);
+                object instance = Activator.CreateInstance(type, null);
                 //var _this = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(type);
-                method?.Invoke(_this, null);
+                method?.Invoke(instance, null);
             }
         }
     }

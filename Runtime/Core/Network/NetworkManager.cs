@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Events;
-using Rano;
 
 namespace Rano.Network
 {
@@ -17,15 +15,12 @@ namespace Rano.Network
     public sealed class NetworkManager : ManagerComponent
     {
         private NetworkState _state;
+        [SerializeField] private string _pingAddress = "8.8.8.8";
+        [SerializeField] private float _pingWaitTime = 0.5f;
+        [SerializeField] private float _pingNextTime = 3.0f;
 
-        [Header("Ping")]
-        public string pingAddress = "8.8.8.8";
-        public float pingWaitTime = 0.5f;
-        public float pingNextTime = 3.0f;
-
-        [Header("Event Callbacks")]
-        public Action onConnected;
-        public Action onDisconnected;
+        public event Action OnConnected;
+        public event Action OnDisconnected;
 
         public NetworkState State => _state;
         public bool IsConnected => _state == NetworkState.Connected;
@@ -49,8 +44,8 @@ namespace Rano.Network
             
             while (true)
             {
-                ping = new Ping(pingAddress);
-                yield return CoroutineYieldCache.WaitForSeconds(pingWaitTime);
+                ping = new Ping(_pingAddress);
+                yield return CoroutineYieldCache.WaitForSeconds(_pingWaitTime);
 
                 if (ping.isDone && ping.time >= 0)
                 {
@@ -59,7 +54,7 @@ namespace Rano.Network
                     {
                         Log.Sys("네트워크 연결됨");
                         _state = NetworkState.Connected;
-                        onConnected?.Invoke();
+                        OnConnected?.Invoke();
                     }
                 }
                 else
@@ -69,12 +64,12 @@ namespace Rano.Network
                     {
                         Log.Sys("네트워크 끊어짐");
                         _state = NetworkState.Disconnected;
-                        onDisconnected?.Invoke();
+                        OnDisconnected?.Invoke();
                     }
                 }
 
                 // 잠시 후에 재시도한다.
-                yield return CoroutineYieldCache.WaitForSeconds(pingNextTime);
+                yield return CoroutineYieldCache.WaitForSeconds(_pingNextTime);
             }
         }
 

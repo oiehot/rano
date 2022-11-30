@@ -52,7 +52,10 @@ namespace Rano.Editor
             {
                 if (data.GetType() != typeof(T)) continue;
                 if (data.name != subAssetName) continue;
-                T result = data as T; 
+                
+                T? result = data as T;
+                if (result == null) continue;
+                
                 results.Add(result);
             }
             return results.ToArray();
@@ -101,16 +104,21 @@ namespace Rano.Editor
         /// <remarks>Missing된 guid는 드롭됩니다.</remarks>
         public static List<T> GetScriptableObjects<T>() where T : ScriptableObject
         {
-            var scriptableObjectName = typeof(T).FullName;
-            var guids = AssetDatabase.FindAssets($"t:{scriptableObjectName}");
-            var assets = guids
+            string scriptableObjectName = typeof(T).FullName;
+            string[] guids = AssetDatabase.FindAssets($"t:{scriptableObjectName}");
+            
+            List<T> assets = guids
                 .Select(guid =>
                 {
-                    var path = AssetDatabase.GUIDToAssetPath(guid);
-                    return AssetDatabase.LoadAssetAtPath(path, typeof(T)) as T;
+                    string? path = AssetDatabase.GUIDToAssetPath(guid);
+                    if (String.IsNullOrEmpty(path)) return null;
+                    
+                    T? obj = AssetDatabase.LoadAssetAtPath(path, typeof(T)) as T;
+                    return obj;
                 })
                 .Where( asset => asset != null )
-                .ToList();
+                .ToList()!;
+            
             return assets;
         }
     }

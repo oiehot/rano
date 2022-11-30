@@ -26,17 +26,17 @@ namespace Rano.Billing.UnityPurchase
             get => _rawProducts;
             set => _rawProducts = value;
         }
-        
-        public Action<InAppProduct[]> onInitialized { get; set; }
-        public Action onInitializeFailed { get; set; }
-        public Action<InAppProduct[]> onUpdateSuccess { get; set; }
-        public Action onUpdateFailed { get; set; }
-        public Action<string> onPurchaseComplete { get; set; }
-        public Action<string, string> onPurchaseFailed { get; set; }
-        public Action<InAppProduct> onValidatePurchaseSuccess { get; set; }
-        public Action<string> onValidatePurchaseFailed { get; set; }
-        public Action onRestoreAllPurchasesComplete { get; set; }
-        public Action onRestoreAllPurchasesFailed { get; set; }
+
+        public event Action<InAppProduct[]> onInitialized;
+        public event Action onInitializeFailed;
+        public event Action<InAppProduct[]> onUpdateSuccess;
+        public event Action onUpdateFailed;
+        public event Action<string> onPurchaseComplete;
+        public event Action<string, string> onPurchaseFailed;
+        public event Action<InAppProduct> onValidatePurchaseSuccess;
+        public event Action<string> onValidatePurchaseFailed;
+        public event Action onRestoreAllPurchasesComplete;
+        public event Action onRestoreAllPurchasesFailed;
         
         protected override void Awake()
         {
@@ -87,26 +87,37 @@ namespace Rano.Billing.UnityPurchase
             // 원시상품들의 정보를 초기화시에 사용한다.
             foreach (InAppProductSO rawProduct in _rawProducts)
             {
-                UnityEngine.Debug.Assert(rawProduct != null);
-                Log.Info($"원시상품 추가 ({rawProduct.Id})");
+                Debug.Assert(rawProduct != null);
+                
+                if (rawProduct.Validate() == false)
+                {
+                    Log.Warning($"원시상품 추가 실패 ({rawProduct})");
+                    continue;
+                }
+
+                if (String.IsNullOrEmpty(rawProduct.ID))
+                {
+                    Log.Warning("");
+                }
+                Log.Info($"원시상품 추가 ({rawProduct.ID})");
                 try
                 {
                     builder.AddProduct(
-                        rawProduct.Id,
+                        rawProduct.ID,
                         rawProduct.Type.ConvertToProductType(),
                         new IDs
                         {
-                            {String.IsNullOrEmpty(rawProduct.AndroidId) ? rawProduct.Id : rawProduct.AndroidId, GooglePlay.Name},
-                            {String.IsNullOrEmpty(rawProduct.IosId) ? rawProduct.Id : rawProduct.IosId, AppleAppStore.Name}
+                            {String.IsNullOrEmpty(rawProduct.AndroidID) ? rawProduct.ID : rawProduct.AndroidID, GooglePlay.Name},
+                            {String.IsNullOrEmpty(rawProduct.IosID) ? rawProduct.ID : rawProduct.IosID, AppleAppStore.Name}
                         }
                     );
                 }
                 catch (Exception e)
                 {
-                    Log.Warning($"원시상품 추가 실패 ({rawProduct.Id}");
+                    Log.Warning($"원시상품 추가 실패 ({rawProduct.ID}");
                     Log.Exception(e);
                     _state = EState.None;
-                    this.onInitializeFailed?.Invoke();
+                    onInitializeFailed?.Invoke();
                     return;
                 }
             }
@@ -121,7 +132,7 @@ namespace Rano.Billing.UnityPurchase
                 Log.Warning($"UnityPurchasing 초기화 실패");
                 Log.Exception(e);
                 _state = EState.None;
-                this.onInitializeFailed?.Invoke();
+                onInitializeFailed?.Invoke();
             }
         }
         
@@ -160,7 +171,6 @@ namespace Rano.Billing.UnityPurchase
             {
                 Log.Warning($"구매 중 예외 발생 ({productId})");
                 Log.Exception(e);
-                return;
             }
         }
 
@@ -170,11 +180,13 @@ namespace Rano.Billing.UnityPurchase
         public void RestoreAllPurchases()
         {
             Log.Info($"구매복구 요청");
+            
             if (_state != EState.Initialized)
             {
                 Log.Warning($"구매복구 할 수 있는 상태가 아닙니다. (state:{_state})");
                 return;
             }
+            
             #if (UNITY_IOS)
                 _extensions.GetExtension<IAppleExtensions>().RestoreTransactions(OnRestoreTransactions);
             #else
@@ -188,18 +200,18 @@ namespace Rano.Billing.UnityPurchase
             {
                 // 구매 복구되지 않더라도 절차가 성공하면 실행됨.
                 Log.Info("구매복구 성공");
-                this.onRestoreAllPurchasesComplete?.Invoke();
+                onRestoreAllPurchasesComplete?.Invoke();
             }
             else
             {
                 Log.Warning("구매복구 실패");
-                this.onRestoreAllPurchasesFailed?.Invoke();
+                onRestoreAllPurchasesFailed?.Invoke();
             }
         }
 
         public void OnInitialized(IStoreController controller, IExtensionProvider extensions)
         {
-            UnityEngine.Debug.Assert(controller != null && extensions != null);
+            Debug.Assert(controller != null && extensions != null);
             
             _controller = controller;
             _extensions = extensions;
@@ -211,14 +223,14 @@ namespace Rano.Billing.UnityPurchase
             
             Log.Info($"초기화 완료");
             _state = EState.Initialized;
-            this.onInitialized?.Invoke(inAppProducts);
+            onInitialized?.Invoke(inAppProducts);
         }
 
         public void OnInitializeFailed(InitializationFailureReason error)
         {
             Log.Warning($"초기화 실패 ({error})");
             _state = EState.None;
-            this.onInitializeFailed?.Invoke();
+            onInitializeFailed?.Invoke();
         }
         
         #if false
@@ -228,13 +240,13 @@ namespace Rano.Billing.UnityPurchase
             InAppProduct[] inAppProducts = _controller.products.all
                 .Select(product => product.ConvertToInAppProduct())
                 .ToArray();
-            this.onUpdateSuccess?.Invoke(inAppProducts);
+            onUpdateSuccess?.Invoke(inAppProducts);
         }
 
         public void OnUpdateFailed(InitializationFailureReason reason)
         {
             Log.Warning($"상품정보 업데이트 실패 ({reason})");
-            this.onUpdateFailed?.Invoke();
+            onUpdateFailed?.Invoke();
         }
         #endif
 
@@ -254,7 +266,7 @@ namespace Rano.Billing.UnityPurchase
             };
             string productId = product.definition.id;
             Log.Warning($"구매 실패 (productId:{productId}, reason:{reason})");
-            this.onPurchaseFailed?.Invoke(productId, reason);
+            onPurchaseFailed?.Invoke(productId, reason);
         }
         
         /// <summary>
@@ -294,14 +306,14 @@ namespace Rano.Billing.UnityPurchase
             Log.Info($"영수증이 검증되어 구매완료 처리합니다 ({productId})");
             Product product = _controller.products.WithID(productId);
             _controller.ConfirmPendingPurchase(product);
-            this.onValidatePurchaseSuccess?.Invoke(product.ConvertToInAppProduct());
-            this.onPurchaseComplete?.Invoke(productId);
+            onValidatePurchaseSuccess?.Invoke(product.ConvertToInAppProduct());
+            onPurchaseComplete?.Invoke(productId);
         }
 
         private void OnValidatePurchaseFailed(Product purchasedProduct)
         {
             string productId = purchasedProduct.definition.id;
-            this.onValidatePurchaseFailed?.Invoke(productId);
+            onValidatePurchaseFailed?.Invoke(productId);
             Log.Warning($"영수증 검증에 실패했습니다 ({purchasedProduct.receipt})");
         }
         

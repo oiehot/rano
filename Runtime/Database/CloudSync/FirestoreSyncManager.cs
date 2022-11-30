@@ -110,7 +110,7 @@ namespace Rano.Database.CloudSync
             {
                 Log.Info($"로컬 데이터가 더 최신입니다");
                 bool result = await SyncLocalToCloudAsync();
-                if (result == true)
+                if (result)
                 {
                     Log.Important(Constants.SYNC_COMPLETED);
                 }
@@ -126,7 +126,7 @@ namespace Rano.Database.CloudSync
             {
                 Log.Info($"클라우드 데이터가 더 최신입니다");
                 bool result = await SyncCloudToLocalAsync();
-                if (result == true)
+                if (result)
                 {
                     Log.Important(Constants.SYNC_COMPLETED);
                 }

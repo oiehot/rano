@@ -195,7 +195,7 @@ namespace Rano.Analytics.Firebase
         private void LogEventByParameters(string eventName, SParameter[] parameters)
         {
             Log.Info($"이벤트 로깅 (event:{eventName}, parametersCount:{parameters.Length})");
-            Parameter[] _parameters = new Parameter[parameters.Length];
+            Parameter[] internalParams = new Parameter[parameters.Length];
             
             for (int i = 0; i < parameters.Length; i++)
             {
@@ -206,23 +206,23 @@ namespace Rano.Analytics.Firebase
                     Type type = parameterValue.GetType();
                     if (type == typeof(int))
                     {
-                        _parameters[i] = new Parameter(parameterName, (int)parameterValue);
+                        internalParams[i] = new Parameter(parameterName, (int)parameterValue);
                     }
                     else if (type == typeof(string))
                     {
-                        _parameters[i] = new Parameter(parameterName, (string)parameterValue);
+                        internalParams[i] = new Parameter(parameterName, (string)parameterValue);
                     }
                     else if (type == typeof(double))
                     {
-                        _parameters[i] = new Parameter(parameterName, (double)parameterValue);
+                        internalParams[i] = new Parameter(parameterName, (double)parameterValue);
                     }
                     else if (type == typeof(long))
                     {
-                        _parameters[i] = new Parameter(parameterName, (long)parameterValue);
+                        internalParams[i] = new Parameter(parameterName, (long)parameterValue);
                     }
                     else if (type == typeof(bool))
                     {
-                        _parameters[i] = new Parameter(parameterName, ((bool)parameterValue).ToString());
+                        internalParams[i] = new Parameter(parameterName, ((bool)parameterValue).ToString());
                     }
                     else
                     {
@@ -239,7 +239,7 @@ namespace Rano.Analytics.Firebase
             }
             try
             {
-                FirebaseAnalytics.LogEvent(eventName, _parameters);
+                FirebaseAnalytics.LogEvent(eventName, internalParams);
             }
             catch (Exception e)
             {

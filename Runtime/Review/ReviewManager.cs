@@ -8,7 +8,7 @@ namespace Rano.Review
 {
     public abstract partial class ReviewManager : ManagerComponent
     {
-        private int _openReviewCount = 0;
+        private int _openReviewCount;
         private DateTime _lastOpenReviewDateTime;
         // TODO: 이 값을 Initialize나 ConfigSO에서 설정할 수 있도록 할것, iOS 정책상 1년에 3회까지만 리뷰요청을 할 수 있으므로 122일 단위시간을 사용 (1년의 1/3)
         private TimeSpan _openReviewTimeSpan = new TimeSpan(days: 122, hours: 0, minutes: 0, seconds: 0);
@@ -52,8 +52,7 @@ namespace Rano.Review
             }
 
             bool result = await RequestReviewInternalAsync();
-
-            if (result == true)
+            if (result)
             {
                 _lastOpenReviewDateTime = DateTime.UtcNow;
                 _openReviewCount++;

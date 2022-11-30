@@ -30,7 +30,7 @@ namespace Rano.Ad.Admob
         /// <remarks>에드몹 스레드에서 실행된다.</remarks>
         private void HandleUserEarnedReward(object sender, Reward reward)
         {
-            int rewardAmount = 0;
+            int rewardAmount;
             string rewardUnit = reward.Type;
             
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
@@ -70,7 +70,7 @@ namespace Rano.Ad.Admob
 
         protected override void UnloadAdInternal()
         {
-            if (_ad == null)
+            if (_ad != null)
             {
                 _ad.Destroy();
                 _ad = null;

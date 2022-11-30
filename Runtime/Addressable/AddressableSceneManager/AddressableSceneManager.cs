@@ -1,15 +1,8 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.AddressableAssets;
-using UnityEngine.AddressableAssets.ResourceLocators;
-using UnityEngine.ResourceManagement;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
-using UnityEngine.ResourceManagement.ResourceLocations;
 
 namespace Rano.Addressable
 {
@@ -33,9 +26,9 @@ namespace Rano.Addressable
                 throw new AddressableSceneManagerException($"씬 교체 실패: {key}는 이미 로드되어 있음");
             }
 
-            AsyncOperationHandle<SceneInstance> handle;
-            handle = Addressables.LoadSceneAsync(key, LoadSceneMode.Single, activateOnLoad:true);
-            handle.Completed += (handle) => {
+            AsyncOperationHandle<SceneInstance> aoh;
+            aoh = Addressables.LoadSceneAsync(key); // LoadSceneMode.Single, activateOnLoad:true
+            aoh.Completed += (handle) => {
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
                     Log.Info($"씬 교체됨: {key}");
@@ -47,7 +40,7 @@ namespace Rano.Addressable
                     throw new AddressableSceneManagerException($"씬 교체 실패: {key}");
                 }
             };
-            return handle;
+            return aoh;
         }
 
         /// <summary>
@@ -60,9 +53,9 @@ namespace Rano.Addressable
                 throw new AddressableSceneManagerException($"씬 추가 실패: {key}는 이미 로드되어 있음");
             }
 
-            AsyncOperationHandle<SceneInstance> handle;
-            handle = Addressables.LoadSceneAsync(key, LoadSceneMode.Additive, activateOnLoad:true);
-            handle.Completed += (handle) => {
+            AsyncOperationHandle<SceneInstance> aoh;
+            aoh = Addressables.LoadSceneAsync(key, LoadSceneMode.Additive, activateOnLoad:true);
+            aoh.Completed += (handle) => {
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
                     Log.Info($"씬 추가됨: {key}");
@@ -73,7 +66,7 @@ namespace Rano.Addressable
                     throw new AddressableSceneManagerException($"씬 추가 실패: {key}");
                 }
             };
-            return handle;
+            return aoh;
         }
 
         /// <summary>
@@ -87,10 +80,10 @@ namespace Rano.Addressable
                 throw new AddressableSceneManagerException($"씬 제거 실패: {key}가 로드되어있지 않음");
             }
 
-            AsyncOperationHandle<SceneInstance> handle;
+            AsyncOperationHandle<SceneInstance> aoh;
             SceneInstance sceneInstance = _scenes[key];
-            handle = Addressables.UnloadSceneAsync(sceneInstance, autoReleaseHandle);
-            handle.Completed += (handle) => {
+            aoh = Addressables.UnloadSceneAsync(sceneInstance, autoReleaseHandle);
+            aoh.Completed += (handle) => {
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
                     Log.Info($"씬 제거: {key}");
@@ -101,7 +94,7 @@ namespace Rano.Addressable
                     throw new AddressableSceneManagerException($"씬 제거 실패: {key}");
                 }
             };
-            return handle;
+            return aoh;
         }
 
         /// <summary>
@@ -119,7 +112,7 @@ namespace Rano.Addressable
             else
             {
                 Log.Info($"현재 활성화 씬으로 지정: {key}");
-                UnityEngine.SceneManagement.SceneManager.SetActiveScene(_scenes[key].Scene);
+                SceneManager.SetActiveScene(_scenes[key].Scene);
                 // _scenes[address].ActivateAsync(); // 로드 후 활성화
             }
         }

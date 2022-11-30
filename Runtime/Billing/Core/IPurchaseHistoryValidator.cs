@@ -1,12 +1,13 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Threading.Tasks;
 
 namespace Rano.Billing
 {
     public interface IPurchaseHistoryValidator
     {
-        Action OnValidated { get; set; }
-        
-        Task ValidateAsync();
+        public event Action OnValidated;
+        public Task ValidateAsync();
     }
 }

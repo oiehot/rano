@@ -8,13 +8,13 @@ namespace Rano.Animation
     public class SpriteRendererScroll : MonoBehaviour
     {
         private SpriteRenderer? _spriteRenderer;
-        private Vector3 startPosition;
+        private Vector3 _startPosition;
         private float _spriteWidth;
         private float _spriteHeight;
         private float _minX;
         private bool _isRun;
         
-        public float speed;
+        [SerializeField] private float _speed;
         
         void Awake()
         {  
@@ -26,12 +26,12 @@ namespace Rano.Animation
         
         void Start()
         {
-            startPosition = transform.position;
-            _minX = startPosition.x - _spriteWidth;
+            _startPosition = transform.position;
+            _minX = _startPosition.x - _spriteWidth;
             Run();
         }
         
-        public void Run()
+        private void Run()
         {
             _isRun = true;
         }
@@ -45,10 +45,10 @@ namespace Rano.Animation
         {
             if (_isRun)
             {
-                transform.Translate(Vector3.left * speed * Time.deltaTime);
+                transform.Translate(Vector3.left * (_speed * Time.deltaTime));
                 if (transform.position.x < _minX)
                 {
-                    transform.position = startPosition;
+                    transform.position = _startPosition;
                 }
             }
         }

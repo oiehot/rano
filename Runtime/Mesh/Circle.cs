@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 namespace Rano.Mesh
 {
@@ -10,39 +9,40 @@ namespace Rano.Mesh
         public int segments = 50;
         [Range(0,1)]
         public float width = 0.02f;
-        private float radiusX = 1;
-        private float radiusY = 1;
-        private LineRenderer line;
+        
+        private float _radiusX = 1;
+        private float _radiusY = 1;
+        private LineRenderer _lineRenderer;
 
         void Start()
         {
-            line = gameObject.GetComponent<LineRenderer>();
-            line.positionCount = segments + 1;
-            line.useWorldSpace = false;
-            line.startWidth = width;
-            line.endWidth = width;
+            _lineRenderer = gameObject.GetComponent<LineRenderer>();
+            _lineRenderer.positionCount = segments + 1;
+            _lineRenderer.useWorldSpace = false;
+            _lineRenderer.startWidth = width;
+            _lineRenderer.endWidth = width;
             CreatePoints();
-        }
-
-        void CreatePoints()
-        {
-            float x=0.0f, y=0.0f, z=0.0f, angle=20.0f;
-
-            for (int i = 0; i < (segments + 1); i++)
-            {
-                x = Mathf.Sin (Mathf.Deg2Rad * angle) * radiusX;
-                y = Mathf.Cos (Mathf.Deg2Rad * angle) * radiusY;
-                line.SetPosition (i,new Vector3(x,y,z) );
-                angle += (360f / segments);
-            }
         }
 
         #if DEVELOPMENT_BUILD || UNITY_EDITOR
         void Update()
         {
-            line.startWidth = width;
-            line.endWidth = width;
+            _lineRenderer.startWidth = width;
+            _lineRenderer.endWidth = width;
         }
         #endif
+        
+        private void CreatePoints()
+        {
+            float x, y, z=0.0f, angle=20.0f;
+
+            for (int i = 0; i < (segments + 1); i++)
+            {
+                x = Mathf.Sin (Mathf.Deg2Rad * angle) * _radiusX;
+                y = Mathf.Cos (Mathf.Deg2Rad * angle) * _radiusY;
+                _lineRenderer.SetPosition (i,new Vector3(x,y,z) );
+                angle += (360f / segments);
+            }
+        }
     }
 }

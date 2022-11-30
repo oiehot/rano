@@ -1,7 +1,6 @@
 ﻿#nullable enable
 
 using System;
-using System.Threading.Tasks;
 using Rano.App;
 
 namespace Rano.Update
@@ -31,7 +30,7 @@ namespace Rano.Update
                 return ECheckUpdateResult.Error;
             }
             
-            if (String.IsNullOrEmpty(latestVersionStr) == true)
+            if (String.IsNullOrEmpty(latestVersionStr))
             {
                 Log.Warning("업데이트 검사 실패 (마지막 버전 값이 비어 있음)");
                 return ECheckUpdateResult.Error;

@@ -6,23 +6,23 @@ namespace Rano.App
     // TODO: Screenshot 디렉토리가 없으면 캡쳐가 안됨.
     public class ScreenshotController : MonoBehaviour
     {
-        private string directory;
+        private string _directory;
         
         private void Awake()
         {
-            directory = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/') ) + "/Screenshot" ;
+            _directory = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/') ) + "/Screenshot" ;
         }
         
         private void Capture()
         {
             string date = DateTime.UtcNow.ToLocalTime().ToString("yyyymmdd_HHmmss");
-            string path = directory + '/' + date + ".png";
+            string path = _directory + '/' + date + ".png";
             ScreenCapture.CaptureScreenshot(path);
             Log.Important("Capture Screenshot to " + path);
         }
         
         // TODO: ENABLE_INPUT_SYSTEM
-        #if UNITY_EDITOR && ENABLE_LEGACY_INPUT_MANAGER
+        #if (UNITY_EDITOR && ENABLE_LEGACY_INPUT_MANAGER)
         public void Update()
         {   
             if (

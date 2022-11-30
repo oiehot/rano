@@ -2,9 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
-using Rano.IO;
 
 namespace Rano.Database
 {
@@ -55,7 +53,7 @@ namespace Rano.Database
                 return;
             }
             
-            Log.Sys($"{typeof(LocalDatabase).ToString()}: 초기화 중...", caller: false);
+            Log.Sys($"{typeof(LocalDatabase)}: 초기화 중...", caller: false);
             Log.Info($"  저장 경로: {_savePath}");
             
             _state = EState.Initializing;

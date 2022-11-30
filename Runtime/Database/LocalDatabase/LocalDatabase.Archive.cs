@@ -2,15 +2,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using UnityEngine;
 using Rano.IO;
 using Rano.IO.Compression;
 using Rano.Encoding;
 
 namespace Rano.Database
 {
-    public sealed partial class LocalDatabase : ILocalDatabase
+    public sealed partial class LocalDatabase
     {
         /// <summary>
         /// 내부 사전 데이터를 Json으로 변환하고 압축 및 암호화 처리된 바이너리로 리턴한다.
@@ -70,7 +68,8 @@ namespace Rano.Database
         public bool LoadFromArchive(byte[] archiveBytes)
         {
             // (1) ArchiveBytes == EncryptedBytes => CompressedBytes
-            byte[]? compressedBytes = archiveBytes;
+            byte[] compressedBytes = archiveBytes;
+            
             // TODO: 세이브 데이터 복호화가 필요함.
             
             // (2) CompressedBytes => Bytes
@@ -112,7 +111,7 @@ namespace Rano.Database
             _dict = dict;
             
             // 데이터베이스 시스템 정보를 복구한다.
-            if (_dict.TryGetValue(SYSTEM_DATA_KEY, out object systemData) == true)
+            if (_dict.TryGetValue(SYSTEM_DATA_KEY, out object systemData))
             {
                 RestoreSystemData(systemData);
             }

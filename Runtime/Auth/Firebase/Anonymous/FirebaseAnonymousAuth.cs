@@ -8,14 +8,14 @@ namespace Rano.Auth.Firebase
 {
     public sealed class FirebaseAnonymousAuth : IFirebaseAuthModule
     {
-        public enum EState
+        private enum EState
         {
             None = 0,
             Initializing,
             Initialized,
         }
-        
-        private EState _state;
+
+        private EState _state = EState.None;
         private FirebaseAuthManager? _authManager;
         public bool IsInitialized => _state >= EState.Initialized;
         
@@ -46,27 +46,39 @@ namespace Rano.Auth.Firebase
         {
             FirebaseUser user;
             
+            Log.Warning("로그인 중... (Anonymous)");
+            
             if (IsInitialized == false)
             {
-                Log.Warning("Anonymous인증이 초기화 되어있지 않음");
+                Log.Warning("로그인 실패 (Anonymous 인증이 초기화 되어있지 않음)");
+                return false;
+            }
+
+            if (_authManager == null)
+            {
+                Log.Warning("로그인 실패 (AuthManager가 연결되어 있지 않음)");
+                return false;
+            }
+
+            if (_authManager.IsInitialized == false)
+            {
+                Log.Warning("로그인 실패 (AuthManager가 초기화되어 있지 않음)");
                 return false;
             }
             
-            Log.Info("SignInAnonymous Trying...");
-            
             try
             {
-                user = await _authManager.Auth.SignInAnonymouslyAsync();
+                user = await _authManager.Auth!.SignInAnonymouslyAsync();
             }
             catch (Exception e)
             {
-                Log.Warning(Constants.SIGN_IN_ANONYMOUSLY_ERROR);
+                Log.Warning("로그인 실패 (Anonymous 인증 실패)");
                 Log.Exception(e);
                 return false;
             }
             _authManager.LogUser(user);
             
-            Log.Info(Constants.SIGN_IN_ANONYMOUSLY_SUCCESS);
+            Log.Info("로그인 성공 (Anonymous)");
             return true;
         }
     }

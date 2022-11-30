@@ -5,10 +5,8 @@ namespace Rano
     public static class TransformExtensions
     {
         /// <summary>
-        /// Hierarchy상 게임오브젝트의 경로를 돌려준다.
+        /// Hierarchy상 경로를 돌려준다.
         /// </summary>
-        /// <param name="gameObject"></param>
-        /// </example>
         public static string GetPath(this Transform transform)
         {
             string path = transform.name;
@@ -23,12 +21,11 @@ namespace Rano
         /// <summary>
         /// Transform 값을 초기화한다.
         /// </summary>
-        /// <param name="trans"></param>
-        public static void ResetTransformation(this Transform trans)
+        public static void ResetTransformation(this Transform transform)
         {
-            trans.position = Vector3.zero;
-            trans.localRotation = Quaternion.identity;
-            trans.localScale = new Vector3(1, 1, 1);
+            transform.position = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
+            transform.localScale = new Vector3(1, 1, 1);
         }
 
         // public static Vector2 ToRectTransformPosition(this Transform transform, Camera camera, RectTransform rectTransform)

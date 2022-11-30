@@ -1,13 +1,5 @@
-﻿// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
-using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq; // JArray, JObject
 using NUnit.Framework;
 
 namespace Rano.Tests.Json
@@ -49,8 +41,8 @@ namespace Rano.Tests.Json
             [JsonProperty] public Address address;
             [JsonIgnore] public int ignoreField;
 
-            public int _publicKey;
-            public int _propertyKey { get; private set; }
+            public int publicKey;
+            public int PropertyKey { get; private set; }
 
             [JsonProperty("private_key", Order = -1)] private int _privateKey;
             private int _subPrivateKey;

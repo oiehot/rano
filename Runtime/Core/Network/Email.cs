@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace Rano.Network
+﻿namespace Rano.Network
 {
     public class Email
     {
@@ -19,7 +17,7 @@ namespace Rano.Network
             _body = body;
         }
         
-        public string? SendMailUrl
+        public string SendMailUrl
         {
             get
             {
@@ -31,6 +29,5 @@ namespace Rano.Network
                 return url;
             }
         }
-
     }
 }

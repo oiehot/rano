@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Purchasing;
 using UnityEngine.Purchasing.Security;
 using System.Reflection;
 using System.Linq;
@@ -19,16 +18,17 @@ namespace Rano.Billing.UnityPurchase
         {
             MethodInfo methodInfo;
             methodInfo = type.GetMethod("Data", BindingFlags.Public | BindingFlags.Static);
+            if (methodInfo == null) return null;
             object value = methodInfo.Invoke(null, null);
             return (byte[])value;
         }
 
-        private Type GetType(string name)
+        private Type GetType(string typeName)
         {
             Type t = AppDomain.CurrentDomain.GetAssemblies()
                 // .Where(a => a.FullName == "MyFramework")
                 .SelectMany(a => a.GetTypes())
-                .FirstOrDefault(t => t.Name == name);
+                .FirstOrDefault(t => t.Name == typeName);
             return t;
         }
         

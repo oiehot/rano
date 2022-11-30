@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using System.Collections;
 using UnityEngine;
 using DG.Tweening;
-using Rano.SaveSystem;
 
 namespace Rano.SoundSystem
 {
@@ -18,6 +17,8 @@ namespace Rano.SoundSystem
         private bool _isMute;
         
         [SerializeField] private string _name;
+
+        public event Action OnPlayFinished;
 
         public string Name
         {
@@ -40,8 +41,6 @@ namespace Rano.SoundSystem
         private bool _latestPlayState = false;
         public bool IsPlaying => _audioSource.isPlaying;
         public bool IsMute => _isMute;
-        
-        public Action OnPlayFinished { get; set; }
         
         void Awake()
         {

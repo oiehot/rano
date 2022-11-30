@@ -1,10 +1,8 @@
 #nullable enable
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEngine;
 using UnityEngine.U2D;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.AddressableAssets;
@@ -66,7 +64,7 @@ namespace Rano.Addressable
         /// </remarks>
         /// <param name="spriteAtlasName">SpriteAtlasManager가 요청할 때 사용하는 에셋의 이름. 어드레서블 키 값이 아니다.</param>
         /// <param name="callback">SpriteAtlasManager에 응답할 떄 사용. 얻은 SpriteAtlas를 매개변수로 담아 콜백하여 전달한다.</param>
-        private void HandleRequestAtlas(string spriteAtlasName, System.Action<SpriteAtlas> callback)
+        private void HandleRequestAtlas(string spriteAtlasName, Action<SpriteAtlas> callback)
         {
             SpriteAtlas spriteAtlas;
 
@@ -74,7 +72,6 @@ namespace Rano.Addressable
             {
                 Log.Info($"스프라이트 아틀라스를 요청 받아 로드되어 있는 스프라이트 아틀라스를 전달합니다 ({spriteAtlasName})");
                 callback(spriteAtlas);
-                return;
             }
             else
             {
@@ -95,7 +92,7 @@ namespace Rano.Addressable
         /// </summary>
         public async Task<bool> LoadSpriteAtlasAsync(string spriteAtlasName)
         {
-            if (IsSpriteAtlasLoaded(spriteAtlasName) == true)
+            if (IsSpriteAtlasLoaded(spriteAtlasName))
             {
                 Log.Warning($"스프라이트 아틀라스가 이미 로드되어 있습니다 ({spriteAtlasName})");
                 return false;

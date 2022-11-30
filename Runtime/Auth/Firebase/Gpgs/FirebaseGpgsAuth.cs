@@ -21,8 +21,8 @@ namespace Rano.Auth.Firebase.Gpgs
         }
         
         private EState _state;
-        private FirebaseAuthManager _authManager;
-        private string? _authCode = null;
+        private FirebaseAuthManager? _authManager;
+        private string? _authCode;
         
         public bool IsInitialized => _state >= EState.Initialized;
         public bool IsAuthenticated => _state >= EState.Authenticated;
@@ -37,6 +37,7 @@ namespace Rano.Auth.Firebase.Gpgs
             
             // AuthManager 초기화가 되어 있어야만 한다.
             _authManager = authManager;
+            
             if (_authManager.IsInitialized == false)
             {
                 Log.Warning("GPGS 인증 초기화 실패 (AuthManager가 초기화 되어있지 않음");
@@ -131,18 +132,18 @@ namespace Rano.Auth.Firebase.Gpgs
             // 초기화 체크
             if (IsInitialized == false)
             {
-                Log.Warning("SignIn 실패 (초기화 안됨)");
+                Log.Warning("로그인 실패 (초기화 안됨)");
                 return false;
             }
             
             // Social 인증
-            if (await AuthenticateAsync() == true)
+            if (await AuthenticateAsync())
             {
-                Log.Info("GPGS 인증 성공");
+                Log.Info("로그인 성공 (GPGS)");
             }
             else
             {
-                Log.Warning("SignIn 실패 (GPGS 인증 실패)");
+                Log.Warning("로그인 실패 (GPGS 인증 실패)");
                 return false;
             }
             
@@ -154,20 +155,26 @@ namespace Rano.Auth.Firebase.Gpgs
             }
             catch (Exception e)
             {
-                Log.Warning("SignIn 실패 (GPGS 인증서를 얻는중 예외가 발생함)");
+                Log.Warning("로그인 실패 (GPGS 인증서를 얻는 중 예외가 발생)");
                 Log.Exception(e);
                 return false;
             }
             if (credential == null)
             {
-                Log.Warning("SignIn 실패 (GPGS 인증서가 없음)");
+                Log.Warning("로그인 실패 (GPGS 인증서가 없음)");
+                return false;
+            }
+            
+            if (_authManager == null)
+            {
+                Log.Warning("로그인 실패 (AuthManager가 연결되어 있지 않음)");
                 return false;
             }
             
             // GPGS 인증서를 통해 Firebase 로그인
             bool result = await _authManager.SignInWithCredentialAsync(credential);
-            if (result) Log.Info("SignIn 성공 (GPGS)");
-            else Log.Warning("SignIn 실패 (GPGS)");
+            if (result) Log.Info("로그인 성공 (GPGS)");
+            else Log.Warning("로그인 실패 (GPGS)");
             
             return result;
         }

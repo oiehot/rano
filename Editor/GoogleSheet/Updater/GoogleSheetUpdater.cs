@@ -17,7 +17,7 @@ namespace Rano.Editor.GoogleSheet
             Log.Important("모든 구글 시트 업데이트 업데이트 중...");
             
             // UpdatableGoogleSheetSO 타입에서 파생된 모든 에셋 GUID를 얻는다.  
-            Type baseClass = typeof(UpdatableSheetSO<>);
+            // Type baseClass = typeof(UpdatableSheetSO<>);
             string query = $"t:{typeof(UpdatableSheetSO<>)}";
 
             string[]? guids = null;

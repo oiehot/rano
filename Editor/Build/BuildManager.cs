@@ -1,3 +1,6 @@
+#nullable enable
+
+using System;
 using System.IO;
 using UnityEditor;
 
@@ -6,9 +9,9 @@ namespace Rano.Editor.Build
     public static class BuildManager
     {
         private const int PRIORITY = 200;
-        public const string DevelopmentBuildName = "Build/Development Build";
-        // public const string AddressableBuildName = "Build/Adressable Build";
-        public const string AutoRunBuildName = "Build/Auto Run";
+        private const string DEVELOPMENT_BUILD_NAME = "Build/Development Build";
+        // public const string ADDRESSABLE_BUILD_NAME = "Build/Adressable Build";
+        private const string AUTORUN_BUILD_NAME = "Build/Auto Run";
         public static bool IsDevelopmentBuild { get; private set; }
         // public static bool IsAdressableBuild { get; private set; }
         public static bool IsAutoRun { get; private set; }
@@ -17,31 +20,47 @@ namespace Rano.Editor.Build
         static BuildManager()
         {
             string assetPath = UnityEngine.Application.dataPath;
-            DirectoryInfo unityDirInfo = System.IO.Directory.GetParent(assetPath);
-            string unityProjectPath = unityDirInfo.FullName;
+
+            DirectoryInfo? unityDirectory;
+            try
+            {
+                unityDirectory = Directory.GetParent(assetPath);
+            }
+            catch
+            {
+                unityDirectory = null;
+            }
+
+            if (unityDirectory == null)
+            {
+                throw new Exception($"상위 디렉토리를 얻을 수 없습니다 ({assetPath})");
+            }
+            
+            string unityProjectPath = unityDirectory.FullName;
+            
             BuildPath = $"{unityProjectPath}/Builds";
 
             // TODO: Remove space and convert slash to dot
-            IsDevelopmentBuild = EditorPrefs.GetBool(DevelopmentBuildName, true);
             // IsAdressableBuild = EditorPrefs.GetBool(AddressableBuildName, true);
-            IsAutoRun = EditorPrefs.GetBool(AutoRunBuildName, false);
+            IsDevelopmentBuild = EditorPrefs.GetBool(DEVELOPMENT_BUILD_NAME, true);
+            IsAutoRun = EditorPrefs.GetBool(AUTORUN_BUILD_NAME, false);
         }
 
         #region ToggleDevelopmentBuild
 
         /// TODO: 자동 빌드 버젼 증가 속성에 따라 메뉴 활성화 여부 결정.
-        [MenuItem(DevelopmentBuildName, true)]
+        [MenuItem(DEVELOPMENT_BUILD_NAME, true)]
         private static bool SetDevelopmentBuildValidate()
         {
-            Menu.SetChecked(DevelopmentBuildName, IsDevelopmentBuild);
+            Menu.SetChecked(DEVELOPMENT_BUILD_NAME, IsDevelopmentBuild);
             return true;
         }
         /// <summary>자동 빌드 버젼 증가 체크</summary>
-        [MenuItem(DevelopmentBuildName, false, PRIORITY+1)]
+        [MenuItem(DEVELOPMENT_BUILD_NAME, false, PRIORITY+1)]
         private static void SetDevelopmentBuild()
         {
             IsDevelopmentBuild = !IsDevelopmentBuild;
-            EditorPrefs.SetBool(DevelopmentBuildName, IsDevelopmentBuild);
+            EditorPrefs.SetBool(DEVELOPMENT_BUILD_NAME, IsDevelopmentBuild);
             Log.Info($"DevelopmentBuild: {IsDevelopmentBuild}");
         }
 
@@ -72,18 +91,18 @@ namespace Rano.Editor.Build
 
         #region AutoRun
 
-        [MenuItem(AutoRunBuildName, true)]
+        [MenuItem(AUTORUN_BUILD_NAME, true)]
         private static bool SetAutoRunValidate()
         {
-            Menu.SetChecked(AutoRunBuildName, IsAutoRun);
+            Menu.SetChecked(AUTORUN_BUILD_NAME, IsAutoRun);
             return true;
         }
 
-        [MenuItem(AutoRunBuildName, false, PRIORITY+3)]
+        [MenuItem(AUTORUN_BUILD_NAME, false, PRIORITY+3)]
         private static void SetAutoRun()
         {
             IsAutoRun = !IsAutoRun;
-            EditorPrefs.SetBool(AutoRunBuildName, IsAutoRun);
+            EditorPrefs.SetBool(AUTORUN_BUILD_NAME, IsAutoRun);
             Log.Info($"AutoRun: {IsAutoRun}");
         }
 

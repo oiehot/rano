@@ -16,8 +16,8 @@ namespace Rano.Editor
 			}
 		}
 
-		static Shell()
-		{
+		// static Shell()
+		// {
 			// if (Application.platform == RuntimePlatform.WindowsEditor)
 			// {
 			// 	pythonPath = Run("where", "python");
@@ -26,7 +26,7 @@ namespace Rano.Editor
 			// {
 			// 	pythonPath = Run("which", "python");
 			// }
-		}
+		// }
 		
 		public static int Run(string filepath, string arg, out string result)
 		{

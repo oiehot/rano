@@ -10,16 +10,15 @@ namespace Rano.Encoding
 {
     public static class Json
     {
-        public static JsonSerializerSettings SerializerSettings;
+        private static readonly JsonSerializerSettings SerializerSettings;
 
         static Json()
         {
-            // Serialize시 기본적으로 사용할 세팅.
             SerializerSettings = new DefaultSerializerSettings();
         }
 
         /// <summary>
-        /// 인스턴스 => JsonString
+        /// Object => JsonString
         /// </summary>
         public static string? ConvertObjectToString(object obj)
         {

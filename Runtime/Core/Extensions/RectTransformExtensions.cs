@@ -14,9 +14,8 @@ namespace Rano
 
         public static void MoveY(this RectTransform rectTransform, float offsetY)
         {
-            float x = rectTransform.anchoredPosition.x;
-            float y = rectTransform.anchoredPosition.y;
-            rectTransform.anchoredPosition = new Vector2(x, y + offsetY);
+            Vector2 rectAnchoredPosition = rectTransform.anchoredPosition;
+            rectTransform.anchoredPosition = new Vector2(rectAnchoredPosition.x, rectAnchoredPosition.y + offsetY);
         }
 
         // Width, Height

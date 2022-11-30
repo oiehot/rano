@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 using DG.Tweening;
 
 namespace Rano.UGUI
@@ -13,10 +11,11 @@ namespace Rano.UGUI
         [SerializeField] private float _hideDuration = 0.5f;
         [SerializeField] private Ease _showEase = Ease.Linear;
         [SerializeField] private Ease _hideEase = Ease.Linear;
+        
+        public event Action OnShowCompleted;
+        public event Action OnHideCompleted;
 
         public bool IsShowed => gameObject.activeSelf;
-        public Action OnShowCompleted { get; set; }
-        public Action OnHideCompleted { get; set; }
         
         void Awake()
         {
@@ -26,7 +25,7 @@ namespace Rano.UGUI
         [ContextMenu("Show")]
         public void Show()
         {
-            if (gameObject.activeSelf == true) return;
+            if (gameObject.activeSelf) return;
             gameObject.SetActive(true);
             _canvasGroup.alpha = 1.0f;
             OnShowCompleted?.Invoke();
@@ -35,7 +34,7 @@ namespace Rano.UGUI
         [ContextMenu("Hide")]
         public void Hide()
         {
-            if (gameObject.activeSelf == false) return;
+            if (gameObject.activeSelf) return;
             _canvasGroup.alpha = 0.0f;
             gameObject.SetActive(false);
             OnHideCompleted?.Invoke();
@@ -44,7 +43,7 @@ namespace Rano.UGUI
         [ContextMenu("Show Fade")]
         public void ShowFade()
         {
-            if (gameObject.activeSelf == true) return;
+            if (gameObject.activeSelf) return;
             gameObject.SetActive(true);
             _canvasGroup.DOFade(1.0f, _showDuration)
                 .SetEase(_showEase)
@@ -55,7 +54,7 @@ namespace Rano.UGUI
         }
         
         [ContextMenu("Hide Fade")]
-        public void HideFade(Action onHideCompleted=null)
+        public void HideFade() // Action onHideCompleted=null)
         {
             if (gameObject.activeSelf == false) return;
             _canvasGroup.DOFade(0.0f, _hideDuration)
@@ -64,7 +63,7 @@ namespace Rano.UGUI
                 {
                     gameObject.SetActive(false);
                     OnHideCompleted?.Invoke();
-                    onHideCompleted?.Invoke();
+                    // onHideCompleted?.Invoke();
                 });
         }
     }

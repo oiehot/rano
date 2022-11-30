@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Rano.Cinematics
@@ -7,21 +5,22 @@ namespace Rano.Cinematics
     [RequireComponent(typeof(Camera))]
     public class FollowCamera : MonoBehaviour
     {
-        private Camera _camera; // ! camera는 deprecated 되었다. 반면에 camera를 만들려고 하면 경고를 띄우므로 _을 붙임.
-        private Vector3 velocity = Vector3.zero;
-        private float errorToIgnore = 0.1f;
+        private Camera _camera;
+        private Vector3 _velocity = Vector3.zero;
+        private float _threshold = 0.1f;
         
-        public Transform target;
-        public Vector3 targetDistance = new Vector3(0.5f, 0.5f, 10.0f); // 이 값 + 타겟 에 카메라가 놓이게 된다.
-        public float smoothTime = 0.15f;
+        [SerializeField] private Transform _targetTransform;
+        [SerializeField] private Vector3 _targetDistance = new Vector3(0.5f, 0.5f, 10.0f); // 이 값 + 타겟 에 카메라가 놓이게 된다.
+        [SerializeField] private float _smoothTime = 0.15f;
         
-        private void Awake() {
+        void Awake()
+        {
             _camera = GetComponent<Camera>();
         }
         
         void Update()
         {
-            if (target)
+            if (_targetTransform)
             {
                 // public static Vector3 SmoothDamp(
                 //   Vector3 current: 현재 위치
@@ -32,12 +31,13 @@ namespace Rano.Cinematics
                 //   float deltaTime: 이 함수가 마지막으로 호출되고 나서의 경과 시간. 기본값은 Time.deltaTime.
                 // );
                 
-                Vector3 delta = target.position - _camera.ViewportToWorldPoint(targetDistance);
+                Vector3 delta = _targetTransform.position - _camera.ViewportToWorldPoint(_targetDistance);
                 // Vector3.magnitude: 벡터의 길이
-                if (delta.magnitude >= errorToIgnore) // 오차는 무시하고 움직이지 않는다. 이 코드가 없으면 카메라가 플레이어 중심에서 계속 떨린다.
+                if (delta.magnitude >= _threshold) // 오차는 무시하고 움직이지 않는다. 이 코드가 없으면 카메라가 플레이어 중심에서 계속 떨린다.
                 {
-                    Vector3 destination = transform.position + delta;
-                    transform.position = Vector3.SmoothDamp(transform.position, destination, ref velocity, smoothTime);
+                    Vector3 position = transform.position;
+                    Vector3 destination = position + delta;
+                    transform.position = Vector3.SmoothDamp(position, destination, ref _velocity, _smoothTime);
                 }
             }
         }

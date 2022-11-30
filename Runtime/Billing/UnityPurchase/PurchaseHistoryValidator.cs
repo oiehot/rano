@@ -8,8 +8,8 @@ namespace Rano.Billing.UnityPurchase
     {
         private IPurchaseHistory _purchaseHistory;
         private IReceiptValidator _receiptValidator;
-        
-        public Action OnValidated { get; set; }
+
+        public event Action OnValidated;
         
         private void Awake()
         {
@@ -57,7 +57,7 @@ namespace Rano.Billing.UnityPurchase
                     Log.Info($"영수증이 없으므로 검증상태를 False로 설정 ({product.id})");
                     _purchaseHistory.SetValidate(product.id, false);
                     continue;
-                };
+                }
                 
                 var result = await _receiptValidator.ValidateAsync(product.receipt);
                 switch (result.Type)

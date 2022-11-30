@@ -6,14 +6,15 @@ using UnityEngine;
 namespace Rano.EventSystem
 {
     [CreateAssetMenu(fileName="VoidEventChannel", menuName = "Rano/Events/Void Event Channel")]
-    public sealed class VoidEventChannelSO : DescriptionBaseSO 
+    public sealed class VoidEventChannelSO : DescriptionBaseSO
     {
-        public Action? OnRaiseEvent { get; set; }
+        public event Action? OnRaiseEvent;
         
         public void RaiseEvent()
         {
             OnRaiseEvent?.Invoke();
         }
+        
 #if UNITY_EDITOR
         /// <summary>
         /// 스크립터블 오브젝트의 상태를 출력한다.
@@ -23,10 +24,17 @@ namespace Rano.EventSystem
         private void LogStatus()
         {
             Log.Info($"{this}:");
-            Log.Info($"  Subscribers:");            
-            if (OnRaiseEvent != null)
+
+            if (OnRaiseEvent == null) return;
+            
+            var subscribers = OnRaiseEvent.GetInvocationList();
+            int subscriberCount = subscribers.Length;
+            
+            Log.Info($"  Subscribers:");
+            
+            if (subscriberCount > 0)
             {
-                foreach (var invocation in OnRaiseEvent.GetInvocationList())
+                foreach (var invocation in subscribers)
                 {
                     UnityEngine.Object? obj = invocation.Target as UnityEngine.Object;
                     if (obj == null) continue;

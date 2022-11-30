@@ -5,25 +5,25 @@ namespace Rano.Billing.UnityPurchase
 {
     public static class ProductExtensions
     {
-        public static ProductType ConvertToProductType(this InAppProductType inAppProductType)
+        public static ProductType ConvertToProductType(this EInAppProductType inAppProductType)
         {
             ProductType result = inAppProductType switch
             {
-                InAppProductType.Consumable => ProductType.Consumable,
-                InAppProductType.NonConsumable => ProductType.NonConsumable,
-                InAppProductType.Subscription => ProductType.Subscription,
+                EInAppProductType.Consumable => ProductType.Consumable,
+                EInAppProductType.NonConsumable => ProductType.NonConsumable,
+                EInAppProductType.Subscription => ProductType.Subscription,
                 _ => throw new Exception($"변환할 수 없는 상품타입 ({inAppProductType})")
             };
             return result;
         }
         
-        public static InAppProductType ConvertToInAppProductType(this ProductType productType)
+        public static EInAppProductType ConvertToInAppProductType(this ProductType productType)
         {
-            InAppProductType result = productType switch
+            EInAppProductType result = productType switch
             {
-                ProductType.Consumable => InAppProductType.Consumable,
-                ProductType.NonConsumable => InAppProductType.NonConsumable,
-                ProductType.Subscription => InAppProductType.Subscription,
+                ProductType.Consumable => EInAppProductType.Consumable,
+                ProductType.NonConsumable => EInAppProductType.NonConsumable,
+                ProductType.Subscription => EInAppProductType.Subscription,
                 _ => throw new Exception($"변환할 수 없는 상품타입 ({productType})")
             };
             return result;

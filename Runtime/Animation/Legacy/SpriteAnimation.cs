@@ -11,56 +11,58 @@ namespace Rano.Animation
         [SerializeField] public float delay;
     }
 
-    class SpriteAnimation : MonoBehaviour
+    public class SpriteAnimation : MonoBehaviour
     {
-        bool playing;
+        private bool _isPlaying;
+        private SpriteRenderer _spriteRenderer;
+        private Coroutine _playCoroutine;
+        
         public SpriteAnimationData[] data;
+        
         [Min(0.1f)] public float speed = 1.0f;
-        private SpriteRenderer spriteRenderer;
-        private Coroutine playCoroutine;
-
+        
         void Awake()
         {
-            this.spriteRenderer = GetComponent<SpriteRenderer>();
-            this.playing = false;
+            _spriteRenderer = GetComponent<SpriteRenderer>();
+            _isPlaying = false;
         }
 
         public void Play()
         {
-            if (this.playing)
+            if (_isPlaying)
             {
-                this.Stop();
+                Stop();
             }
-            this.playing = true;
-            this.spriteRenderer.sprite = null;
-            this.playCoroutine = StartCoroutine(this.PlayCoroutine());
+            _isPlaying = true;
+            _spriteRenderer.sprite = null;
+            _playCoroutine = StartCoroutine(this.PlayCoroutine());
         }
 
         public void Stop()
         {
-            if (this.playCoroutine != null)
+            if (_playCoroutine != null)
             {
-                StopCoroutine(this.playCoroutine);
+                StopCoroutine(_playCoroutine);
             }
         }
 
         private void Close()
         {
-            this.playing = false;
-            this.playCoroutine = null;
-            this.spriteRenderer.sprite = null;
-            this.gameObject.SetActive(false);
+            _isPlaying = false;
+            _playCoroutine = null;
+            _spriteRenderer.sprite = null;
+            gameObject.SetActive(false);
         }
 
-        IEnumerator PlayCoroutine()
+        private IEnumerator PlayCoroutine()
         {
             for (int i=0; i<this.data.Length; i++)
             {
-                this.spriteRenderer.sprite = this.data[i].sprite;
+                _spriteRenderer.sprite = this.data[i].sprite;
                 Log.Warning("이 코루틴에서 WaitForSeconds 객체를 생성하고 있습니다. 성능이 저하될 수 있습니다.");
                 yield return new WaitForSeconds(this.data[i].delay / this.speed);
             }
-            this.Close();        
+            Close();        
         }
     }
 }

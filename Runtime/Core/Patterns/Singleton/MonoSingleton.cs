@@ -12,8 +12,10 @@ namespace Rano.Pattern
     public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
         private static T _instance;
-        private static bool _isAppQuitting = false;
+        // ReSharper disable StaticMemberInGenericType
+        private static bool _isAppQuitting;
         private static readonly object Lock = new object();
+        // ReSharper restore StaticMemberInGenericType
 
         public static T Instance
         {
@@ -32,6 +34,7 @@ namespace Rano.Pattern
                     // UnityEngine.Object의 비교연산자는 오버로딩되어 성능이 떨어진다.
                     // 네이티브 객체를 비교하지 않고 유니티 객체(래핑객체)만 비교하도록 한다.
                     //if (_instance == null)
+                    // ReSharper disable once RedundantNameQualifier
                     if (object.ReferenceEquals(_instance, null))
                     {
                         _instance = (T)FindObjectOfType(typeof(T));
@@ -68,14 +71,14 @@ namespace Rano.Pattern
                 // Destroy(gameObject);
                 return;
             }
-            Log.Sys($"{typeof(T).ToString()}: Awake", caller: false);
+            Log.Sys($"{typeof(T)}: Awake", caller: false);
             //gameObject.name = typeof(T).ToString();
             DontDestroyOnLoad(gameObject);
         }
 
         protected virtual void OnEnable()
         {
-            Log.Sys($"{typeof(T).ToString()}: OnEnable", caller: false);
+            Log.Sys($"{typeof(T)}: OnEnable", caller: false);
         }
 
         /// <summary>
@@ -91,14 +94,13 @@ namespace Rano.Pattern
 
         protected virtual void OnDisable()
         {
-            Log.Sys($"{typeof(T).ToString()}: OnDisable", caller: false);
+            Log.Sys($"{typeof(T)}: OnDisable", caller: false);
         }
-
-
-        protected virtual void OnDestroy()
-        {
-            //Log.Sys($"{typeof(T).ToString()}: OnDestroy", caller: false);
-        }
+        
+        // protected virtual void OnDestroy()
+        // {
+        //     //Log.Sys($"{typeof(T).ToString()}: OnDestroy", caller: false);
+        // }
 
         /// <summary>
         /// Instance를 생성하기 위한 빈 메소드.

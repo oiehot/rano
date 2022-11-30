@@ -15,7 +15,7 @@ namespace Rano
                 if (task.IsFaulted)
                 {
                     Log.Exception(task.Exception);
-                    yield break;
+                    // yield break;
                 }
             }
     }

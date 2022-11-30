@@ -1,9 +1,3 @@
-// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
@@ -126,9 +120,14 @@ namespace Rano.Tests.Json
         [Test]
         public void JObject_Remove_Test()
         {
-            JObject jobj = new JObject();
-            jobj.Add("foo", "bar");
-            jobj.Remove("foo");
+            const string KEY = "foo";
+            const string VALUE = "bar";
+            
+            JObject jObject = new JObject();
+            
+            jObject.Add(KEY, VALUE);
+            jObject.Remove(KEY);
+            Assert.IsFalse(jObject.ContainsKey(KEY));
         }
 
         [Test]

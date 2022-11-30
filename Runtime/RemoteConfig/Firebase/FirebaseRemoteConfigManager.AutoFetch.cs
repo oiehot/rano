@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Rano.RemoteConfig.Firebase
 {
-    public sealed partial class FirebaseRemoteConfigManager : ManagerComponent, IRemoteConfigManager
+    public sealed partial class FirebaseRemoteConfigManager // : ManagerComponent, IRemoteConfigManager
     {
         private const int AUTO_FETCH_PERIOD = 60 * 1000; // ms
         private CancellationTokenSource? _updateCancelTokenSource;
@@ -29,21 +29,21 @@ namespace Rano.RemoteConfig.Firebase
             
             while (true)
             {
-                if (token.IsCancellationRequested == true)
+                if (token.IsCancellationRequested)
                 {
                     Log.Info("토큰에 의해 AutoFetch를 취소합니다 (in while loop)");
                     break;
                 }
 
                 // 지금 Fetch가 가능한지 확인하고 Fetch합니다.
-                if (IsFetchable() == true)
+                if (IsFetchable())
                 {
                     bool fetchResult = await FetchAsync();
                     
                     // Fetch에 성공하면 즉시 적용합니다 (활성화, Activate)
-                    if (fetchResult == true)
+                    if (fetchResult)
                     {
-                        bool activateResult = await ActivateAsync();
+                        _ = await ActivateAsync();
                     }
                 }
 
@@ -71,7 +71,7 @@ namespace Rano.RemoteConfig.Firebase
                 return;
             }
             
-            if (_updateCancelTokenSource.IsCancellationRequested == true)
+            if (_updateCancelTokenSource.IsCancellationRequested)
             {
                 Log.Info("자동 Fetch 중지 실패 (이미 취소했음)");
                 return;

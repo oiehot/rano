@@ -18,9 +18,9 @@ namespace Rano.Billing
     {
         private IPurchaseManager _purchaseManager;
         private Dictionary<string, InAppProduct> _products = new();
-        
-        public Action OnInitialized { get; set; }
-        public Action OnUpdated { get; set; }
+
+        public event Action OnInitialized;
+        public event Action OnUpdated;
         
         public Dictionary<string, InAppProduct> Products => _products;
 
@@ -70,7 +70,7 @@ namespace Rano.Billing
             string productId = newProduct.id;
             if (_products.TryGetValue(productId, out var savedProduct))
             {
-                UnityEngine.Debug.Assert(newProduct.hasReceipt == true);
+                Debug.Assert(newProduct.hasReceipt);
                 Log.Info($"PurchaseHistory에 저장된 상품의 검증상태를 True로 업데이트합니다 ({productId})");
                 savedProduct.receipt = newProduct.receipt;
                 savedProduct.hasReceipt = newProduct.hasReceipt;
@@ -138,11 +138,11 @@ namespace Rano.Billing
 
         public bool IsPurchased(InAppProduct product)
         {
-            if (product.type == InAppProductType.NonConsumable && product.validated)
+            if (product.type == EInAppProductType.NonConsumable && product.validated)
             {
                 return true;
             }
-            if (product.type == InAppProductType.Subscription)
+            if (product.type == EInAppProductType.Subscription)
             {
                 throw new NotImplementedException($"구독형 상품에 대한 구매여부를 알아낼 수 없습니다");
             }

@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Rano;
 
 namespace Rano.SaveSystem
 {
@@ -20,7 +19,7 @@ namespace Rano.SaveSystem
         [SerializeField] private int exp;
         [SerializeField] private int extra;
 
-        private Dictionary<string, object> dict;
+        private Dictionary<string, object> _dict;
 
 #if USE_ACCOUNT_DATA_TEST
         [Serializable]
@@ -46,7 +45,7 @@ namespace Rano.SaveSystem
         void Awake()
         {
             Log.Info("Awake");
-            dict = new Dictionary<string, object>();
+            _dict = new Dictionary<string, object>();
         }
 
         void OnEnable()
@@ -73,7 +72,7 @@ namespace Rano.SaveSystem
             age = 0;
             _name = null;
 #endif
-            dict.Clear();
+            _dict.Clear();
         }
 
         public void DefaultState()
@@ -82,17 +81,17 @@ namespace Rano.SaveSystem
             level = 42;
             exp = 1234;
             extra = 7;
-            dict["foo"] = 100;
-            dict["bar"] = 3.141592f;
+            _dict["foo"] = 100;
+            _dict["bar"] = 3.141592f;
 #if USE_ACCOUNT_DATA_TEST
             age = 39;
             _name = "Taewoo Lee";
-            dict["baz"] = new AccountData
+            _dict["baz"] = new AccountData
             {
                 age = 1,
                 name = "baz"
             };
-            dict["baz2"] = new AccountData
+            _dict["baz2"] = new AccountData
             {
                 age = 2,
                 name = "baz2"
@@ -113,7 +112,7 @@ namespace Rano.SaveSystem
                 name = _name
             };
 #endif
-            state.dict = dict;
+            state.dict = _dict;
             return state;
         }
 
@@ -136,7 +135,7 @@ namespace Rano.SaveSystem
             age = data.account.age;
             _name = data.account.name;
 #endif
-            dict = data.dict;
+            _dict = data.dict;
         }
     }
 }

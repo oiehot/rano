@@ -1,11 +1,7 @@
-﻿using System;
-using System.IO;
+﻿#nullable enable
+
+using System;
 using System.Text;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Rano.Encoding
 {
@@ -13,60 +9,56 @@ namespace Rano.Encoding
     {
         public static string EscapeString(string text)
         {
-            if (text == null || text.Length == 0)
-            {
-                return "";
-            }
+            int index;
+            int textLength = text.Length;
+            char character;
+            
+            StringBuilder stringBuilder = new StringBuilder(textLength + 4);
+            String tempString;
 
-            char c = '\0';
-            int i;
-            int len = text.Length;
-            StringBuilder sb = new StringBuilder(len + 4);
-            String t;
-
-            for (i = 0; i < len; i += 1)
+            for (index = 0; index < textLength; index += 1)
             {
-                c = text[i];
-                switch (c)
+                character = text[index];
+                switch (character)
                 {
                     case '\\':
                     case '"':
-                        sb.Append('\\');
-                        sb.Append(c);
+                        stringBuilder.Append('\\');
+                        stringBuilder.Append(character);
                         break;
                     case '/':
-                        sb.Append('\\');
-                        sb.Append(c);
+                        stringBuilder.Append('\\');
+                        stringBuilder.Append(character);
                         break;
                     case '\b':
-                        sb.Append("\\b");
+                        stringBuilder.Append("\\b");
                         break;
                     case '\t':
-                        sb.Append("\\t");
+                        stringBuilder.Append("\\t");
                         break;
                     case '\n':
-                        sb.Append("\\n");
+                        stringBuilder.Append("\\n");
                         break;
                     case '\f':
-                        sb.Append("\\f");
+                        stringBuilder.Append("\\f");
                         break;
                     case '\r':
-                        sb.Append("\\r");
+                        stringBuilder.Append("\\r");
                         break;
                     default:
-                        if (c < ' ')
+                        if (character < ' ')
                         {
-                            t = "000" + String.Format("X", c);
-                            sb.Append("\\u" + t.Substring(t.Length - 4));
+                            tempString = "000" + String.Format("X", character);
+                            stringBuilder.Append("\\u" + tempString.Substring(tempString.Length - 4));
                         }
                         else
                         {
-                            sb.Append(c);
+                            stringBuilder.Append(character);
                         }
                         break;
                 }
             }
-            return sb.ToString();
+            return stringBuilder.ToString();
         }
     }
 }

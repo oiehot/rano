@@ -3,7 +3,6 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Diagnostics;
-using UnityEngine;
 
 namespace Rano
 {
@@ -11,7 +10,7 @@ namespace Rano
     {
         private enum ELogType
         {
-            Default,
+            // Default,
             Info,
             Warning,
             Error,
@@ -20,37 +19,37 @@ namespace Rano
             Todo
         }
         
-        private static readonly int FONT_SIZE = 12;
+        private const int FONT_SIZE = 12;
         
         #if UNITY_EDITOR
 
-        private static readonly string DEFAULT_TITLE_COLOR = "#aaaaaaff";
-        private static readonly string DEFAULT_CALLER_COLOR = "#aaaaaaff";
-        private static readonly string DEFAULT_TEXT_COLOR = "#aaaaaaff";
+        private const string DEFAULT_TITLE_COLOR = "#aaaaaaff";
+        private const string DEFAULT_CALLER_COLOR = "#aaaaaaff";
+        private const string DEFAULT_TEXT_COLOR = "#aaaaaaff";
 
-        private static readonly string INFO_TITLE_COLOR = "#ffffffff";
-        private static readonly string INFO_CALLER_COLOR = "#999999ff";
-        private static readonly string INFO_TEXT_COLOR = "#999999ff";
+        private const string INFO_TITLE_COLOR = "#ffffffff";
+        private const string INFO_CALLER_COLOR = "#999999ff";
+        private const string INFO_TEXT_COLOR = "#999999ff";
         
-        private static readonly string WARNING_TITLE_COLOR = "#ffff55ff";
-        private static readonly string WARNING_CALLER_COLOR = "#ffff55ff";
-        private static readonly string WARNING_TEXT_COLOR = "#ffff55ff";
+        private const string WARNING_TITLE_COLOR = "#ffff55ff";
+        private const string WARNING_CALLER_COLOR = "#ffff55ff";
+        private const string WARNING_TEXT_COLOR = "#ffff55ff";
 
-        private static readonly string ERROR_TITLE_COLOR = "#ff5555ff";
-        private static readonly string ERROR_CALLER_COLOR = "#ff5555ff";
-        private static readonly string ERROR_TEXT_COLOR = "#ff5555ff";
+        private const string ERROR_TITLE_COLOR = "#ff5555ff";
+        private const string ERROR_CALLER_COLOR = "#ff5555ff";
+        private const string ERROR_TEXT_COLOR = "#ff5555ff";
         
-        private static readonly string SYSTEM_TITLE_COLOR = "#ffffffff";
-        private static readonly string SYSTEM_CALLER_COLOR = "#00ffffff";
-        private static readonly string SYSTEM_TEXT_COLOR = "#00ffffff";
+        private const string SYSTEM_TITLE_COLOR = "#ffffffff";
+        private const string SYSTEM_CALLER_COLOR = "#00ffffff";
+        private const string SYSTEM_TEXT_COLOR = "#00ffffff";
 
-        private static readonly string IMPORTANT_TITLE_COLOR = "#00ff00ff";
-        private static readonly string IMPORTANT_CALLER_COLOR = "#00ff00ff";
-        private static readonly string IMPORTANT_TEXT_COLOR = "#00ff00ff";
+        private const string IMPORTANT_TITLE_COLOR = "#00ff00ff";
+        private const string IMPORTANT_CALLER_COLOR = "#00ff00ff";
+        private const string IMPORTANT_TEXT_COLOR = "#00ff00ff";
 
-        private static readonly string TODO_TITLE_COLOR = "#ffbb00ff";
-        private static readonly string TODO_CALLER_COLOR = "#ffbb00ff";
-        private static readonly string TODO_TEXT_COLOR = "#ffbb00ff";
+        private const string TODO_TITLE_COLOR = "#ffbb00ff";
+        private const string TODO_CALLER_COLOR = "#ffbb00ff";
+        private const string TODO_TEXT_COLOR = "#ffbb00ff";
         #endif
         
         private static string ToShortFilepath(string filePath)

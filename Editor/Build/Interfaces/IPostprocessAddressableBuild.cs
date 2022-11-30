@@ -4,7 +4,7 @@ namespace Rano.Editor.Build
 {
     public interface IPostprocessAddressableBuild
     {
-        int callbackOrder { get; }
-        void OnPostprocessAddressableBuild();
+        public int CallbackOrder { get; }
+        public void OnPostprocessAddressableBuild();
     }
 }

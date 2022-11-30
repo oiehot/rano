@@ -9,7 +9,7 @@ namespace Rano.Billing
 
         public string id;
         public string storeSpecificId;
-        public InAppProductType type;
+        public EInAppProductType type;
 
         public string localizedTitle;
         public string localizedDescription;

@@ -10,7 +10,7 @@ namespace Rano.Review
     /// <remarks>초기화에서는 아무런 액션을 취하지 않으며, 리뷰 요청은 항상 성공한다.</remarks>
     public sealed class TestReviewManager : ReviewManager
     {
-        private bool _initialized = false;
+        private bool _initialized;
         public override bool IsInitialized => _initialized;
 
         public override bool Initialize()

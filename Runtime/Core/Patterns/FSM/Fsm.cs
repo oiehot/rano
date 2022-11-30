@@ -18,7 +18,7 @@ namespace Rano.Pattern
         public T Current {get; private set;}
         public T Next {get; set;} // 이 값을 설정하면 곧 상태가 바뀐다.
 
-        public bool shouldChange => !EqualityComparer<T>.Default.Equals(Current, Next);
+        public bool ShouldChange => !EqualityComparer<T>.Default.Equals(Current, Next);
 
         public Fsm(MonoBehaviour mono)
         {

@@ -5,9 +5,9 @@ namespace Rano.Editor.Build
 {
     public class AndroidBuilder : Builder
     {
-        public AndroidBuilder(bool developmentBuild) : base(developmentBuild)
+        protected AndroidBuilder(bool developmentBuild) : base(developmentBuild)
         {
-            _options.target = BuildTarget.Android;
+            options.target = BuildTarget.Android;
         }
 
         protected override string GetOutputDirectory()
@@ -23,7 +23,7 @@ namespace Rano.Editor.Build
             EditorUserBuildSettings.buildAppBundle = false;
             if (autoRun)
             {
-                _options.options |= BuildOptions.AutoRunPlayer;
+                options.options |= BuildOptions.AutoRunPlayer;
             }
         }
 
@@ -40,7 +40,7 @@ namespace Rano.Editor.Build
             EditorUserBuildSettings.buildAppBundle = true;
             if (autoRun)
             {
-                _options.options |= BuildOptions.AutoRunPlayer;
+                options.options |= BuildOptions.AutoRunPlayer;
             }
         }
 

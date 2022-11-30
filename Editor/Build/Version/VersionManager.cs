@@ -16,7 +16,7 @@ namespace Rano.Editor.Build
     {
         private const int PRIORITY = 100;
         private const string AUTO_INCREASE_MENU_NAME = "Build/Auto Increase Build Version";
-        public static bool IsAutoIncrease { get; private set; } = true;
+        public static bool IsAutoIncrease { get; private set; }
         public static SVersion LastVersion { get; private set; }
         public static SVersion CurrentVersion { get; private set; }
         public static string CurrentVersionString
@@ -57,8 +57,8 @@ namespace Rano.Editor.Build
             LastVersion = GetCurrentVersion();
             CurrentVersion = version;
             PlayerSettings.bundleVersion = version.ToString();
-            PlayerSettings.Android.bundleVersionCode = version.buildVersionCode;
-            PlayerSettings.iOS.buildNumber = version.buildVersionCode.ToString();
+            PlayerSettings.Android.bundleVersionCode = version.BuildVersionCode;
+            PlayerSettings.iOS.buildNumber = version.BuildVersionCode.ToString();
             Log.Info($"Change Version: {LastVersion.ToString()} => {CurrentVersion.ToString()}");            
         }
 
@@ -66,9 +66,9 @@ namespace Rano.Editor.Build
         {
             SVersion version;
             version = GetCurrentVersion();
-            version.major += majorInc;
-            version.minor += minorInc;
-            version.build += buildInc;
+            version.Major += majorInc;
+            version.Minor += minorInc;
+            version.Build += buildInc;
             ApplyVersion(version);
         }
 
@@ -92,9 +92,9 @@ namespace Rano.Editor.Build
         [MenuItem("Build/Edit Version", false, PRIORITY+3)]
         static void OpenEditVersionWindow()
         {
-            VersionEditor window = EditorWindow.CreateInstance<VersionEditor>();
+            VersionEditor window = ScriptableObject.CreateInstance<VersionEditor>();
             window.SetVersion(VersionManager.GetCurrentVersion());
-            window.position = new Rect(Screen.width / 2, Screen.height / 2, 250, 150);
+            window.position = new Rect(Screen.width / 2.0f, Screen.height / 2.0f, 250.0f, 150.0f);
             window.ShowUtility();
         }
     

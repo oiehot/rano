@@ -40,11 +40,12 @@ namespace Rano.Encoding
     /// </summary>
     public static class TypeCsvParser
     {
-        private static string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))";
-        private static string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r";
-        private static char[] TRIM_CHARS = { '\"' };
-        private static char[] HEADER_TRIM_CHARS = { ' ', ':', '\u0020' };
-        private static NumberStyles NUMBER_STYLE = NumberStyles.AllowThousands | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign;
+        private const string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))";
+        private const string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r";
+        private const NumberStyles NUMBER_STYLE = NumberStyles.AllowThousands | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign;
+        
+        private static readonly char[] TrimCharacters = { '\"' };
+        private static readonly char[] HeaderTrimCharacters = { ' ', ':', '\u0020' };
 
         public static List<Dictionary<string, object>> Parse(SCsvText csvText)
         {
@@ -70,10 +71,10 @@ namespace Rano.Encoding
                     string seriesFullname = headerColumns[j];
 
                     // 헤더명이 #으로 시작하면 그 Column은 무시한다.
-                    if (seriesFullname.StartsWith("#") == true) continue;
+                    if (seriesFullname.StartsWith("#")) continue;
 
                     // 헤더명을 분리한다. 예) sprites : list[str] => sprites, list[str]
-                    var seriesToken = seriesFullname.Split(HEADER_TRIM_CHARS, StringSplitOptions.RemoveEmptyEntries);
+                    var seriesToken = seriesFullname.Split(HeaderTrimCharacters, StringSplitOptions.RemoveEmptyEntries);
                     string seriesName = seriesToken[0];
                     
                     if (seriesToken.Length != 2)
@@ -91,7 +92,7 @@ namespace Rano.Encoding
                     
                     // 셀의 값
                     string value = rowValues[j];
-                    value = value.TrimStart(TRIM_CHARS).TrimEnd(TRIM_CHARS); // 좌우의 '"'를 제거한다.
+                    value = value.TrimStart(TrimCharacters).TrimEnd(TrimCharacters); // 좌우의 '"'를 제거한다.
                     value = value.Replace("\\n", "\n"); // \\n을 \n으로 교체한다.
                     value = value.Replace("\\t", "\t"); // \\t를 \t로 교체한다.
                     //value = value.Replace("\\", "");

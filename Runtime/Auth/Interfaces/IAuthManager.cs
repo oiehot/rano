@@ -1,7 +1,6 @@
 ﻿#nullable enable
 
 using System;
-using System.Threading.Tasks;
 
 namespace Rano.Auth
 {
@@ -12,8 +11,7 @@ namespace Rano.Auth
         public bool IsAuthenticated { get; }
         public bool Initialize();
         public bool SignOut();
-
-        public Action OnSignIn { get; set; }
-        public Action OnSignOut { get; set; }
+        public event Action OnSignIn;
+        public event Action OnSignOut;
     }
 }

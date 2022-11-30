@@ -44,16 +44,14 @@ namespace Rano.UGUI
             var color = _scrollHandleImage.color;
             color.a = 0.0f;
             _scrollHandleImage.color = color;
-
             _scrollRect.onValueChanged.AddListener(CheckScroll);
         }
 
         void OnDisable()
         {
-            var color = _scrollHandleImage.color;
+            Color color = _defaultColor;
             color.a = 1.0f;
-            _scrollHandleImage.color = _defaultColor;
-
+            _scrollHandleImage.color = color;
             _scrollRect.onValueChanged.RemoveListener(CheckScroll);
         }
 

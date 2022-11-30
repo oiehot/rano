@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,18 +7,19 @@ namespace Rano.PoolSystem
 {
     public class Pool
     {
-        public GameObject prefab {get; private set;}
-        public Transform transform {get; private set;}
-        Stack<GameObject> _stack = new Stack<GameObject>();
+        private readonly Stack<GameObject> _stack;
+        private readonly GameObject _prefab;
+        private readonly Transform _transform;
 
-        /// <summary>
-        /// 풀을 초기화한다.
-        /// </summary>
-        public void Initialize(GameObject prefab, int capacity)
+        public GameObject Prefab => _prefab;
+        public Transform PoolTransform => _transform;
+        
+        public Pool(GameObject prefab, int capacity)
         {
-            this.prefab = prefab;
-            transform = new GameObject().transform;
-            transform.name = $"{prefab.name}_Pool";
+            _stack = new Stack<GameObject>();
+            _prefab = prefab;
+            _transform = new GameObject().transform;
+            _transform.name = $"{prefab.name}_Pool";
             for (int i=0; i<capacity; i++)
             {
                 Push(Create());
@@ -29,9 +32,10 @@ namespace Rano.PoolSystem
         GameObject Create()
         {
             GameObject gameObject;
+            
             // TODO: 어드레서블인 경우 문제됨.
-            gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab);
-            gameObject.name = prefab.name;
+            gameObject = Object.Instantiate<GameObject>(_prefab);
+            gameObject.name = _prefab.name;
             return gameObject;
         }
 
@@ -43,8 +47,7 @@ namespace Rano.PoolSystem
         /// </remarks>
         public void Push(GameObject gameObject)
         {
-            if (gameObject == null) return;
-            gameObject.transform.parent = transform;
+            gameObject.transform.parent = _transform;
             gameObject.SetActive(false);
             _stack.Push(gameObject);
         }
@@ -52,29 +55,35 @@ namespace Rano.PoolSystem
         /// <summary>
         /// 재사용 풀로부터 게임오브젝트 꺼내오기.
         /// </summary>
-        public GameObject Pop(Transform parent, bool createIfNotExists=true)
+        public GameObject? Pop(Transform? parentTransform=null, bool createIfNotExists=true)
         {
             GameObject gameObject;
 
-            // 재사용 가능한 게임오브젝트가 있다면 꺼내고
-            // 없으면 새로 생성한다.
+            // 재사용 가능한 게임오브젝트가 있다면 꺼내고 없으면 새로 생성한다.
             if (_stack.Count > 0)
+            {
                 gameObject = _stack.Pop();
+            }
             else
+            {
                 if (createIfNotExists)
-                    // TODO: 하나씩 생성하는게 아니라 초기 capacity의 단위의 곱으로
-                    // TODO: 스택 사이즈를 증가시킬것.
+                {
+                    // TODO: 하나씩 생성하는게 아니라 초기 capacity의 단위의 곱으로 스택 사이즈를 증가시킬것.
                     gameObject = Create();
+                }
                 else
+                {
                     return null;
-            
+                }
+            }
+
             // 게임오브젝트를 활성화 한다.
             gameObject.SetActive(true);
 
             // 꺼낼 게임오브젝트가 들어갈 Parent Transform이 지정되어있지 않다면,
             // 현재 활성화 씬 루트 Transform 에 넣는다.
             // DontDestroyOnLoad가 아닌 현재 활성화 씬으로 옮긴다.
-            if (parent == null)
+            if (parentTransform == null)
             {
                 // DontDestroyOnLoad의 루트로 옮긴다.
                 //
@@ -91,7 +100,7 @@ namespace Rano.PoolSystem
             }
 
             // 지정한 Transform 아래로 옮긴다. Transform은 활성화 씬에 있어야만 한다.
-            gameObject.transform.parent = parent;
+            gameObject.transform.parent = parentTransform;
             
             return gameObject;
         }

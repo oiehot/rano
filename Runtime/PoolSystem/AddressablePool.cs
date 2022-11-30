@@ -1,6 +1,7 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -8,10 +9,11 @@ namespace Rano.PoolSystem
 {
     public class AddressablePool
     {
+        private readonly Stack<GameObject> _stack;
+        
         public int Available => _stack.Count;
         public int Capacity { get; private set; }
 
-        private Stack<GameObject> _stack;
         public string AssetName { get; private set; }
         public AssetReferenceGameObject Reference { get; private set;}
         public GameObject PoolGameObject { get; private set; }
@@ -77,7 +79,7 @@ namespace Rano.PoolSystem
 
             if (PoolGameObject != null)
             {
-                GameObject.Destroy(PoolGameObject);
+                UnityEngine.Object.Destroy(PoolGameObject);
             }
             else
             {
