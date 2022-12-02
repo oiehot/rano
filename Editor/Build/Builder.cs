@@ -112,7 +112,7 @@ namespace Rano.Editor.Build
 
             // 빌드 시작 전 로그
             string buildVersionStr = VersionManager.GetCurrentVersion().ToString();
-            Log.Important($"Building... {buildVersionStr}");
+            Log.Important($"Building... (v{buildVersionStr})");
             Log.Info($"BuildPlayerOptions: {options}");
             Log.Info($"BuildOptions: {options.options}");
             Log.Info($"Target: {options.target}");

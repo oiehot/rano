@@ -92,7 +92,7 @@ namespace Rano.Database
             }
             else
             {
-                Log.Warning("로그 실패");
+                Log.Warning("로드 실패");
                 return false;
             }
         }

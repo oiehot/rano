@@ -33,7 +33,7 @@ namespace Rano.Auth.Firebase.Gpgs
         public void Initialize(FirebaseAuthManager authManager)
         {
             _state = EState.Initializing;
-            Log.Info("GPGS인증 초기화 중...");
+            Log.Info("GPGS 인증 초기화 중...");
             
             // AuthManager 초기화가 되어 있어야만 한다.
             _authManager = authManager;
