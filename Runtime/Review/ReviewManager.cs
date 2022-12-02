@@ -47,7 +47,7 @@ namespace Rano.Review
         {
             if (CanReview() == false)
             {
-                Log.Warning("리뷰 요청 실패 (기간 또는 횟수 제한으로 거부)");
+                Log.Info("리뷰 요청 실패 (기간 또는 횟수 제한으로 거부)");
                 return false;
             }
 
