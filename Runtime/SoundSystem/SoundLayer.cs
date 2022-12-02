@@ -10,7 +10,8 @@ namespace Rano.SoundSystem
     {
         private const float DEFAULT_VOLUME = 1.0f;
         private const float DEFAULT_PITCH = 1.0f;
-        private static int ClassCount = 1;
+        
+        private static int _classCount = 1;
         
         private AudioSource _audioSource;
         private float _targetVolume = DEFAULT_VOLUME;
@@ -38,7 +39,7 @@ namespace Rano.SoundSystem
             set => _targetVolume = value;
         }
 
-        private bool _latestPlayState = false;
+        private bool _latestPlayState;
         public bool IsPlaying => _audioSource.isPlaying;
         public bool IsMute => _isMute;
         
@@ -46,7 +47,7 @@ namespace Rano.SoundSystem
         {
             if (String.IsNullOrEmpty(_name))
             {
-                _name = $"UnknownSoundLayer{SoundLayer.ClassCount++}";
+                _name = $"UnknownSoundLayer{_classCount++}";
             }
             _audioSource = gameObject.AddComponent<AudioSource>();
             _audioSource.playOnAwake = false;
@@ -69,7 +70,7 @@ namespace Rano.SoundSystem
         {
             while (true)
             {
-                if (_latestPlayState == true && IsPlaying == false)
+                if (_latestPlayState && IsPlaying == false)
                 {
                     OnPlayFinished?.Invoke();
                     _latestPlayState = false;
@@ -152,7 +153,7 @@ namespace Rano.SoundSystem
 
         public void SetVolume(float volume)
         {
-            if (_isMute == true)
+            if (_isMute)
             {
                 Log.Warning("뮤트중에는 볼륨을 설정할 수 없습니다");
                 return;
@@ -163,7 +164,7 @@ namespace Rano.SoundSystem
 
         public void SetVolumeFade(float volume, float fadeDuration)
         {
-            if (_isMute == true)
+            if (_isMute)
             {
                 Log.Warning("뮤트중에는 볼륨을 설정할 수 없습니다");
                 return;
@@ -177,7 +178,7 @@ namespace Rano.SoundSystem
             if (_isMute == value) return;
 
             // 뮤트를 켜서 소리를 없애는 경우:
-            if (value == true)
+            if (value)
             {
                 _isMute = true;
                 _audioSource.mute = true;
@@ -199,7 +200,7 @@ namespace Rano.SoundSystem
             if (_isMute == value) return;
             
             // 뮤트를 켜서 소리를 없애는 경우:
-            if (value == true)
+            if (value)
             {
                 _isMute = true;
                 _audioSource.DOKill();

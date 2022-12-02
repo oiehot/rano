@@ -7,36 +7,14 @@ using Rano.SaveSystem;
 
 namespace Rano.SoundSystem
 {
-    public enum ESoundLayerType
-    {
-        Unknown = 0,
-        Background,
-        Prop,
-        Character,
-        FX,
-        UI,
-        System
-    }
-
-    [Serializable]
-    public class SoundLayerData
-    {
-        public float volume;
-        public bool mute;
-    }
-    
-    [Serializable]
-    public class SoundManagerData
-    {
-        public float masterVolume;
-        public Dictionary<String, SoundLayerData> soundLayers;
-    }
-
-    public sealed partial class SoundManager : ManagerComponent, ISaveLoadable
+    public sealed class SoundManager : ManagerComponent, ISaveLoadable
     {
         private const float DEFAULT_MASTER_VOLUME = 1.0f;
+        
+        #nullable disable
         private SoundLayer[] _soundLayers;
-        private AudioListener? _audioListener;
+        private AudioListener _audioListener;
+        #nullable enable
 
         public float MasterVolume => AudioListener.volume;
 
@@ -46,7 +24,7 @@ namespace Rano.SoundSystem
 
             SetMasterVolume(DEFAULT_MASTER_VOLUME);
             
-            int soundlayerSize = System.Enum.GetValues(typeof(ESoundLayerType)).Length;
+            int soundlayerSize = Enum.GetValues(typeof(ESoundLayerType)).Length;
             _soundLayers = new SoundLayer[soundlayerSize];
 
             // 현재 씬에 AudioListener가 없다면(보통 카메라에 있음) 이 사운드 매니져에 장착한다.
@@ -173,26 +151,18 @@ namespace Rano.SoundSystem
         
         public object CaptureState()
         {
-            // SoundLayer 들의 상태를 준비한다.
-            Dictionary<String, SoundLayerData> soundLayerDatas = new Dictionary<string, SoundLayerData>();
+            Dictionary<String, SoundLayerData> soundLayerDataDict = new Dictionary<string, SoundLayerData>();
             
             for (int i=0; i < _soundLayers.Length; i++)
             {
                 ESoundLayerType soundLayerType = (ESoundLayerType)i;
-                SoundLayerData soundLayerData = new SoundLayerData
-                {
-                    mute = _soundLayers[i].IsMute,
-                    volume = _soundLayers[i].TargetVolume
-                };
-                soundLayerDatas.Add(soundLayerType.ToString(), soundLayerData);
+                SoundLayerData soundLayerData = new SoundLayerData(
+                    _soundLayers[i].TargetVolume, _soundLayers[i].IsMute
+                );
+                soundLayerDataDict.Add(soundLayerType.ToString(), soundLayerData);
             }
             
-            // SoundManager의 상태를 준비한다.
-            SoundManagerData state = new SoundManagerData
-            {
-                masterVolume = MasterVolume,
-                soundLayers = soundLayerDatas
-            };
+            SoundManagerData state = new SoundManagerData(MasterVolume, soundLayerDataDict);
             
             return state;
         }
@@ -231,7 +201,7 @@ namespace Rano.SoundSystem
                 SoundLayerData soundLayerData = soundLayerDataKv.Value;
 
                 ESoundLayerType soundLayerType;
-                if (ESoundLayerType.TryParse(soundLayerName, out soundLayerType) == true)
+                if (Enum.TryParse(soundLayerName, out soundLayerType))
                 {
                     int idx = (int)soundLayerType;
                     _soundLayers[idx].SetVolume(soundLayerData.volume);

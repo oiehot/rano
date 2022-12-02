@@ -4,19 +4,23 @@ namespace Rano.Billing
 {
     public interface IPurchaseManager
     {
+        InAppProductSO[] RawProducts { get; set; }
+       
         bool IsInitialized { get; }
         
-        InAppProductSO[] RawProducts { get; set; }
-        public event Action<InAppProduct[]> onInitialized;
-        public event Action onInitializeFailed;
-        public event Action<InAppProduct[]> onUpdateSuccess;
-        public event Action onUpdateFailed;
-        public event Action<string> onPurchaseComplete;
-        public event Action<string, string> onPurchaseFailed;
-        public event Action<InAppProduct> onValidatePurchaseSuccess;
-        public event Action<string> onValidatePurchaseFailed;
-        public event Action onRestoreAllPurchasesComplete;
-        public event Action onRestoreAllPurchasesFailed;
+        public event Action<InAppProduct[]> OnInitialized;
+        public event Action OnInitializeFailed;
+        public event Action<InAppProduct[]> OnUpdateSuccess;
+        public event Action OnUpdateFailed;
+        public event Action<string> OnPurchaseCompleted;
+        public event Action<string, string> OnPurchaseFailed;
+        public event Action<InAppProduct> OnValidatePurchaseSuccess;
+        public event Action<string> OnValidatePurchaseFailed;
+        
+#if UNITY_IOS
+        public event Action OnRestoreAllPurchasesComplete;
+        public event Action OnRestoreAllPurchasesFailed;
+#endif
 
         void Initialize();
         void UpdateProducts();

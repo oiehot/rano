@@ -8,8 +8,6 @@ namespace Rano.Tests.Json
 {
     public class NewtonsoftJsonTests
     {
-        #region CLASSES
-
         [System.Serializable]
         public class Author
         {
@@ -39,20 +37,13 @@ namespace Rano.Tests.Json
                 this.author = author;
             }
         }
-
-        #endregion
-
-        #region FIELDS
-
-        private string _json_articles;
-        private string _json_article;
-
-        #endregion
-
+        private string _jsonArticles;
+        private string _jsonArticle;
+        
         [SetUp]
         public void Setup()
         {
-            _json_articles = @"[
+            _jsonArticles = @"[
               {
                 'id': 100,
                 'title': 'Hello World',
@@ -64,7 +55,7 @@ namespace Rano.Tests.Json
               }
             ]";
 
-            _json_article = @"{
+            _jsonArticle = @"{
               'id': 100,
               'title': 'Hello World',
               'author': {
@@ -78,7 +69,7 @@ namespace Rano.Tests.Json
         [Test]
         public void JToken_Cast_Test()
         {
-            dynamic article = JObject.Parse(_json_article);
+            dynamic article = JObject.Parse(_jsonArticle);
             JToken nameToken = article.author.name;
 
             Assert.IsNotNull(nameToken);
@@ -88,71 +79,82 @@ namespace Rano.Tests.Json
         [Test]
         public void JObject_Add_Test()
         {
-            JObject jobj = new JObject();
-            jobj.Add("int_key", 100);
-            jobj.Add("float_key", 3.141592f);
-            jobj.Add("string_key", "foo");
-            jobj.Add("boolean_key", true);
+            JObject jObject = new JObject();
+            
+            Assert.IsNotNull(jObject);
+            
+            jObject.Add("int_key", 100);
+            jObject.Add("float_key", 3.141592f);
+            jObject.Add("string_key", "foo");
+            jObject.Add("boolean_key", true);
 
-            Assert.IsNotNull(jobj.ToString());
-            Assert.AreEqual((int)jobj["int_key"], 100);
-            Assert.AreEqual((float)jobj["float_key"], 3.141592f);
-            Assert.AreEqual(jobj["string_key"].ToString(), "foo");
-            Assert.AreEqual((bool)jobj["boolean_key"], true);
+            Assert.AreEqual((int)jObject["int_key"], 100);
+            Assert.AreEqual((float)jObject["float_key"], 3.141592f);
+            Assert.IsNotNull(jObject["string_key"]);
+            Assert.AreEqual(jObject["string_key"].ToString(), "foo");
+            Assert.AreEqual((bool)jObject["boolean_key"], true);
         }
 
         [Test]
         public void JObject_ValueQuery_Test()
         {
-            JObject jobj = new JObject();
-            jobj.Add("int_key", 100);
-            jobj.Add("float_key", 3.141592f);
-            jobj.Add("string_key", "foo");
-            jobj.Add("boolean_key", true);
+            JObject jObject = new JObject();
+            Assert.IsNotNull(jObject);
+            
+            jObject.Add("int_key", 100);
+            jObject.Add("float_key", 3.141592f);
+            jObject.Add("string_key", "foo");
+            jObject.Add("boolean_key", true);
 
-            Assert.AreEqual(jobj.Value<int>("int_key"), 100);
-            Assert.AreEqual(jobj.Value<int?>("int_key"), 100);
-            Assert.AreEqual(jobj.Value<float>("float_key"), 3.141592f);
-            Assert.AreEqual(jobj.Value<string>("string_key"), "foo");
-            Assert.AreEqual(jobj.Value<bool>("boolean_key"), true);
+            Assert.AreEqual(jObject.Value<int>("int_key"), 100);
+            Assert.AreEqual(jObject.Value<float>("float_key"), 3.141592f);
+            Assert.AreEqual(jObject.Value<string>("string_key"), "foo");
+            Assert.AreEqual(jObject.Value<bool>("boolean_key"), true);
         }
 
         [Test]
         public void JObject_Remove_Test()
         {
-            const string KEY = "foo";
-            const string VALUE = "bar";
+            const string key = "foo";
+            const string value = "bar";
             
             JObject jObject = new JObject();
+            Assert.IsNotNull(jObject);
             
-            jObject.Add(KEY, VALUE);
-            jObject.Remove(KEY);
-            Assert.IsFalse(jObject.ContainsKey(KEY));
+            jObject.Add(key, value);
+            jObject.Remove(key);
+            
+            Assert.IsFalse(jObject.ContainsKey(key));
         }
 
         [Test]
         public void JObject_RemoveAll_Test()
         {
-            JObject jobj = new JObject();
-            jobj.Add("foo", "0");
-            jobj.Add("bar", "1");
-            jobj.Add("baz", "2");
-            jobj.RemoveAll();
+            JObject jObject = new JObject();
+            Assert.IsNotNull(jObject);
+            
+            jObject.Add("foo", "0");
+            jObject.Add("bar", "1");
+            jObject.Add("baz", "2");
+            jObject.RemoveAll();
         }
 
         [Test]
         public void JObject_ContainsKey_Test()
         {
-            JObject jobj = new JObject();
-            jobj.Add("foo", "bar");
-            Assert.IsTrue(jobj.ContainsKey("foo"));
-            Assert.IsFalse(jobj.ContainsKey("baz"));
+            JObject jObject = new JObject();
+            Assert.IsNotNull(jObject);
+            
+            jObject.Add("foo", "bar");
+            Assert.IsTrue(jObject.ContainsKey("foo"));
+            Assert.IsFalse(jObject.ContainsKey("baz"));
         }
 
         [Test]
         public void JObject_Parse_Test()
         {
-            dynamic article = JObject.Parse(_json_article);
+            dynamic article = JObject.Parse(_jsonArticle);
+            Assert.IsNotNull(article);
 
             Assert.IsNotNull(article.ToString());
 
@@ -177,23 +179,29 @@ namespace Rano.Tests.Json
         {
             Author author = new Author("Taewoo Lee", "oiehot@gmail.com", "@oiehot");
             Article article = new Article(100, "Foo Bar", author);
-            JObject jobj = JObject.FromObject(article);
-
-            Assert.IsNotNull(jobj.ToString());
-            Assert.AreEqual((int)jobj["id"], 100);
-            Assert.AreEqual(jobj["title"].ToString(), "Foo Bar");
-            Assert.AreEqual(jobj["author"]["name"].ToString(), "Taewoo Lee");
-            Assert.AreEqual(jobj["author"]["email"].ToString(), "oiehot@gmail.com");
-            Assert.AreEqual(jobj["author"]["twitter"].ToString(), "@oiehot");
+            
+            JObject jObject = JObject.FromObject(article);
+            Assert.IsNotNull(jObject);
+            
+            Assert.AreEqual((int)jObject["id"], 100);
+            Assert.IsNotNull(jObject["title"]);
+            Assert.AreEqual(jObject["title"].ToString(), "Foo Bar");
+            Assert.IsNotNull(jObject["author"]);
+            Assert.IsNotNull(jObject["author"]["name"]);
+            Assert.IsNotNull(jObject["author"]["email"]);
+            Assert.IsNotNull(jObject["author"]["twitter"]);
+            Assert.AreEqual(jObject["author"]["name"].ToString(), "Taewoo Lee");
+            Assert.AreEqual(jObject["author"]["email"].ToString(), "oiehot@gmail.com");
+            Assert.AreEqual(jObject["author"]["twitter"].ToString(), "@oiehot");
         }
 
         [Test]
         public void JArray_Parse_Test()
         {
-            dynamic articles = JArray.Parse(_json_articles);
+            dynamic articles = JArray.Parse(_jsonArticles);
             dynamic article = articles[0];
 
-            Assert.AreEqual((int)article.id, (int)100);
+            Assert.AreEqual((int)article.id, 100);
             Assert.AreEqual(article.id.ToString(), "100");
             Assert.AreEqual(article.title.ToString(), "Hello World");
             JToken nameToken = article.author.name;
@@ -233,31 +241,36 @@ namespace Rano.Tests.Json
         [Test]
         public void JArray_Remove_Test()
         {
-            JArray a = new JArray();
-            a.Add("foo");
-            a.Add("bar");
-            a.Add("baz");
-            a.Remove(a[0]);
-            Assert.AreEqual(a.Count, 2);
+            JArray jArray = new JArray();
+            Assert.IsNotNull(jArray);
+            jArray.Add("foo");
+            jArray.Add("bar");
+            jArray.Add("baz");
+            jArray.Remove(jArray[0]);
+            Assert.AreEqual(jArray.Count, 2);
         }
 
         [Test]
         public void JArray_RemoveAll_Test()
         {
-            JArray a = new JArray();
-            a.Add("foo");
-            a.Add("bar");
-            a.Add("baz");
-            a.RemoveAll();
-            Assert.AreEqual(a.Count, 0);
+            JArray jArray = new JArray();
+            Assert.IsNotNull(jArray);
+            jArray.Add("foo");
+            jArray.Add("bar");
+            jArray.Add("baz");
+            jArray.RemoveAll();
+            Assert.AreEqual(jArray.Count, 0);
         }
 
 
         [Test]
         public void JsonConvert_DeserializeObject_ListT_Test()
         {
-            List<Article> articles = JsonConvert.DeserializeObject<List<Article>>(_json_articles);
-            Article article = articles[0];
+            List<Article> articles = JsonConvert.DeserializeObject<List<Article>>(_jsonArticles);
+            Assert.IsNotNull(articles);
+            
+            Article article = articles![0];
+            
             Assert.AreEqual(article.id, 100);
             Assert.AreEqual(article.title, "Hello World");
             Assert.AreEqual(article.author.name, "Taewoo Lee");
@@ -268,8 +281,9 @@ namespace Rano.Tests.Json
         [Test]
         public void JsonConvert_DeserializeObject_T_Test()
         {
-            Article article = JsonConvert.DeserializeObject<Article>(_json_article);
-            Assert.AreEqual(article.id, 100);
+            Article article = JsonConvert.DeserializeObject<Article>(_jsonArticle);
+            Assert.IsNotNull(article);
+            Assert.AreEqual(article!.id, 100);
             Assert.AreEqual(article.title, "Hello World");
             Assert.AreEqual(article.author.name, "Taewoo Lee");
             Assert.AreEqual(article.author.email, "oiehot@gmail.com");

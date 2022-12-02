@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
 using UnityEngine;
 using Rano.Database;
 
@@ -37,7 +36,7 @@ namespace Rano.SaveSystem
         {
             SaveableEntity saveableEntity;
             
-            if (go.TryGetComponent<SaveableEntity>(out saveableEntity) == true)
+            if (go.TryGetComponent<SaveableEntity>(out saveableEntity))
             {
                 return this.SaveToDatabase(saveableEntity);
             }
@@ -123,7 +122,7 @@ namespace Rano.SaveSystem
         {
             SaveableEntity saveableEntity;
             
-            if (go.TryGetComponent<SaveableEntity>(out saveableEntity) == true)
+            if (go.TryGetComponent<SaveableEntity>(out saveableEntity))
             {
                 return this.LoadFromDatabase(saveableEntity, useDefaultStateIfFailed);
             }

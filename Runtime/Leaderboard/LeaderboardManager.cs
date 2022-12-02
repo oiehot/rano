@@ -42,19 +42,19 @@ namespace Rano.Leaderboard
         /// </summary>
         public bool Initialize(FirebaseAuthManager authManager, FirebaseFirestoreManager firestoreManager)
         {
-            Log.Info("리더보드 초기화중...");
+            Log.Info("리더보드 초기화 중...");
 
-            if (authManager == null)
-            {
-                Log.Warning("리더보드 초기화 실패 (인증 관리자가 비어 있음)");
-                return false;
-            }
-
-            if (firestoreManager == null)
-            {
-                Log.Warning("리더보드 초기화 실패 (데이터베이스 관리자가 비어 있음)");
-                return false;
-            }
+            // if (authManager == null)
+            // {
+            //     Log.Warning("리더보드 초기화 실패 (인증 관리자가 비어 있음)");
+            //     return false;
+            // }
+            //
+            // if (firestoreManager == null)
+            // {
+            //     Log.Warning("리더보드 초기화 실패 (데이터베이스 관리자가 비어 있음)");
+            //     return false;
+            // }
             
             if (authManager.IsInitialized == false)
             {

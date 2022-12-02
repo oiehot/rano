@@ -42,7 +42,7 @@ namespace Rano.Tests.Json
             [JsonIgnore] public int ignoreField;
 
             public int publicKey;
-            public int PropertyKey { get; private set; }
+            public int PropertyKey { get; set; }
 
             [JsonProperty("private_key", Order = -1)] private int _privateKey;
             private int _subPrivateKey;

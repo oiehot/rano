@@ -18,11 +18,13 @@ namespace Rano.Update
     public abstract class UpdateManager: ManagerComponent
     {
         private VoidEventChannelSO? _updateRequiredEventChannel;
-        protected IRemoteConfigManager? _remoteConfig;
-        protected SVersion _currentVersion;
-        public bool IsInitialized => _remoteConfig != null && _remoteConfig.IsInitialized;
-
+        private IRemoteConfigManager? _remoteConfig;
+        private SVersion _currentVersion;
         
+        protected bool IsInitialized => _remoteConfig != null && _remoteConfig.IsInitialized;
+        protected IRemoteConfigManager? RemoteConfig => _remoteConfig;
+        protected SVersion CurrentVersion => _currentVersion;
+
         /// <summary>
         /// 초기화한다.
         /// </summary>

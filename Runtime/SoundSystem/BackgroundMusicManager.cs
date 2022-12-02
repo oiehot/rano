@@ -5,44 +5,29 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using Rano.SaveSystem;
-using Rano;
 using Rano.Math;
-using Rano.Pattern;
 using System.Linq;
 
 namespace Rano.SoundSystem
 {
-    public sealed class PlayItem
-    {   
-        public AudioClip? AudioClip { get; set; }
-        public bool IsPlayed { get; set; }
-
-        public PlayItem(AudioClip audioClip)
-        {
-            this.AudioClip = audioClip;
-            this.IsPlayed = false;
-        }
-    }
-    
     public sealed class BackgroundMusicManager : ManagerComponent
     {   
         private int _playIntervalMilliseconds = 5000;
-        private SoundManager _soundManager;
-        private SoundLayer _soundLayer;
         
+        private SoundManager? _soundManager;
+        private SoundLayer? _soundLayer;
         private PlayItem[] _playItems = Array.Empty<PlayItem>();
-        private PlayItem[] _unplayedItems => _playItems.Where(item => item.IsPlayed == false).ToArray();
         
         private int _currentIndex;
         private bool _isShuffleMode = true;
         private bool _isRepeatMode = true;
-        
+
+        public bool IsInitialized => _soundManager && _soundLayer;
         public int MusicCount => _playItems.Length;
         public bool IsLoaded => _playItems.Length > 0;
         public bool IsShuffleMode => _isShuffleMode;
         public bool IsRepeatMode => _isRepeatMode;
-        public bool IsPlaying => _soundLayer.IsPlaying;
+        public bool IsPlaying => _soundLayer != null && _soundLayer.IsPlaying;
         public bool IsAllMusicPlayed
         {
             get
@@ -54,21 +39,42 @@ namespace Rano.SoundSystem
                 return true;
             }
         }
+        private PlayItem[] UnplayedItems => _playItems.Where(item => item.IsPlayed == false).ToArray();
         
         protected override void Awake()
         {
             base.Awake();
-            _soundManager = UnityEngine.Object.FindObjectOfType<SoundManager>();
-            _soundLayer = _soundManager.GetSoundLayer(ESoundLayerType.Background);
             
-            Log.Info($"사운드 매니져 연결 ({_soundManager})");
-            Log.Info($"사운드 레이어 연결 ({_soundLayer})");
+            Log.Info("초기화 중...");
+            
+            _soundManager = UnityEngine.Object.FindObjectOfType<SoundManager>();
+            if (_soundManager)
+            {
+                _soundLayer = _soundManager.GetSoundLayer(ESoundLayerType.Background);
+                if (!_soundLayer)
+                {
+                    Log.Warning($"사운드 레이어 연결 실패 ({_soundLayer})");
+                }
+            }
+            else
+            {
+                Log.Warning($"사운드 매니져 연결 실패");
+            }
+
+            if (IsInitialized)
+            {
+                Log.Info("초기화 성공");
+            }
+            else
+            {
+                Log.Warning("초기화 실패");
+            }
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            if (_soundLayer)
+            if (_soundLayer != null)
             {
                 _soundLayer.OnPlayFinished += OnPlayFinished;
             }
@@ -77,7 +83,7 @@ namespace Rano.SoundSystem
         protected override void OnDisable()
         {
             base.OnEnable();
-            if (_soundLayer)
+            if (_soundLayer != null)
             {
                 _soundLayer.OnPlayFinished -= OnPlayFinished;    
             }
@@ -213,8 +219,7 @@ namespace Rano.SoundSystem
                 else
                 {
                     (bool result, int index) resultTuple = GetRandomIndex_InUnplayedList();
-                    Debug.Assert(resultTuple.result == true);
-                    if (resultTuple.result == true)
+                    if (resultTuple.result)
                     {
                         index = resultTuple.index;
                     }
@@ -232,7 +237,7 @@ namespace Rano.SoundSystem
                     else
                     {
                         Log.Info("모든 곡이 플레이되었습니다");
-                        index = 0;
+                        _currentIndex = 0;
                         return;
                     }
                 }
@@ -242,10 +247,19 @@ namespace Rano.SoundSystem
             PlayByIndex(index);
         }
 
-        private bool PlayByIndex(int index)
+        private void PlayByIndex(int index)
         {
-            if (index < 0 || index >= _playItems.Length) return false;
-            Debug.Assert(_soundLayer.IsPlaying == false);
+            if (!IsInitialized)
+            {
+                Log.Warning($"초기화 되지 않아 음악을 재생할 수 없습니다 (index:{index})");
+                return;
+            }
+
+            if (index < 0 || index >= _playItems.Length)
+            {
+                Log.Warning($"플레이리스트 범위를 넘어선 곡을 플레이 할 수 없습니다 (index:{index})");
+                return;
+            }
             
             PlayItem playItem = _playItems[index];
             AudioClip? audioClip = playItem.AudioClip;
@@ -253,31 +267,45 @@ namespace Rano.SoundSystem
             if (audioClip == null)
             {
                 Log.Warning($"음악 플레이 실패 (오디오 클립이 없음, index: {index})");
-                return false;
+                return;
             }
             
             Log.Info($"음악 플레이 시작 (index: {index})");
-            _soundLayer.PlayOneShot(audioClip);
+            _soundLayer!.PlayOneShot(audioClip);
             
             playItem.IsPlayed = true;
             _currentIndex = index;
-            return true;
         }
 
         public void Pause()
         {
-            _soundLayer.Pause();
+            if (!IsInitialized)
+            {
+                Log.Warning($"초기화 되지 않아 음악을 멈출 수 없습니다");
+                return;
+            }
+            _soundLayer!.Pause();
         }
 
         public void Resume()
         {
-            _soundLayer.Resume();
+            if (!IsInitialized)
+            {
+                Log.Warning($"초기화 되지 않아 음악을 재개할 수 없습니다");
+                return;
+            }
+            _soundLayer!.Resume();
         }
 
         [ContextMenu("Stop")]
         public async Task StopAsync()
         {
-            await _soundLayer.StopAsync();
+            if (!IsInitialized)
+            {
+                Log.Warning($"초기화 되지 않아 음악을 멈출 수 없습니다");
+                return;
+            }
+            await _soundLayer!.StopAsync();
         }
 
         private async void OnPlayFinished()

@@ -20,8 +20,7 @@ namespace Rano.Editor.GoogleSheet
             // Type baseClass = typeof(UpdatableSheetSO<>);
             string query = $"t:{typeof(UpdatableSheetSO<>)}";
 
-            string[]? guids = null;
-            guids = AssetDatabase.FindAssets(query);
+            string[]? guids = AssetDatabase.FindAssets(query);
             
             if (guids == null)
             {

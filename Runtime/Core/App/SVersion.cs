@@ -1,5 +1,6 @@
+#nullable enable
+
 using System;
-using UnityEngine;
 
 namespace Rano.App
 {
@@ -34,7 +35,7 @@ namespace Rano.App
             {
                 if (_minor >= 10)
                 {
-                    Debug.LogWarning($"Minor 버젼이 10 이상인 경우 Major 자릿수를 침범합니다 ({_minor})");
+                    Log.Warning($"Minor 버젼이 10 이상인 경우 Major 자릿수를 침범합니다 ({_minor})");
                 }
                 return _major * 10000 + _minor * 1000 + _build;
             }

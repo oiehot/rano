@@ -27,16 +27,19 @@ namespace Rano.Billing.UnityPurchase
             set => _rawProducts = value;
         }
 
-        public event Action<InAppProduct[]> onInitialized;
-        public event Action onInitializeFailed;
-        public event Action<InAppProduct[]> onUpdateSuccess;
-        public event Action onUpdateFailed;
-        public event Action<string> onPurchaseComplete;
-        public event Action<string, string> onPurchaseFailed;
-        public event Action<InAppProduct> onValidatePurchaseSuccess;
-        public event Action<string> onValidatePurchaseFailed;
-        public event Action onRestoreAllPurchasesComplete;
-        public event Action onRestoreAllPurchasesFailed;
+        public event Action<InAppProduct[]> OnInitialized;
+        public event Action OnInitializeFailed;
+        public event Action<InAppProduct[]> OnUpdateSuccess;
+        public event Action OnUpdateFailed;
+        public event Action<string> OnPurchaseCompleted;
+        public event Action<string, string> OnPurchaseFailed;
+        public event Action<InAppProduct> OnValidatePurchaseSuccess;
+        public event Action<string> OnValidatePurchaseFailed;
+        
+#if UNITY_IOS
+        public event Action OnRestoreAllPurchasesComplete;
+        public event Action OnRestoreAllPurchasesFailed;
+#endif
         
         protected override void Awake()
         {
@@ -87,11 +90,10 @@ namespace Rano.Billing.UnityPurchase
             // 원시상품들의 정보를 초기화시에 사용한다.
             foreach (InAppProductSO rawProduct in _rawProducts)
             {
-                Debug.Assert(rawProduct != null);
-                
+                if (rawProduct == null) continue;
                 if (rawProduct.Validate() == false)
                 {
-                    Log.Warning($"원시상품 추가 실패 ({rawProduct})");
+                    Log.Warning($"원시상품 추가 실패 (검증 실패, {rawProduct})");
                     continue;
                 }
 
@@ -117,7 +119,7 @@ namespace Rano.Billing.UnityPurchase
                     Log.Warning($"원시상품 추가 실패 ({rawProduct.ID}");
                     Log.Exception(e);
                     _state = EState.None;
-                    onInitializeFailed?.Invoke();
+                    OnInitializeFailed?.Invoke();
                     return;
                 }
             }
@@ -132,7 +134,7 @@ namespace Rano.Billing.UnityPurchase
                 Log.Warning($"UnityPurchasing 초기화 실패");
                 Log.Exception(e);
                 _state = EState.None;
-                onInitializeFailed?.Invoke();
+                OnInitializeFailed?.Invoke();
             }
         }
         
@@ -151,7 +153,7 @@ namespace Rano.Billing.UnityPurchase
                 additionalProducts.Add(new ProductDefinition(product.definition.id, product.definition.type));
             }
             Log.Info($"상품정보 업데이트를 요청합니다,");
-            _controller.FetchAdditionalProducts(additionalProducts, OnUpdateSuccess, OnUpdateFailed);
+            _controller.FetchAdditionalProducts(additionalProducts, OnUpdateSuccess_Internal, OnUpdateFailed_Internal);
             #endif
         }
 
@@ -184,35 +186,34 @@ namespace Rano.Billing.UnityPurchase
             if (_state != EState.Initialized)
             {
                 Log.Warning($"구매복구 할 수 있는 상태가 아닙니다. (state:{_state})");
-                return;
             }
             
-            #if (UNITY_IOS)
-                _extensions.GetExtension<IAppleExtensions>().RestoreTransactions(OnRestoreTransactions);
+            #if UNITY_IOS
+                _extensions.GetExtension<IAppleExtensions>().RestoreTransactions(OnRestoreTransactions_Internal);
             #else
                 // 안드로이드에서는 초기화시 복구할 상품들에 대해 ProcessPurchase가 자동으로 실행됩니다.
             #endif
         }
         
-        private void OnRestoreTransactions(bool result)
+#if UNITY_IOS
+        private void OnRestoreTransactions_Internal(bool result)
         {
             if (result)
             {
                 // 구매 복구되지 않더라도 절차가 성공하면 실행됨.
                 Log.Info("구매복구 성공");
-                onRestoreAllPurchasesComplete?.Invoke();
+                OnRestoreAllPurchasesComplete?.Invoke();
             }
             else
             {
                 Log.Warning("구매복구 실패");
-                onRestoreAllPurchasesFailed?.Invoke();
+                OnRestoreAllPurchasesFailed?.Invoke();
             }
         }
+#endif
 
-        public void OnInitialized(IStoreController controller, IExtensionProvider extensions)
+        void IStoreListener.OnInitialized(IStoreController controller, IExtensionProvider extensions)
         {
-            Debug.Assert(controller != null && extensions != null);
-            
             _controller = controller;
             _extensions = extensions;
 
@@ -223,34 +224,32 @@ namespace Rano.Billing.UnityPurchase
             
             Log.Info($"초기화 완료");
             _state = EState.Initialized;
-            onInitialized?.Invoke(inAppProducts);
+            OnInitialized?.Invoke(inAppProducts);
         }
 
-        public void OnInitializeFailed(InitializationFailureReason error)
+        void IStoreListener.OnInitializeFailed(InitializationFailureReason error)
         {
             Log.Warning($"초기화 실패 ({error})");
             _state = EState.None;
-            onInitializeFailed?.Invoke();
+            OnInitializeFailed?.Invoke();
         }
         
-        #if false
-        public void OnUpdateSuccess()
+        private void OnUpdateSuccess_Internal()
         {
             Log.Info("상품정보 업데이트 성공.");
             InAppProduct[] inAppProducts = _controller.products.all
                 .Select(product => product.ConvertToInAppProduct())
                 .ToArray();
-            onUpdateSuccess?.Invoke(inAppProducts);
+            OnUpdateSuccess?.Invoke(inAppProducts);
         }
 
-        public void OnUpdateFailed(InitializationFailureReason reason)
+        private void OnUpdateFailed_Internal(InitializationFailureReason reason)
         {
             Log.Warning($"상품정보 업데이트 실패 ({reason})");
-            onUpdateFailed?.Invoke();
+            OnUpdateFailed?.Invoke();
         }
-        #endif
 
-        public void OnPurchaseFailed(Product product, PurchaseFailureReason failureReason)
+        void IStoreListener.OnPurchaseFailed(Product product, PurchaseFailureReason failureReason)
         {
             string reason = failureReason switch
             {
@@ -266,13 +265,10 @@ namespace Rano.Billing.UnityPurchase
             };
             string productId = product.definition.id;
             Log.Warning($"구매 실패 (productId:{productId}, reason:{reason})");
-            onPurchaseFailed?.Invoke(productId, reason);
+            OnPurchaseFailed?.Invoke(productId, reason);
         }
         
-        /// <summary>
-        /// </summary>
-        /// <remarks>IStoreListener 인터페이스의 메소드 구현</remarks>
-        public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs purchaseEvent)
+        PurchaseProcessingResult IStoreListener.ProcessPurchase(PurchaseEventArgs purchaseEvent)
         {
             ValidatePurchaseAsync(purchaseEvent.purchasedProduct);
             return PurchaseProcessingResult.Pending;
@@ -286,34 +282,34 @@ namespace Rano.Billing.UnityPurchase
                 case EValidatePurchaseResultType.Success:
                     foreach (var receipt in result.ValidateReceipts)
                     {
-                        OnValidatePurchaseSuccess(receipt.productID);
+                        OnValidatePurchaseSuccess_Internal(receipt.productID);
                     }
                     break;
                 
                 case EValidatePurchaseResultType.SuccessTest:
-                    OnValidatePurchaseSuccess(purchasedProduct.definition.id);
+                    OnValidatePurchaseSuccess_Internal(purchasedProduct.definition.id);
                     break;
                 
                 case EValidatePurchaseResultType.Failed:
                 default:
-                    OnValidatePurchaseFailed(purchasedProduct);
+                    OnValidatePurchaseFailed_Internal(purchasedProduct);
                     break;
             }
         }
 
-        private void OnValidatePurchaseSuccess(string productId)
+        private void OnValidatePurchaseSuccess_Internal(string productId)
         {
             Log.Info($"영수증이 검증되어 구매완료 처리합니다 ({productId})");
             Product product = _controller.products.WithID(productId);
             _controller.ConfirmPendingPurchase(product);
-            onValidatePurchaseSuccess?.Invoke(product.ConvertToInAppProduct());
-            onPurchaseComplete?.Invoke(productId);
+            OnValidatePurchaseSuccess?.Invoke(product.ConvertToInAppProduct());
+            OnPurchaseCompleted?.Invoke(productId);
         }
 
-        private void OnValidatePurchaseFailed(Product purchasedProduct)
+        private void OnValidatePurchaseFailed_Internal(Product purchasedProduct)
         {
             string productId = purchasedProduct.definition.id;
-            onValidatePurchaseFailed?.Invoke(productId);
+            OnValidatePurchaseFailed?.Invoke(productId);
             Log.Warning($"영수증 검증에 실패했습니다 ({purchasedProduct.receipt})");
         }
         
@@ -391,6 +387,5 @@ namespace Rano.Billing.UnityPurchase
                 product.LogStatus();
             }
         }
-
     }
 }

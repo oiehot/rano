@@ -23,9 +23,12 @@ namespace Rano.Database.CloudSync
         }
 
         private EState _state = EState.None;
-        private ILocalDatabase? _local;
-        private ICloudDatabase? _cloud;
-        private IAuthManager? _auth;
+        
+        #nullable disable
+        private ILocalDatabase _local;
+        private ICloudDatabase _cloud;
+        private IAuthManager _auth;
+        #nullable enable
 
         public bool IsInitialized => _state >= EState.Ready;
         
@@ -37,11 +40,7 @@ namespace Rano.Database.CloudSync
         /// <param name="authManager">UserId를 얻기 위해서 필요하다</param>
         /// <returns>초기화 결과</returns>
         public bool Initialize(ILocalDatabase localDatabase, ICloudDatabase cloudDatabase, IAuthManager authManager)
-        {
-            Debug.Assert(localDatabase != null);
-            Debug.Assert(cloudDatabase != null);
-            Debug.Assert(authManager != null);
-            
+        {   
             Log.Info(Constants.INITIALIZING);
             
             if (localDatabase.IsInitialized == false)
@@ -84,7 +83,7 @@ namespace Rano.Database.CloudSync
                 return false;
             }
 
-            if (_auth!.IsAuthenticated == false)
+            if (_auth.IsAuthenticated == false)
             {
                 Log.Warning("동기화 실패 (인증이 안되어 있음)");
                 return false;
@@ -99,7 +98,7 @@ namespace Rano.Database.CloudSync
             Log.Info($"로컬 데이터베이스 마지막 수정 날짜: {localDateTime.ToLocalTime()} (LocalTime)");
             
             // 클라우드 저장 날짜를 얻는다.
-            DateTime? cloudDateTime = await _cloud!.GetLastModifiedDateTimeAsync(_auth.UserID);
+            DateTime? cloudDateTime = await _cloud.GetLastModifiedDateTimeAsync(_auth.UserID!);
             if (cloudDateTime == null) cloudDateTime = DateTime.MinValue;
             Log.Info($"클라우드 데이터베이스 마지막 수정 날짜: {cloudDateTime.Value} (UTC)");
             Log.Info($"클라우드 데이터베이스 마지막 수정 날짜: {cloudDateTime.Value.ToLocalTime()} (LocalTime)");

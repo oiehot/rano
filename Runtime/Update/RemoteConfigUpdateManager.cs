@@ -1,6 +1,5 @@
 ﻿#nullable enable
 
-using System;
 using Rano.App;
 
 namespace Rano.Update
@@ -24,32 +23,32 @@ namespace Rano.Update
                 return ECheckUpdateResult.Error;
             }
 
-            if (_remoteConfig!.TryGetString(Constants.VERSION, out string? latestVersionStr) == false)
+            if (RemoteConfig!.TryGetString(Constants.VERSION, out string? latestVersionStr) == false)
             {
                 Log.Warning("업데이트 검사 실패 (마지막 버전 값을 얻을 수 없음)");
                 return ECheckUpdateResult.Error;
             }
             
-            if (String.IsNullOrEmpty(latestVersionStr))
+            if (string.IsNullOrEmpty(latestVersionStr))
             {
                 Log.Warning("업데이트 검사 실패 (마지막 버전 값이 비어 있음)");
                 return ECheckUpdateResult.Error;
             }
             
-            SVersion latestVersion = new SVersion(latestVersionStr);
-            if (_currentVersion < latestVersion)
+            SVersion latestVersion = new SVersion(latestVersionStr!);
+            if (CurrentVersion < latestVersion)
             {
-                Log.Info($"업데이트가 필요합니다 ({_currentVersion} => {latestVersion})");
+                Log.Info($"업데이트가 필요합니다 ({CurrentVersion} => {latestVersion})");
                 return ECheckUpdateResult.UpdateRequired;
             }
-            else if (_currentVersion == latestVersion)
+            else if (CurrentVersion == latestVersion)
             {
-                Log.Info($"이미 최신 버전입니다 ({_currentVersion})");
+                Log.Info($"이미 최신 버전입니다 ({CurrentVersion})");
                 return ECheckUpdateResult.UpdateAlready;
             }
             else
             {
-                Log.Info($"현재 버전이 RemoteConfig에 설정된 버전보다 최신입니다 (current:{_currentVersion}, latest:{latestVersion})");
+                Log.Info($"현재 버전이 RemoteConfig에 설정된 버전보다 최신입니다 (current:{CurrentVersion}, latest:{latestVersion})");
                 return ECheckUpdateResult.UpdateAlready;
             }
         }

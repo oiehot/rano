@@ -14,7 +14,7 @@ namespace Rano.SaveSystem
         /// <summary>
         /// 배치시 로드 순서. 작을수록 더 먼저 로드된다.
         /// </summary>
-        [SerializeField] private int _order = 0;
+        [SerializeField] private int _order;
 
         public string Id => _id;
         public int Order => _order;
@@ -26,7 +26,7 @@ namespace Rano.SaveSystem
 
         public bool Initialize(string id, int order=0)
         {
-            if (string.IsNullOrEmpty(id) == true)
+            if (string.IsNullOrEmpty(id))
             {
                 Log.Warning($"초기화 실패 (잘못된 Id: {id})");
                 return false;
@@ -40,7 +40,7 @@ namespace Rano.SaveSystem
         
         public bool IsInitialized()
         {
-            if (string.IsNullOrEmpty(_id) == true) return false;
+            if (string.IsNullOrEmpty(_id)) return false;
             return true;
         }
 
@@ -48,7 +48,7 @@ namespace Rano.SaveSystem
         // [ContextMenu("Generate Id", false, 1401)]
         private void GenerateId()
         {
-            _id = System.Guid.NewGuid().ToString();
+            _id = Guid.NewGuid().ToString();
         }
 
         [ContextMenu("Set to ClearState")]
@@ -126,7 +126,7 @@ namespace Rano.SaveSystem
         public bool RestoreState(object dict, bool useDefaultStateIfFailed)
         {
             // TODO: 두 개 이상의 동일컴포넌트가 있는 예외상황 대처.
-            var componentStates = (Dictionary<string, object>)dict;
+            Dictionary<string, object> componentStates = (Dictionary<string, object>)dict;
             
             // 게임오브젝트에 달린 모든 ISaveLoadable 인터페이스를 지원하는 컴포넌트들의 상태를 복구한다.
             foreach (ISaveLoadable component in GetComponents<ISaveLoadable>())
@@ -134,7 +134,7 @@ namespace Rano.SaveSystem
                 string componentName = component.GetType().ToString();
                 
                 // 게임오브젝트 상태 데이터에서 컴포넌트의 데이터를 찾는데 성공한 경우:
-                if (componentStates.TryGetValue(componentName, out object componentState) == true)
+                if (componentStates.TryGetValue(componentName, out object componentState))
                 {
                     // 상태 데이터를 검증한다.
                     try
@@ -197,7 +197,7 @@ namespace Rano.SaveSystem
             var dict = CaptureState();
             if (dict != null)
             {
-                return Rano.Encoding.Json.ConvertObjectToString(dict);
+                return Encoding.Json.ConvertObjectToString(dict);
             }
             else return null;
         }

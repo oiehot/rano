@@ -19,26 +19,26 @@ namespace Rano.Update
             SVersion[] versions =
             {
                 new SVersion("0.0.1"),
-                _currentVersion,
+                CurrentVersion,
                 new SVersion("9.9.9")
             };
             
             SVersion latestVersion =
                 Rano.Math.RandomUtils.GetRandomValueInArray<SVersion>(versions);
             
-            if (_currentVersion < latestVersion)
+            if (CurrentVersion < latestVersion)
             {
-                Log.Important($"업데이트가 필요합니다 ({_currentVersion} => {latestVersion}) (TEST MODE)");
+                Log.Important($"업데이트가 필요합니다 ({CurrentVersion} => {latestVersion}) (TEST MODE)");
                 return ECheckUpdateResult.UpdateRequired;
             }
-            else if (_currentVersion == latestVersion)
+            else if (CurrentVersion == latestVersion)
             {
-                Log.Important($"이미 최신 버전입니다 ({_currentVersion}) (TEST MODE)");
+                Log.Important($"이미 최신 버전입니다 ({CurrentVersion}) (TEST MODE)");
                 return ECheckUpdateResult.UpdateAlready;
             }
             else // if (_currentVersion > latestVersion)
             {
-                Log.Warning($"현재 버전이 RemoteConfig에 설정된 버전보다 최신입니다 (current:{_currentVersion}, latest:{latestVersion}) (TEST MODE)");
+                Log.Warning($"현재 버전이 RemoteConfig에 설정된 버전보다 최신입니다 (current:{CurrentVersion}, latest:{latestVersion}) (TEST MODE)");
                 return ECheckUpdateResult.Error;
             }
         }

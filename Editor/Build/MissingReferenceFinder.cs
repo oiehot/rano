@@ -3,22 +3,23 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Rano.Editor.Build
 {
 	public class MissingReferenceFinder : MonoBehaviour
 	{
 		private const int PRIORITY = 300;
-		private const string MENUROOT = "Build/Find Missing References/";
+		private const string MENU_ROOT = "Build/Find Missing References/";
 
-		[MenuItem(MENUROOT + "Search in scene", false, PRIORITY+1)]
+		[MenuItem(MENU_ROOT + "Search in scene", false, PRIORITY+1)]
 		public static void FindMissingReferencesInCurrentScene()
 		{
 			var sceneObjects = GetSceneObjects();
-			FindMissingReferences(EditorSceneManager.GetActiveScene().path, sceneObjects);
+			FindMissingReferences(SceneManager.GetActiveScene().path, sceneObjects);
 		}
 		
-		[MenuItem(MENUROOT + "Search in build scenes", false, PRIORITY+2)]
+		[MenuItem(MENU_ROOT + "Search in build scenes", false, PRIORITY+2)]
 		public static void FindMissingReferencesInBuildScenes()
 		{
 			EditorSceneManager.NewScene(NewSceneSetup.EmptyScene);
@@ -30,7 +31,7 @@ namespace Rano.Editor.Build
 			EditorSceneManager.NewScene(NewSceneSetup.EmptyScene);
 		}
 
-		[MenuItem(MENUROOT + "Search in assets", false, PRIORITY+4)]
+		[MenuItem(MENU_ROOT + "Search in assets", false, PRIORITY+4)]
 		public static void FindMissingReferencesInAssets()
 		{
 			var allAssets = AssetDatabase.GetAllAssetPaths().Where(path => path.StartsWith("Assets/")).ToArray();
@@ -55,8 +56,7 @@ namespace Rano.Editor.Build
 					// 잃어버린 컴포넌트는 null로 간주된다.
 					if (!component)
 					{
-						Debug.LogErrorFormat(go, $"Missing Component {0} in GameObject: {1}",
-							component.GetType().FullName, GetFullPath(go));
+						Log.Warning($"컴포넌트 없음 (Component:{component.GetType().FullName}, GameObject:{GetFullPath(go)}");
 						continue;
 					}
 
@@ -102,8 +102,8 @@ namespace Rano.Editor.Build
 
 		private static void ShowError(string context, GameObject go, string componentName, string propertyName)
 		{
-			const string ERROR_TEMPLATE = "Missing Ref in: [{3}]{0}. Component: {1}, Property: {2}";
-			Debug.LogError(string.Format(ERROR_TEMPLATE, GetFullPath(go), componentName, propertyName, context), go);
+			const string errorTemplate = "Missing Ref in: [{3}]{0}. Component: {1}, Property: {2}";
+			Debug.LogError(string.Format(errorTemplate, GetFullPath(go), componentName, propertyName, context), go);
 		}
 
 		private static string GetFullPath(GameObject go)

@@ -138,10 +138,10 @@ namespace Rano.RemoteConfig.Firebase
             {
                 await _remoteConfig!.FetchAsync();    
             }
-            catch (Exception e)
+            catch // (Exception e)
             {
                 Log.Warning("데이터 가져오기 생략 (예외 발생)");
-                Log.Exception(e);
+                // Log.Exception(e);
                 return false;
             }
 

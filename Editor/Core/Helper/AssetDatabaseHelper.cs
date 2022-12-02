@@ -40,8 +40,15 @@ namespace Rano.Editor
         public static T? LoadSubAssetFromName<T>(string subAssetName, string[]? searchInFolders=null) where T : Object
         {
             T[] objects = LoadSubAssetsFromName<T>(subAssetName, searchInFolders);
-            if (objects.Length > 0) return objects[0];
-            else return null;
+
+            int count = objects.Length;
+            if (count <= 0) return null;
+
+            if (count >= 2)
+            {
+                Log.Warning($"동일한 이름을 가진 에셋이 있습니다. 첫번째 아이템을 리턴합니다. (name:{subAssetName}, count:{count})");
+            }
+            return objects[0];
         }
         
         public static T[] LoadSubAssetsFromAssetPath<T>(string assetPath, string subAssetName) where T : Object

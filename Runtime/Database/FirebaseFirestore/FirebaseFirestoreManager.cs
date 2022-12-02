@@ -33,7 +33,7 @@ namespace Rano.Database.FirebaseFirestore
         /// </summary>
         public bool Initialize()
         {
-            Log.Info(Constants.INITIALIZING);
+            Log.Info("초기화 중...");
             
             // FirebaseAuth 싱글톤 인스턴스를 얻는다.
             try
@@ -59,11 +59,11 @@ namespace Rano.Database.FirebaseFirestore
 
             if (_db == null)
             {
-                Log.Warning(Constants.INITIALIZE_FAILED);
+                Log.Warning("초기화 실패");
                 return false;
             }
             
-            Log.Info(Constants.INITIALIZE_COMPLETED);
+            Log.Info("초기화 완료");
             return true;
         }
         

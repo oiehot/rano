@@ -22,31 +22,32 @@ namespace Rano.PoolSystem
     /// </remarks>
     public sealed class AddressablePoolManager
     {
-        private Dictionary<string, AddressablePool> _pools;
-        private Transform _rootTransform;
+        private readonly Dictionary<string, AddressablePool> _pools;
+        private readonly Transform _rootTransform;
 
         public AddressablePoolManager()
         {
-            Log.Sys($"{typeof(AddressablePoolManager).ToString()}: Construction", caller: false);
+            Log.Sys($"{typeof(AddressablePoolManager)}: Construction", caller: false);
+            
             _pools = new Dictionary<string, AddressablePool>();
-            if (_rootTransform == null)
-            {
-                _rootTransform = new GameObject { name = "AddressablePools" }.transform;
-                UnityEngine.Object.DontDestroyOnLoad(_rootTransform);
-            }
+            GameObject rootGameObject = new GameObject();
+            _rootTransform = rootGameObject.transform;
+            _rootTransform.name = "AddressablePools";
+            
+            Object.DontDestroyOnLoad(rootGameObject);
         }
 
-        public async Task CreatePoolAsync(AssetReferenceGameObject reference, int capacity)
+        public async Task CreatePoolAsync(AssetReferenceGameObject assetReference, int capacity)
         {
             // 에셋이 로드되어 있지 않다면 로드
-            if (reference.Asset == null)
+            if (assetReference.Asset == null)
             {
-                var handle = reference.LoadAssetAsync();
+                var handle = assetReference.LoadAssetAsync();
                 await handle.Task;
             }
 
             // 프리팹 에셋의 이름으로 풀이 이미 있는지 체크
-            string assetName = reference.Asset.name;
+            string assetName = assetReference.Asset.name;
             if (_pools.ContainsKey(assetName))
             {
                 Log.Warning($"오브젝트 풀이 이미 존재해서 생성할 수 없음 ({assetName})");
@@ -54,9 +55,11 @@ namespace Rano.PoolSystem
             }
 
             // 풀을 생성
-            AddressablePool pool = new AddressablePool();
-            pool.Initialize(reference, capacity);
-            pool.PoolTransform.parent = _rootTransform;
+            AddressablePool pool = new AddressablePool(assetReference, capacity);
+            if (pool.PoolTransform != null)
+            {
+                pool.PoolTransform.parent = _rootTransform;
+            }
             _pools.Add(assetName, pool);
         }
 
@@ -138,7 +141,7 @@ namespace Rano.PoolSystem
             string poolName = gameObject.name;
             
             // 게임오브젝트의 이름으로 Pool을 얻는다.
-            if (_pools.TryGetValue(poolName, out pool) == true)
+            if (_pools.TryGetValue(poolName, out pool))
             {
                 pool.Push(gameObject);
             }

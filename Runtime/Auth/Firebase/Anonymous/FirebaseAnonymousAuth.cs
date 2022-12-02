@@ -46,7 +46,7 @@ namespace Rano.Auth.Firebase
         {
             FirebaseUser user;
             
-            Log.Warning("로그인 중... (Anonymous)");
+            Log.Info("로그인 중... (Anonymous)");
             
             if (IsInitialized == false)
             {

@@ -31,18 +31,18 @@ namespace Rano.Billing
         
         private void OnEnable()
         {
-            _purchaseManager.onInitialized += HandleInitialized;
-            _purchaseManager.onUpdateSuccess += HandleUpdated;
-            _purchaseManager.onValidatePurchaseSuccess += HandleValidatePurchaseSuccess;
-            _purchaseManager.onValidatePurchaseFailed += HandleValidatePurchaseFailed;
+            _purchaseManager.OnInitialized += HandleInitialized;
+            _purchaseManager.OnUpdateSuccess += HandleUpdated;
+            _purchaseManager.OnValidatePurchaseSuccess += HandleValidatePurchaseSuccess;
+            _purchaseManager.OnValidatePurchaseFailed += HandleValidatePurchaseFailed;
         }
 
         private void OnDisable()
         {
-            _purchaseManager.onInitialized -= HandleInitialized;
-            _purchaseManager.onUpdateSuccess -= HandleUpdated;
-            _purchaseManager.onValidatePurchaseSuccess -= HandleValidatePurchaseSuccess;
-            _purchaseManager.onValidatePurchaseFailed -= HandleValidatePurchaseFailed;
+            _purchaseManager.OnInitialized -= HandleInitialized;
+            _purchaseManager.OnUpdateSuccess -= HandleUpdated;
+            _purchaseManager.OnValidatePurchaseSuccess -= HandleValidatePurchaseSuccess;
+            _purchaseManager.OnValidatePurchaseFailed -= HandleValidatePurchaseFailed;
         }
 
         private void HandleInitialized(InAppProduct[] products)
@@ -138,26 +138,37 @@ namespace Rano.Billing
 
         public bool IsPurchased(InAppProduct product)
         {
-            if (product.type == EInAppProductType.NonConsumable && product.validated)
+            switch (product.type)
             {
-                return true;
+                case EInAppProductType.NonConsumable:
+                    return product.validated;
+                
+                case EInAppProductType.Consumable:
+                    Log.Warning($"구매여부를 알아낼 수 없습니다 (소비형 상품, {product.id})");
+                    break;
+                
+                case EInAppProductType.Subscription:
+                    Log.Warning($"구매여부를 알아낼 수 없습니다 (구독형 상품, {product.id})");
+                    break;
+                
+                default:
+                    Log.Error($"구매여부를 알아낼 수 없습니다 (알 수 없는 상품 타입, {product.type})");
+                    break;
             }
-            if (product.type == EInAppProductType.Subscription)
-            {
-                throw new NotImplementedException($"구독형 상품에 대한 구매여부를 알아낼 수 없습니다");
-            }
+            
             return false;
         }
 
         public bool IsPurchased(string productId)
         {
-            if (_products.TryGetValue(productId, out var product))
+            if (_products.TryGetValue(productId, out InAppProduct product))
             {
                 return IsPurchased(product);
             }
             else
             {
-                throw new NotFoundProductException(productId);
+                Log.Warning($"구매여부 확인 실패 ({productId}, 등재되지 않음)");
+                return false;
             }
         }
 
