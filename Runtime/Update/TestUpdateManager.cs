@@ -38,7 +38,7 @@ namespace Rano.Update
             }
             else // if (_currentVersion > latestVersion)
             {
-                Log.Warning($"현재 버전이 RemoteConfig에 설정된 버전보다 최신입니다 (current:{CurrentVersion}, latest:{latestVersion}) (TEST MODE)");
+                Log.Important($"현재 버전이 RemoteConfig에 설정된 버전보다 최신입니다 (current:{CurrentVersion}, latest:{latestVersion}) (TEST MODE)");
                 return ECheckUpdateResult.Error;
             }
         }

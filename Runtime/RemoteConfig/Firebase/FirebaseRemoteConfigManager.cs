@@ -140,7 +140,12 @@ namespace Rano.RemoteConfig.Firebase
             }
             catch // (Exception e)
             {
+#if UNITY_EDITOR
+                // 에디터에서는 항상 나오는 에러로 Warning에서 Info로 내림.
+                Log.Info("데이터 가져오기 생략 (예외 발생)");
+#else
                 Log.Warning("데이터 가져오기 생략 (예외 발생)");
+#endif
                 // Log.Exception(e);
                 return false;
             }

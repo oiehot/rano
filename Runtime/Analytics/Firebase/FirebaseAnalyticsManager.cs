@@ -65,7 +65,7 @@ namespace Rano.Analytics.Firebase
             OnAuthUserChanged();
             Log.Info("초기화 완료");
 #if UNITY_EDITOR
-            Log.Warning("FirebaseAnalytics는 데스크톱이나 에디터 환경을 지원하지 않습니다");
+            Log.Info("FirebaseAnalytics는 데스크톱이나 에디터 환경을 지원하지 않습니다");
 #endif
         }
 
