@@ -2,11 +2,6 @@
 
 /* 코루틴 몰이해로 인한 수정이 필요함 */
 
-// Copyright (C) OIEHOT - All Rights Reserved
-// Unauthorized copying of this file, via any medium is strictly prohibited
-// Proprietary and confidential
-// Written by Taewoo Lee <oiehot@gmail.com>
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
